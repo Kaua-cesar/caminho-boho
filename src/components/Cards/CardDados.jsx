@@ -5,6 +5,7 @@ import vestido3 from "../../assets/vestido3.jpg";
 
 export const produtos = [
    {
+      id: "prod1",
       nome: "Vestido Costa Nua Longo",
       precoOriginal: 629.99,
       categoria: "costanua",
@@ -20,6 +21,7 @@ export const produtos = [
       qntavaliacoes: 2,
    },
    {
+      id: "prod2",
       nome: "Vestido Vest Lenco Elegante [ EDICAO ESPECIAL ] ",
 
       precoOriginal: 399.99,
@@ -35,8 +37,8 @@ export const produtos = [
       qntavaliacoes: 10,
    },
    {
+      id: "prod3",
       nome: "Vestido Boho Longo 2023",
-
       precoOriginal: 249.99,
       desconto: -25,
       categoria: "boholongo",
@@ -51,8 +53,8 @@ export const produtos = [
       qntavaliacoes: 7,
    },
    {
+      id: "prod4",
       nome: "Vestido Boho Chic Elegante",
-
       precoOriginal: 399.99,
       categoria: "bohochic",
       cores: [
@@ -67,8 +69,8 @@ export const produtos = [
       qntavaliacoes: 11,
    },
    {
+      id: "prod5",
       nome: "Vestido Boho Chic Elegante",
-
       precoOriginal: 399.99,
       categoria: "bohochic",
       cores: [
@@ -83,8 +85,8 @@ export const produtos = [
       qntavaliacoes: 11,
    },
    {
+      id: "prod6",
       nome: "Vestido Boho Chic Elegante",
-
       precoOriginal: 399.99,
       categoria: "bohochic",
       cores: [
@@ -99,8 +101,8 @@ export const produtos = [
       qntavaliacoes: 11,
    },
    {
+      id: "prod7",
       nome: "Vestido Boho Chic Elegante",
-
       precoOriginal: 399.99,
       categoria: "bohochic",
       cores: [
@@ -115,6 +117,7 @@ export const produtos = [
       qntavaliacoes: 11,
    },
    {
+      id: "prod8",
       nome: "Vestido Costa Nua Longo",
       precoOriginal: 629.99,
       categoria: "costanua",

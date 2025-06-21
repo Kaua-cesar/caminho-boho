@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/select";
 import { FaSearch } from "react-icons/fa";
 import { Card } from "./Card";
-import { produtos } from "./components/Cards/CardDados"; // Importa o array completo com todos os produtos
+import { produtos } from "./components/Cards/CardDados";
 
 // Função para calcular preço com desconto
 function calcularPrecoComDesconto(produto) {
@@ -34,7 +34,6 @@ export function Home() {
          if (precoSelecionado === "duzentos") return preco <= 200;
          if (precoSelecionado === "trezentos") return preco <= 300;
          if (precoSelecionado === "quinhentos") return preco <= 500;
-         if (precoSelecionado === "todos") return true;
          return true;
       })
       .filter((produto) =>
@@ -139,6 +138,8 @@ export function Home() {
                </p>
             )}
          </div>
+
+         {/* Total de Favoritos */}
       </div>
    );
 }

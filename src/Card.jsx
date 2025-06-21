@@ -1,4 +1,3 @@
-import { FaStar, FaStarHalfAlt, FaRegStar } from "react-icons/fa";
 import React, { useState } from "react";
 import { CardDialog } from "./components/Cards/CardDialog";
 import { CardButton } from "./components/Cards/CardButton";
@@ -15,6 +14,8 @@ export function Card({
    desconto,
    qntavaliacoes,
    avaliacao,
+   id,
+   atualizarTotalFavoritos, // << adicionar aqui
 }) {
    const [corSelecionada, setCorSelecionada] = useState("");
    const [tamanhoSelecionado, setTamanhoSelecionado] = useState("");
@@ -25,6 +26,7 @@ export function Card({
       <div className="basis-1/6 flex justify-center items-center">
          <div className="w-80 max-w-full shadow-md h-180 rounded-md flex-col flex transition-transform duration-300 ease-in-out">
             <CardDialog
+               id={id}
                nome={nome}
                preco={preco}
                precoOriginal={precoOriginal}
@@ -34,6 +36,7 @@ export function Card({
                tamanhos={tamanhos}
                avaliacao={avaliacao}
                qntavaliacoes={qntavaliacoes}
+               atualizarTotalFavoritos={atualizarTotalFavoritos} // << adicionar aqui
             />
             <div className="p-3">
                <div className="flex text-yellow-500 items-center">

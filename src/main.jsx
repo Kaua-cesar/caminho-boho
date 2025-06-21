@@ -13,7 +13,7 @@ createRoot(document.getElementById("root")).render(
       <div className="mt-17">
          <Carrosel />
       </div>
-      <div className=" mx-70">
+      <div className="mx-70">
          <Home />
       </div>
    </StrictMode>

@@ -1,8 +1,8 @@
+import React, { useState } from "react";
 import { ContadorCliques } from "../ui/contador";
 import { CardButton } from "./CardButton";
-import React, { useState } from "react";
 import { CardFavorits } from "./CardFavorits";
-import { FaStar, FaStarHalfAlt, FaRegStar, FaEye } from "react-icons/fa";
+import { FaEye } from "react-icons/fa";
 import Rating from "@mui/material/Rating";
 import Stack from "@mui/material/Stack";
 import {
@@ -16,6 +16,7 @@ import {
 import { Separator } from "@/components/ui/separator";
 
 export function CardDialog({
+   id,
    nome,
    preco,
    precoOriginal,
@@ -25,6 +26,7 @@ export function CardDialog({
    desconto,
    qntavaliacoes,
    avaliacao,
+   atualizarTotalFavoritos,
 }) {
    const [corSelecionada, setCorSelecionada] = useState("");
    const [tamanhoSelecionado, setTamanhoSelecionado] = useState("");
@@ -46,16 +48,20 @@ export function CardDialog({
    return (
       <Dialog open={open} onOpenChange={setOpen}>
          <div className="overflow-hidden rounded-t-md relative group ">
-            <CardFavorits desconto={desconto} />
+            <CardFavorits
+               produtoId={id}
+               desconto={desconto}
+               atualizarTotalFavoritos={atualizarTotalFavoritos}
+            />
             <DialogTrigger asChild>
-               <div className=" cursor-pointer">
+               <div className="cursor-pointer">
                   <img
                      src={imagem}
                      alt={nome}
-                     className=" object-cover transition-all duration-300 ease-in-out group-hover:scale-110 group-hover:brightness-80"
+                     className="object-cover transition-all duration-300 ease-in-out group-hover:scale-110 group-hover:brightness-80"
                   />
                   <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                     <button className=" bg-white text-black cursor-pointer p-3 rounded-md flex items-center gap-2 text-sm font-medium shadow">
+                     <button className="bg-white text-black cursor-pointer p-3 rounded-md flex items-center gap-2 text-sm font-medium shadow">
                         <FaEye />
                         Veja Detalhes
                      </button>
