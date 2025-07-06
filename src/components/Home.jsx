@@ -170,7 +170,7 @@ export function Home() {
             </p>
             <CardClientes />
          </div>
-         <div className="flex w-full bg-zinc-100 justify-center flex-col items-center ">
+         <footer className="flex w-full bg-zinc-100 justify-center flex-col items-center ">
             <div className="flex mt-16 justify-between w-7xl ">
                <div className="flex flex-col gap-2 w-md">
                   <h1 className="font-semibold mb-3 text-xl">Caminho Boho</h1>
@@ -259,7 +259,7 @@ export function Home() {
             <p className="mt-6 mb-6">
                © 2025 Caminho Boho. Todos os direitos reservados.
             </p>
-         </div>
+         </footer>
       </div>
    );
 }
