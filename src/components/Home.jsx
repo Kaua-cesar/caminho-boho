@@ -1,15 +1,18 @@
 import React, { useState } from "react";
-import { Input } from "./components/ui/input";
+import { Input } from "./ui/input";
 import {
    Select,
    SelectContent,
    SelectItem,
    SelectTrigger,
    SelectValue,
-} from "@/components/ui/select";
+} from "./ui/select";
 import { FaSearch } from "react-icons/fa";
-import { Card } from "./Card";
-import { produtos } from "./components/Cards/CardDados";
+import { Card } from "../Card";
+import { produtos } from "./Cards/CardDados";
+import { CardQuadros } from "./quadros/CardQuadros";
+import { CardCollection } from "./Collection/CardCollection";
+import { CardClientes } from "./quadros/CardClientes";
 
 // Função para calcular preço com desconto
 function calcularPrecoComDesconto(produto) {
@@ -44,8 +47,6 @@ export function Home() {
          const precoB = calcularPrecoComDesconto(b);
          if (ordenacao === "costamenornua") return precoA - precoB;
          if (ordenacao === "costamaiorpreco") return precoB - precoA;
-         if (ordenacao === "costamaisvendidos")
-            return b.qntavaliacoes - a.qntavaliacoes;
          if (ordenacao === "costavaliados") return b.avaliacao - a.avaliacao;
          return 0;
       });
@@ -114,9 +115,7 @@ export function Home() {
                   <SelectItem value="sem-ordenacao">Sem ordenação</SelectItem>
                   <SelectItem value="costamenornua">Menor Preço</SelectItem>
                   <SelectItem value="costamaiorpreco">Maior Preço</SelectItem>
-                  <SelectItem value="costamaisvendidos">
-                     Mais vendidos
-                  </SelectItem>
+
                   <SelectItem value="costavaliados">Mais avaliados</SelectItem>
                </SelectContent>
             </Select>
@@ -133,13 +132,43 @@ export function Home() {
                   />
                ))
             ) : (
-               <p className="text-gray-500 text-center mt-8">
+               <p className="text-gray-500 text-center m-8">
                   Nenhum produto encontrado.
                </p>
             )}
          </div>
-
-         {/* Total de Favoritos */}
+         <div className="mt-16 mb-8">
+            <h1 className="text-4xl font-bold text-amber-500  text-center">
+               Explore Nossas Categorias
+            </h1>
+            <p className="mt-2 text-lg text-center">
+               Cada peça é cuidadosamente selecionada para oferecer
+               autenticidade
+               <br /> e qualidade excepcional
+            </p>
+         </div>
+         <CardCollection />
+         <div className="mt-16 mb-8 ">
+            <h1 className="text-4xl font-bold text-amber-500  text-center">
+               Por que Escolher a Gente?
+            </h1>
+            <p className="mt-2 text-lg text-center">
+               Somos especializados em moda indiana autêntica com o melhor
+               <br />
+               atendimento do Brasil
+            </p>
+         </div>
+         <CardQuadros />
+         <div className=" w-full bg-zinc-100 mt-16 flex flex-col justify-center items-center pb-16">
+            <h1 className="text-4xl font-bold text-amber-500 mt-16 text-center">
+               O que Nossas Clientes Dizem
+            </h1>
+            <p className="mt-2 text-lg text-center mb-8">
+               Mais de 1000 mulheres já se apaixonaram por nossos <br />
+               vestidos. Veja alguns depoimentos
+            </p>
+            <CardClientes />
+         </div>
       </div>
    );
 }

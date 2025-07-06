@@ -19,6 +19,7 @@ export const produtos = [
       imagem: vestido1,
       avaliacao: 2.5,
       qntavaliacoes: 2,
+      estoque: 0,
    },
    {
       id: "prod2",
@@ -35,6 +36,7 @@ export const produtos = [
       imagem: vestido2,
       avaliacao: 1.7,
       qntavaliacoes: 10,
+      estoque: 1,
    },
    {
       id: "prod3",
@@ -51,6 +53,7 @@ export const produtos = [
       imagem: vestido3,
       avaliacao: 4.5,
       qntavaliacoes: 7,
+      estoque: 2,
    },
    {
       id: "prod4",
@@ -63,10 +66,10 @@ export const produtos = [
       ],
       desconto: null,
       tamanhos: [{ nome: "P" }, { nome: "M" }, { nome: "G" }],
-      imagem:
-         "https://scontent.fcaw3-1.fna.fbcdn.net/v/t51.75761-15/504158139_18306728875213518_7924141132859634593_n.jpg?_nc_cat=104&ccb=1-7&_nc_sid=127cfc&_nc_ohc=8IZO1dGLCb0Q7kNvwE-LXUA&_nc_oc=AdnKavPs8t-UmjxKh3-b9_2F1GG28vXuoADcEvq-6Mmb3LuLEFFv4BrMWz_R6cJxGDA&_nc_zt=23&_nc_ht=scontent.fcaw3-1.fna&_nc_gid=nAFZripRaWI2ZWU0hsj_KQ&oh=00_AfN0egprXKQaUQ0RdIJak-xrK-U0-RpG_QUU2lyFmt7oDQ&oe=685AE493",
+      imagem: vestido3,
       avaliacao: 4.6,
       qntavaliacoes: 11,
+      estoque: 2,
    },
    {
       id: "prod5",
@@ -79,10 +82,10 @@ export const produtos = [
       ],
       desconto: -25,
       tamanhos: [{ nome: "P" }, { nome: "M" }, { nome: "G" }],
-      imagem:
-         "https://scontent.fcaw3-1.fna.fbcdn.net/v/t51.75761-15/504158139_18306728875213518_7924141132859634593_n.jpg?_nc_cat=104&ccb=1-7&_nc_sid=127cfc&_nc_ohc=8IZO1dGLCb0Q7kNvwE-LXUA&_nc_oc=AdnKavPs8t-UmjxKh3-b9_2F1GG28vXuoADcEvq-6Mmb3LuLEFFv4BrMWz_R6cJxGDA&_nc_zt=23&_nc_ht=scontent.fcaw3-1.fna&_nc_gid=nAFZripRaWI2ZWU0hsj_KQ&oh=00_AfN0egprXKQaUQ0RdIJak-xrK-U0-RpG_QUU2lyFmt7oDQ&oe=685AE493",
+      imagem: vestido3,
       avaliacao: 4.6,
       qntavaliacoes: 11,
+      estoque: 0,
    },
    {
       id: "prod6",
@@ -95,10 +98,10 @@ export const produtos = [
       ],
       desconto: -25,
       tamanhos: [{ nome: "P" }, { nome: "M" }, { nome: "G" }],
-      imagem:
-         "https://scontent.fcaw3-1.fna.fbcdn.net/v/t51.75761-15/504158139_18306728875213518_7924141132859634593_n.jpg?_nc_cat=104&ccb=1-7&_nc_sid=127cfc&_nc_ohc=8IZO1dGLCb0Q7kNvwE-LXUA&_nc_oc=AdnKavPs8t-UmjxKh3-b9_2F1GG28vXuoADcEvq-6Mmb3LuLEFFv4BrMWz_R6cJxGDA&_nc_zt=23&_nc_ht=scontent.fcaw3-1.fna&_nc_gid=nAFZripRaWI2ZWU0hsj_KQ&oh=00_AfN0egprXKQaUQ0RdIJak-xrK-U0-RpG_QUU2lyFmt7oDQ&oe=685AE493",
+      imagem: vestido3,
       avaliacao: 4.6,
       qntavaliacoes: 11,
+      estoque: 2,
    },
    {
       id: "prod7",
@@ -111,10 +114,10 @@ export const produtos = [
       ],
       desconto: -25,
       tamanhos: [{ nome: "P" }, { nome: "M" }, { nome: "G" }],
-      imagem:
-         "https://scontent.fcaw3-1.fna.fbcdn.net/v/t51.75761-15/504158139_18306728875213518_7924141132859634593_n.jpg?_nc_cat=104&ccb=1-7&_nc_sid=127cfc&_nc_ohc=8IZO1dGLCb0Q7kNvwE-LXUA&_nc_oc=AdnKavPs8t-UmjxKh3-b9_2F1GG28vXuoADcEvq-6Mmb3LuLEFFv4BrMWz_R6cJxGDA&_nc_zt=23&_nc_ht=scontent.fcaw3-1.fna&_nc_gid=nAFZripRaWI2ZWU0hsj_KQ&oh=00_AfN0egprXKQaUQ0RdIJak-xrK-U0-RpG_QUU2lyFmt7oDQ&oe=685AE493",
+      imagem: vestido3,
       avaliacao: 4.6,
       qntavaliacoes: 11,
+      estoque: 2,
    },
    {
       id: "prod8",
@@ -131,6 +134,7 @@ export const produtos = [
       imagem: vestido1,
       avaliacao: 4.5,
       qntavaliacoes: 2,
+      estoque: 2,
    },
    // Adicione os outros produtos aqui
 ];

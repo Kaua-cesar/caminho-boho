@@ -1,7 +1,7 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
-import { Home } from "./Home";
+import { Home } from "./components/Home";
 import { Nav } from "./Nav";
 import { Carrosel } from "./Carrosel";
 
@@ -13,7 +13,7 @@ createRoot(document.getElementById("root")).render(
       <div className="mt-17">
          <Carrosel />
       </div>
-      <div className="mx-70">
+      <div className="">
          <Home />
       </div>
    </StrictMode>

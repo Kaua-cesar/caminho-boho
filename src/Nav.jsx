@@ -2,7 +2,6 @@ import { IoHeartOutline } from "react-icons/io5";
 import { RiShoppingCartFill } from "react-icons/ri";
 import Logo from "./assets/logo.png";
 import React, { useState, useEffect } from "react";
-import { CardFavorits } from "./components/Cards/CardFavorits";
 
 export function Nav() {
    const [totalFavoritos, setTotalFavoritos] = useState(0); // Atualiza o total de favoritos a partir do localStorage
@@ -40,9 +39,13 @@ export function Nav() {
          <div className="flex items-center gap-10 text-2xl">
             <div className="relative">
                <IoHeartOutline className="cursor-pointer" />
-               <span className="absolute -top-2 -right-3 text-white bg-amber-500 text-xs p-1 rounded-full">
-                  {totalFavoritos}
-               </span>
+               {totalFavoritos >= 1 ? (
+                  <span className="absolute -top-2 -right-3 text-white bg-amber-500 text-xs p-1 rounded-full">
+                     {totalFavoritos}
+                  </span>
+               ) : (
+                  ""
+               )}
             </div>
             <RiShoppingCartFill className="cursor-pointer" />
          </div>

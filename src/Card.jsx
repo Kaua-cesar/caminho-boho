@@ -8,6 +8,7 @@ export function Card({
    nome,
    preco,
    precoOriginal,
+   estoque,
    cores = [],
    tamanhos = [],
    imagem,
@@ -29,6 +30,7 @@ export function Card({
                id={id}
                nome={nome}
                preco={preco}
+               estoque={estoque}
                precoOriginal={precoOriginal}
                imagem={imagem}
                desconto={desconto}
@@ -128,7 +130,7 @@ export function Card({
                            </button>
                         ))}
                      </div>
-                     <CardButton />
+                     <CardButton estoque={estoque} />
                   </>
                )}
             </div>
