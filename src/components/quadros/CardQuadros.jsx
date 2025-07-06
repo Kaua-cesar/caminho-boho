@@ -10,7 +10,7 @@ import { TbTruckDelivery } from "react-icons/tb";
 export function CardQuadros() {
    return (
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-7xl">
-         <div className="flex flex-col items-center p-6 rounded-md border-1 border-amber-500/60 hover:shadow-sm shadow-black/10 hover:scale-102 transition-all duration-300">
+         <div className="flex flex-col items-center p-6 rounded-md border-1 bg-white border-amber-500/60 hover:shadow-sm shadow-black/10 hover:scale-102 transition-all duration-300">
             <span className="bg-amber-500 rounded-full p-5 text-white text-4xl mb-5">
                <BiSolidMedal />
             </span>
@@ -19,7 +19,7 @@ export function CardQuadros() {
                Tecidos selecionados e bordados artesanais únicos
             </p>
          </div>
-         <div className="flex flex-col items-center p-6 rounded-md border-1 border-amber-500/60 hover:shadow-sm shadow-black/10 hover:scale-102 transition-all duration-300">
+         <div className="flex flex-col items-center p-6 rounded-md border-1 bg-white border-amber-500/60 hover:shadow-sm shadow-black/10 hover:scale-102 transition-all duration-300">
             <span className="bg-amber-500 rounded-full p-5 text-white text-4xl mb-5">
                <TbTruckDelivery />
             </span>
@@ -28,7 +28,7 @@ export function CardQuadros() {
                Entregamos em todo o Brasil com segurança e agilidade
             </p>
          </div>
-         <div className="flex flex-col items-center p-6 rounded-md border-1 border-amber-500/60 hover:shadow-sm shadow-black/10 hover:scale-102 transition-all duration-300">
+         <div className="flex flex-col items-center p-6 rounded-md border-1 bg-white border-amber-500/60 hover:shadow-sm shadow-black/10 hover:scale-102 transition-all duration-300">
             <span className="bg-amber-500 rounded-full p-5 text-white text-4xl mb-5">
                <BiShieldQuarter />
             </span>
@@ -37,7 +37,7 @@ export function CardQuadros() {
                30 dias para troca ou devolução sem complicações
             </p>
          </div>
-         <div className="flex flex-col items-center p-6 rounded-md border-1 border-amber-500/60 hover:shadow-sm shadow-black/10 hover:scale-102 transition-all duration-300">
+         <div className="flex flex-col items-center p-6 rounded-md border-1 bg-white border-amber-500/60 hover:shadow-sm shadow-black/10 hover:scale-102 transition-all duration-300">
             <span className="bg-amber-500 rounded-full p-5 text-white text-4xl mb-5">
                <BiUserVoice />
             </span>
@@ -46,7 +46,7 @@ export function CardQuadros() {
                Nossa equipe conhece cada peça e pode te ajudar
             </p>
          </div>
-         <div className="flex flex-col items-center p-6 rounded-md border-1 border-amber-500/60 hover:shadow-sm shadow-black/10 hover:scale-102 transition-all duration-300">
+         <div className="flex flex-col items-center p-6 rounded-md border-1 bg-white border-amber-500/60 hover:shadow-sm shadow-black/10 hover:scale-102 transition-all duration-300">
             <span className="bg-amber-500 rounded-full p-5 text-white text-4xl mb-5">
                <BiHeart />
             </span>
@@ -55,7 +55,7 @@ export function CardQuadros() {
                Cada vestido é uma obra de arte criada com carinho
             </p>
          </div>
-         <div className="flex flex-col items-center p-6 rounded-md border-1 border-amber-500/60 hover:shadow-sm shadow-black/10 hover:scale-102 transition-all duration-300">
+         <div className="flex flex-col items-center p-6 rounded-md border-1 bg-white border-amber-500/60 hover:shadow-sm shadow-black/10 hover:scale-102 transition-all duration-300">
             <span className="bg-amber-500 rounded-full p-5 text-white text-4xl mb-5">
                <BiStar />
             </span>

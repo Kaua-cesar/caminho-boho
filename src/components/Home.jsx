@@ -13,6 +13,7 @@ import { produtos } from "./Cards/CardDados";
 import { CardQuadros } from "./quadros/CardQuadros";
 import { CardCollection } from "./Collection/CardCollection";
 import { CardClientes } from "./quadros/CardClientes";
+import { Separator } from "@/components/ui/separator";
 
 // Função para calcular preço com desconto
 function calcularPrecoComDesconto(produto) {
@@ -60,7 +61,6 @@ export function Home() {
             Descubra peças autênticas feitas à mão com tecidos premium <br /> e
             bordados tradicionais
          </p>
-
          {/* Filtros */}
          <div className="flex items-center my-9 gap-4 flex-wrap justify-between w-full max-w-7xl px-4">
             <div className="flex items-center gap-6 flex-wrap">
@@ -120,7 +120,6 @@ export function Home() {
                </SelectContent>
             </Select>
          </div>
-
          {/* Produtos */}
          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 justify-center px-4 max-w-7xl">
             {produtosFiltrados.length > 0 ? (
@@ -137,7 +136,7 @@ export function Home() {
                </p>
             )}
          </div>
-         <div className="mt-16 mb-8">
+         <div className="mt-16 mb-8 ">
             <h1 className="text-4xl font-bold text-amber-500  text-center">
                Explore Nossas Categorias
             </h1>
@@ -148,19 +147,21 @@ export function Home() {
             </p>
          </div>
          <CardCollection />
-         <div className="mt-16 mb-8 ">
-            <h1 className="text-4xl font-bold text-amber-500  text-center">
-               Por que Escolher a Gente?
-            </h1>
-            <p className="mt-2 text-lg text-center">
-               Somos especializados em moda indiana autêntica com o melhor
-               <br />
-               atendimento do Brasil
-            </p>
+         <div className="bg-zinc-100 w-full flex flex-col  items-center pb-16 mt-16">
+            <div className="mt-16 mb-8 ">
+               <h1 className="text-4xl font-bold text-amber-500  text-center">
+                  Por que Escolher a Gente?
+               </h1>
+               <p className="mt-2 text-lg text-center">
+                  Somos especializados em moda indiana autêntica com o melhor
+                  <br />
+                  atendimento do Brasil
+               </p>
+            </div>
+            <CardQuadros />
          </div>
-         <CardQuadros />
-         <div className=" w-full bg-zinc-100 mt-16 flex flex-col justify-center items-center pb-16">
-            <h1 className="text-4xl font-bold text-amber-500 mt-16 text-center">
+         <div className=" w-full  mt-16 flex flex-col justify-center items-center pb-16">
+            <h1 className="text-4xl font-bold text-amber-500  text-center">
                O que Nossas Clientes Dizem
             </h1>
             <p className="mt-2 text-lg text-center mb-8">
@@ -168,6 +169,96 @@ export function Home() {
                vestidos. Veja alguns depoimentos
             </p>
             <CardClientes />
+         </div>
+         <div className="flex w-full bg-zinc-100 justify-center flex-col items-center ">
+            <div className="flex mt-16 justify-between w-7xl ">
+               <div className="flex flex-col gap-2 w-md">
+                  <h1 className="font-semibold mb-3 text-xl">Caminho Boho</h1>
+                  <p className="text-zinc-700 ">
+                     Tradição e elegância em cada peça. Autenticidade que você
+                     pode confiar.
+                  </p>
+               </div>
+               <div className="flex flex-col gap-2 ">
+                  <h1 className="font-semibold mb-3 text-xl ">Atendimento</h1>
+                  <a
+                     href="#"
+                     className="text-zinc-700 hover:text-black hover:font-medium"
+                  >
+                     Central de Ajuda
+                  </a>
+                  <a
+                     href="#"
+                     className="text-zinc-700 hover:text-black hover:font-medium"
+                  >
+                     Política de Troca
+                  </a>
+                  <a
+                     href="#"
+                     className="text-zinc-700 hover:text-black hover:font-medium"
+                  >
+                     Envios e Entregas
+                  </a>
+                  <a
+                     href="#"
+                     className="text-zinc-700 hover:text-black hover:font-medium"
+                  >
+                     Contato
+                  </a>
+               </div>
+               <div className="flex flex-col gap-2 ">
+                  <h1 className="font-semibold mb-3 text-xl">Categorias</h1>
+                  <a
+                     href="#"
+                     className="text-zinc-700 hover:text-black hover:font-medium"
+                  >
+                     Lehenga Choa
+                  </a>
+                  <a
+                     href="#"
+                     className="text-zinc-700 hover:text-black hover:font-medium"
+                  >
+                     Sarees
+                  </a>
+                  <a
+                     href="#"
+                     className="text-zinc-700 hover:text-black hover:font-medium"
+                  >
+                     Anarkaa Suits
+                  </a>
+                  <a
+                     href="#"
+                     className="text-zinc-700 hover:text-black hover:font-medium"
+                  >
+                     Acessórios
+                  </a>
+               </div>
+               <div className="flex flex-col gap-2 ">
+                  <h1 className="font-semibold mb-3 text-xl">Redes Sociais</h1>
+                  <a
+                     href="#"
+                     className="text-zinc-700 hover:text-black hover:font-medium"
+                  >
+                     Instagram
+                  </a>
+                  <a
+                     href="#"
+                     className="text-zinc-700 hover:text-black hover:font-medium"
+                  >
+                     Facebook
+                  </a>
+                  <a
+                     href="#"
+                     className="text-zinc-700 hover:text-black hover:font-medium"
+                  >
+                     WhatsApp
+                  </a>
+               </div>
+            </div>
+            <span className="w-[1800px] h-[1px] bg-zinc-300 mt-16 flex justify-center"></span>
+            <p className="mt-6 mb-6">
+               © 2025 Caminho Boho. Todos os direitos reservados.
+            </p>
          </div>
       </div>
    );
