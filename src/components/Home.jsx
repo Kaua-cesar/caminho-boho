@@ -168,7 +168,7 @@ export function Home() {
                Mais de 1000 mulheres já se apaixonaram por nossos <br />
                vestidos. Veja alguns depoimentos
             </p>
-            {/* <CardClientes /> */}
+            <CardClientes />
          </div>
          <footer className="flex md:w-full bg-zinc-100 justify-center flex-col items-center w-full">
             <div className="flex flex-col mt-16 justify-between md:w-7xl md:flex-row md:gap-0 gap-6 text-center md:text-start">
