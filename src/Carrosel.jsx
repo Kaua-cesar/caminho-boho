@@ -19,7 +19,7 @@ export function Carrosel() {
             centeredSlides={true}
             autoplay={{
                delay: 2500,
-               disableOnInteraction: false,
+               disableOnInteraction: true,
             }}
             pagination={{
                clickable: true,
@@ -29,12 +29,14 @@ export function Carrosel() {
             className="mySwiper"
          >
             <SwiperSlide>
-               <div className="absolute flex flex-col items-start top-[20%] md:top-[40%] md:left-45 text-white">
+               <div className="absolute flex flex-col items-start top-[20%] md:top-[40%] md:left-45 text-white w-screen">
                   <p className="text-2xl font-semibold w-full md:w-auto">
                      Para ocasioes especiais
                   </p>
-                  <h1 className="text-6xl font-bold w-full">Costa nua curto</h1>
-                  <h2 className="text-xl w-full md:w-auto md:mb-0 ">
+                  <h1 className="md:text-6xl font-bold w-full text-5xl h-[60px] md:text-start">
+                     Costa nua curto
+                  </h1>
+                  <h2 className="text-xl w-full md:w-auto md:mb-0 px-10 md:px-0">
                      Vestidos de costa falase opasdklaskdlas
                   </h2>
                   <div className="w-full items-center justify-center">
@@ -50,12 +52,14 @@ export function Carrosel() {
                />
             </SwiperSlide>
             <SwiperSlide>
-               <div className="absolute flex flex-col items-start top-[20%] md:top-[40%] md:left-45 text-white">
+               <div className="absolute flex flex-col items-start top-[20%] md:top-[40%] md:left-45 text-white  w-screen">
                   <p className="text-2xl font-semibold w-full md:w-auto">
                      Para ocasioes especiais
                   </p>
-                  <h1 className="text-6xl font-bold w-full">Viscose liso</h1>
-                  <h2 className="text-xl w-full md:w-auto md:mb-0 ">
+                  <h1 className="text-6xl font-bold w-full md:text-start text-center h-[60px]">
+                     Viscose liso
+                  </h1>
+                  <h2 className="text-xl w-full md:w-auto md:mb-0 px-10 md:px-0">
                      Vestidos de viscoise falase opasdklaskdlas
                   </h2>
                   <div className="w-full items-center justify-center">
