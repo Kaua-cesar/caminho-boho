@@ -54,21 +54,21 @@ export function Home() {
 
    return (
       <div className="flex flex-col items-center justify-center mt-16">
-         <h1 className="text-4xl font-bold text-amber-500">
+         <h1 className="md:text-4xl text-2xl font-bold text-amber-500 text-center mx-10 md-mx-0">
             Nossa Coleção Exclusiva
          </h1>
-         <p className="mt-2 text-lg text-center">
-            Descubra peças autênticas feitas à mão com tecidos premium <br /> e
+         <p className="mt-2 md:text-lg text-md text-center mx-10 md-mx-0">
+            Descubra peças autênticas feitas à mão com tecidos premium e
             bordados tradicionais
          </p>
          {/* Filtros */}
          <div className="flex items-center my-9 gap-4 flex-wrap justify-between w-full max-w-7xl px-4">
             <div className="flex items-center gap-6 flex-wrap">
-               <div className="relative">
+               <div className="relative w-full sm:w-auto">
                   <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                   <Input
                      placeholder="Buscar produtos"
-                     className="w-52 pl-10"
+                     className="md:w-52 pl-10 w-full"
                      value={busca}
                      onChange={(e) => setBusca(e.target.value)}
                   />
@@ -137,10 +137,10 @@ export function Home() {
             )}
          </div>
          <div className="mt-16 mb-8 ">
-            <h1 className="text-4xl font-bold text-amber-500  text-center">
+            <h1 className="md:text-4xl text-2xl font-bold text-amber-500 text-center">
                Explore Nossas Categorias
             </h1>
-            <p className="mt-2 text-lg text-center">
+            <p className="mt-2 md:text-lg text-md text-center">
                Cada peça é cuidadosamente selecionada para oferecer
                autenticidade
                <br /> e qualidade excepcional
@@ -149,10 +149,10 @@ export function Home() {
          <CardCollection />
          <div className="bg-zinc-100 w-full flex flex-col  items-center pb-16 mt-16">
             <div className="mt-16 mb-8 ">
-               <h1 className="text-4xl font-bold text-amber-500  text-center">
+               <h1 className="md:text-4xl text-2xl font-bold text-amber-500 text-center mx-10 md-mx-0">
                   Por que Escolher a Gente?
                </h1>
-               <p className="mt-2 text-lg text-center">
+               <p className="mt-2 md:text-lg text-md text-center mx-10 md-mx-0">
                   Somos especializados em moda indiana autêntica com o melhor
                   <br />
                   atendimento do Brasil
@@ -161,10 +161,10 @@ export function Home() {
             <CardQuadros />
          </div>
          <div className=" w-full  mt-16 flex flex-col justify-center items-center pb-16">
-            <h1 className="text-4xl font-bold text-amber-500  text-center">
+            <h1 className="md:text-4xl text-2xl font-bold text-amber-500 text-center mx-10 md:mx-0">
                O que Nossas Clientes Dizem
             </h1>
-            <p className="mt-2 text-lg text-center mb-8">
+            <p className="mt-2 md:text-lg text-md text-center mb-8 mx-10 md-mx-0">
                Mais de 1000 mulheres já se apaixonaram por nossos <br />
                vestidos. Veja alguns depoimentos
             </p>
