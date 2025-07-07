@@ -9,7 +9,7 @@ import { TbTruckDelivery } from "react-icons/tb";
 
 export function CardQuadros() {
    return (
-      <div className="md:grid grid grid-cols-2 md:grid-cols-3 gap-6 md:w-7xl w-80 text-center">
+      <div className="md:grid grid grid-cols-2 md:grid-cols-3 gap-6 md:w-7xl w-90 text-center">
          <div className="flex flex-col items-center p-6 rounded-md border-1 bg-white border-amber-500/60 hover:shadow-sm shadow-black/10 hover:scale-102 transition-all duration-300">
             <span className="bg-amber-500 rounded-full p-5 text-white text-4xl mb-5">
                <BiSolidMedal />

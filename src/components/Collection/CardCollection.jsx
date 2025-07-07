@@ -2,7 +2,7 @@ import { categorias } from "./ColletionDados";
 
 export function CardCollection() {
    return (
-      <div className="flex gap-6 justify-between  max-w-7xl">
+      <div className="flex flex-col md:flex-row  gap-6  max-w-7xl">
          {categorias.map((cat, idx) => (
             <div
                key={idx}

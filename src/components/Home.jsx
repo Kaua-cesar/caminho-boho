@@ -168,13 +168,13 @@ export function Home() {
                Mais de 1000 mulheres já se apaixonaram por nossos <br />
                vestidos. Veja alguns depoimentos
             </p>
-            <CardClientes />
+            {/* <CardClientes /> */}
          </div>
-         <footer className="flex w-full bg-zinc-100 justify-center flex-col items-center ">
-            <div className="flex mt-16 justify-between w-7xl ">
-               <div className="flex flex-col gap-2 w-md">
+         <footer className="flex md:w-full bg-zinc-100 justify-center flex-col items-center w-full">
+            <div className="flex flex-col mt-16 justify-between md:w-7xl md:flex-row md:gap-0 gap-6 text-center md:text-start">
+               <div className="flex flex-col gap-2 ">
                   <h1 className="font-semibold mb-3 text-xl">Caminho Boho</h1>
-                  <p className="text-zinc-700 ">
+                  <p className="text-zinc-700">
                      Tradição e elegância em cada peça. Autenticidade que você
                      pode confiar.
                   </p>
@@ -255,8 +255,8 @@ export function Home() {
                   </a>
                </div>
             </div>
-            <span className="w-[1800px] h-[1px] bg-zinc-300 mt-16 flex justify-center"></span>
-            <p className="mt-6 mb-6">
+            <span className="h-[1px] bg-zinc-300 mt-16 flex justify-center w-[88vw]"></span>
+            <p className="mt-6 mb-6 md:text-[16px] text-xs">
                © 2025 Caminho Boho. Todos os direitos reservados.
             </p>
          </footer>
