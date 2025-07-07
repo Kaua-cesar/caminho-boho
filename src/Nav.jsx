@@ -25,7 +25,7 @@ export function Nav() {
    }, []);
 
    return (
-      <div className="text-amber-600 font-semibold flex items-center justify-between px-12 md:px-32 w-full h-17 bg-white shadow-xs shadow-amber-600/50">
+      <div className="text-amber-600 font-semibold flex items-center justify-between px-8 md:px-32 w-full h-17 bg-white shadow-xs shadow-amber-600/50">
          <div className="flex items-center">
             <img src={Logo} alt="Logo Caminho Boho" className="h-10 md:h-14" />
          </div>
