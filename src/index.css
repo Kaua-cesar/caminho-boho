@@ -165,7 +165,14 @@
    --sidebar-border: oklch(1 0 0 / 10%);
    --sidebar-ring: oklch(0.556 0 0);
 }
-
+.rating-responsive {
+   font-size: 2rem; /* tamanho padrão do medium */
+}
+@media (max-width: 767px) {
+   .rating-responsive {
+      font-size: 1rem !important; /* tamanho do small do MUI */
+   }
+}
 @layer base {
    * {
       @apply border-border outline-ring/50;

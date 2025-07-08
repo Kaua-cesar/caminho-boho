@@ -14,6 +14,7 @@ export function Home() {
    const [precoSelecionado, setPrecoSelecionado] = useState("todos");
    const [ordenacao, setOrdenacao] = useState("sem-ordenacao");
    const [busca, setBusca] = useState("");
+   const [quantidadeExibida, setQuantidadeExibida] = useState(8);
 
    const produtosFiltrados = useMemo(() => {
       return produtos
@@ -43,6 +44,13 @@ export function Home() {
          });
    }, [produtos, categoriaSelecionada, precoSelecionado, ordenacao, busca]);
 
+   // Mostra apenas os primeiros N produtos
+   const produtosParaExibir = produtosFiltrados.slice(0, quantidadeExibida);
+
+   function handleVerMais() {
+      setQuantidadeExibida((prev) => prev + 8);
+   }
+
    return (
       <main className="flex flex-col items-center justify-center mt-16">
          <h1 className="md:text-4xl text-2xl font-bold text-amber-500 text-center mx-10">
@@ -63,9 +71,9 @@ export function Home() {
             setBusca={setBusca}
          />
          {/* Produtos */}
-         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 justify-center px-4 max-w-7xl">
-            {produtosFiltrados.length > 0 ? (
-               produtosFiltrados.map((produto) => (
+         <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 justify-center px-4 max-w-7xl">
+            {produtosParaExibir.length > 0 ? (
+               produtosParaExibir.map((produto) => (
                   <Card
                      key={produto.id}
                      {...produto}
@@ -78,6 +86,15 @@ export function Home() {
                </p>
             )}
          </div>
+         {/* Botão Ver Mais */}
+         {quantidadeExibida < produtosFiltrados.length && (
+            <button
+               onClick={handleVerMais}
+               className="mt-8 mb-4 px-6 py-2 rounded cursor-pointer bg-amber-500 text-white font-semibold hover:bg-amber-600 transition"
+            >
+               Veja mais
+            </button>
+         )}
          <CardsHome />
          <Footer />
       </main>
