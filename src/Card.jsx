@@ -24,7 +24,7 @@ export function Card({
 
    return (
       <div className="basis-1/6 flex justify-center items-center">
-         <div className="w-80 max-w-full shadow-md md:h-180 h-161 rounded-md flex-col flex transition-transform duration-300 ease-in-out">
+         <div className="w-80 max-w-full md:mx-0  shadow-md md:h-180 h-155 rounded-md flex-col flex transition-transform duration-300 ease-in-out">
             <CardDialog
                id={id}
                nome={nome}
@@ -72,7 +72,7 @@ export function Card({
 
                {cores.length > 0 && (
                   <>
-                     <p className="mt-4 text-sm text-gray-600">
+                     <p className="md:mt-4 mt-2 text-sm text-gray-600">
                         Cor:{" "}
                         <span className="font-medium">
                            {corSelecionada ? corSelecionada : ""}
@@ -103,7 +103,7 @@ export function Card({
 
                {tamanhos.length > 0 && (
                   <>
-                     <p className="mt-4 text-sm text-gray-600">
+                     <p className="md:mt-4 mt-2 text-sm text-gray-600">
                         Tamanho:{" "}
                         <span className="font-medium">
                            {tamanhoSelecionado ? tamanhoSelecionado : ""}

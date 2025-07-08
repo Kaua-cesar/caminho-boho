@@ -48,7 +48,7 @@ export function Home() {
    const produtosParaExibir = produtosFiltrados.slice(0, quantidadeExibida);
 
    function handleVerMais() {
-      setQuantidadeExibida((prev) => prev + 8);
+      setQuantidadeExibida((prev) => prev + 4);
    }
 
    return (
@@ -71,7 +71,7 @@ export function Home() {
             setBusca={setBusca}
          />
          {/* Produtos */}
-         <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 justify-center px-4 max-w-7xl">
+         <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 md:gap-6 justify-center px-4 max-w-7xl mx-2 gap-4">
             {produtosParaExibir.length > 0 ? (
                produtosParaExibir.map((produto) => (
                   <Card
@@ -90,7 +90,7 @@ export function Home() {
          {quantidadeExibida < produtosFiltrados.length && (
             <button
                onClick={handleVerMais}
-               className="mt-8 mb-4 px-6 py-2 rounded cursor-pointer bg-amber-500 text-white font-semibold hover:bg-amber-600 transition"
+               className="mt-8 mb-4 px-6 py-2 rounded cursor-pointer bg-amber-600 text-white font-semibold hover:bg-amber-700 transition"
             >
                Veja mais
             </button>

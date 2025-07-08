@@ -3,7 +3,7 @@ import { RiShoppingCartFill } from "react-icons/ri";
 export function CardButton({ onClick, estoque }) {
    return (
       <button
-         className="flex justify-center w-full md:h-auto h-14 mt-4"
+         className="flex justify-center w-full md:min-h-auto min-h-14 mt-4"
          onClick={onClick}
          disabled={Number(estoque) <= 0}
       >
