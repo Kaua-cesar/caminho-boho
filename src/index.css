@@ -173,6 +173,9 @@
       font-size: 1rem !important; /* tamanho do small do MUI */
    }
 }
+.rating-responsive-mobb {
+   font-size: 1.1rem !important; /* tamanho padrão do medium */
+}
 @layer base {
    * {
       @apply border-border outline-ring/50;
