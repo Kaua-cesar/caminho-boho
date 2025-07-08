@@ -82,11 +82,11 @@ export function CardDialog({
             </div>
 
             <DialogContent className="md:max-w-4xl flex w-screen">
-               <div className="md:w-full w-screen  relative cursor-pointer">
+               <div className="md:w-full relative cursor-pointer">
                   <img
                      src={imagem}
                      alt={nome}
-                     className=" rounded-md md:w-100 md:h-auto h-163 object-cover transition-all duration-300 ease-in-out group-hover:scale-110 group-hover:brightness-80"
+                     className=" rounded-md md:w-100  md:h-auto h-150 object-cover transition-all duration-300 ease-in-out group-hover:scale-110 group-hover:brightness-80"
                   />
                </div>
 
