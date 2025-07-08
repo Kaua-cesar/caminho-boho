@@ -86,7 +86,7 @@ export function CardDialog({
                   <img
                      src={imagem}
                      alt={nome}
-                     className=" rounded-md md:w-100  md:h-auto h-150 object-cover transition-all duration-300 ease-in-out group-hover:scale-110 group-hover:brightness-80"
+                     className=" rounded-md md:w-100 md:h-auto h-154 object-cover transition-all duration-300 ease-in-out group-hover:scale-110 group-hover:brightness-80"
                   />
                </div>
 
@@ -110,7 +110,7 @@ export function CardDialog({
                         </span>
                      </div>
 
-                     <div className="flex gap-2 items-center">
+                     <div className="flex gap-2 md:items-center items-start md:flex-row flex-col ">
                         <h2 className="text-amber-600 font-semibold md:text-2xl text-xl">
                            R${preco}
                         </h2>
@@ -173,7 +173,7 @@ export function CardDialog({
                                     atual === tamanho.nome ? "" : tamanho.nome
                                  )
                               }
-                              className={`w-8 h-8 rounded-sm border-1 transition text-sm cursor-pointer ${
+                              className={`w-8 h-8 rounded-sm border-1 transition text-xs md:text-sm cursor-pointer ${
                                  tamanho.classe || ""
                               } ${
                                  tamanhoSelecionado === tamanho.nome
