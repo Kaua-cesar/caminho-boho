@@ -25,10 +25,11 @@ export default function Login() {
 
    return (
       <>
-         <div className="h-screen flex flex-col w-full justify-center ">
-            <div className="flex justify-center ">
+         <div className="min-h-screen flex flex-col">
+            {/* Conteúdo principal */}
+            <div className="flex-grow flex justify-center items-center md:mt-52">
                <div className="flex gap-0 md:border-1 borde-black rounded-xl border-0 flex-col-reverse md:flex-row md:p-5">
-                  <span className="text-xs flex justify-center mt-12">
+                  <span className="text-xs flex justify-center mt-12 md:hidden">
                      © 2025 Caminho Boho. Todos os direitos reservados.
                   </span>
                   <div className="max-w-sm mx-6 p-6 bg-white rounded flex flex-col gap-8 md:gap-4 font-medium items-start">
@@ -118,7 +119,7 @@ export default function Login() {
                         </span>
                         {camposPreenchidos ? (
                            <button
-                              type="button"
+                              type="submit"
                               className="w-full bg-amber-600 text-white md:py-2 py-3 rounded-md hover:bg-amber-700 transition cursor-pointer"
                            >
                               Entrar
@@ -142,9 +143,11 @@ export default function Login() {
                   </div>
                </div>
             </div>
-         </div>
-         <div className="md:flex hidden">
-            <Footer />
+
+            {/* Rodapé no fim da tela */}
+            <div className="md:flex hidden">
+               <Footer />
+            </div>
          </div>
       </>
    );
