@@ -28,6 +28,9 @@ export default function Login() {
          <div className="h-screen flex flex-col w-full justify-center ">
             <div className="flex justify-center ">
                <div className="flex gap-0 md:border-1 borde-black rounded-xl border-0 flex-col-reverse md:flex-row md:p-5">
+                  <span className="text-xs flex justify-center mt-12">
+                     © 2025 Caminho Boho. Todos os direitos reservados.
+                  </span>
                   <div className="max-w-sm mx-6 p-6 bg-white rounded flex flex-col gap-8 md:gap-4 font-medium items-start">
                      <h1 className="text-2xl mb-4 md:flex hidden">
                         Entre ou cadastre-se
@@ -65,7 +68,7 @@ export default function Login() {
                            Boho.
                         </span>
                      </div>
-                     <button className="w-full border-1 md:border-2 md:py-2 py-4 rounded-md transition cursor-pointer md:hidden ">
+                     <button className="w-full border-1 md:border-2 md:py-2 py-4 rounded-md transition cursor-pointer md:hidden">
                         Criar Conta
                      </button>
                   </div>
