@@ -25,7 +25,7 @@ function Layout() {
    return (
       <>
          {/* Nav fixo, sobreposto, sem reservar espaço */}
-         <div className="fixed top-0 left-0 w-full z-50 bg-white shadow-xs shadow-amber-600/50 h-17">
+         <div className="fixed top-0 left-0 w-full z-50 bg-white shadow-xs shadow-amber-600/50 h-17 ">
             <Nav />
          </div>
 
