@@ -27,8 +27,8 @@ export default function Login() {
       <>
          <div className="h-screen flex flex-col w-full justify-center ">
             <div className="flex justify-center ">
-               <div className="flex gap-10 md:border-1 borde-black rounded-xl border-0 flex-col-reverse md:flex-row md:p-5">
-                  <div className="max-w-sm  mx-6 p-6 bg-white rounded flex flex-col gap-12 md:gap-4 font-medium items-start">
+               <div className="flex gap-0 md:border-1 borde-black rounded-xl border-0 flex-col-reverse md:flex-row md:p-5">
+                  <div className="max-w-sm mx-6 p-6 bg-white rounded flex flex-col gap-8 md:gap-4 font-medium items-start">
                      <h1 className="text-2xl mb-4 md:flex hidden">
                         Entre ou cadastre-se
                      </h1>
@@ -65,7 +65,7 @@ export default function Login() {
                            Boho.
                         </span>
                      </div>
-                     <button className="mt-4 w-full border-1 md:border-2 md:py-2 py-4 rounded-md transition cursor-pointer md:hidden ">
+                     <button className="w-full border-1 md:border-2 md:py-2 py-4 rounded-md transition cursor-pointer md:hidden ">
                         Criar Conta
                      </button>
                   </div>
@@ -80,7 +80,7 @@ export default function Login() {
                      <h1 className="text-2xl font-medium mb-4 md:flex hidden">
                         Entre ou cadastre-se
                      </h1>
-                     <form onSubmit={handleSubmit} className="space-y-6 ">
+                     <form onSubmit={handleSubmit} className="space-y-4 ">
                         <input
                            type="email"
                            placeholder="E-mail"
@@ -110,7 +110,7 @@ export default function Login() {
                               />
                            )}
                         </div>
-                        <span className="flex justify-center underline cursor-pointer md:hidden mb-12">
+                        <span className="flex justify-center underline cursor-pointer md:hidden mb-8">
                            Esqueceu seus dados de acesso?
                         </span>
                         {camposPreenchidos ? (

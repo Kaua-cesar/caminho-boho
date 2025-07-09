@@ -53,8 +53,6 @@ export function Nav() {
       location.pathname
    );
 
-   // Exemplo de uso
-   console.log("Está na rota login ou register?", naRotaLoginOuRegister);
    return (
       <>
          {!naRotaLoginOuRegister && (
