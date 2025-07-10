@@ -130,7 +130,13 @@ export function Card({
                            </button>
                         ))}
                      </div>
-                     <CardButton estoque={estoque} />
+                     <CardButton
+                        id={id}
+                        nome={nome}
+                        preco={preco}
+                        estoque={estoque}
+                        imagem={imagem}
+                     />
                   </>
                )}
             </div>

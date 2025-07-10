@@ -154,7 +154,10 @@ export function Nav() {
                      )}
                   </div>
 
-                  <RiShoppingCartFill className="cursor-pointer" />
+                  <RiShoppingCartFill
+                     className="cursor-pointer"
+                     onClick={() => navigate("/carrinho")}
+                  />
                </div>
             </div>
          )}

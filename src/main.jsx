@@ -11,15 +11,20 @@ import { Home } from "./components/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import MinhaConta from "./pages/MinhaConta";
+import Carrinho from "./pages/Carrinho";
 import RotaPrivada from "./components/auth/RotaPrivada";
 import RotaPublica from "./components/auth/RotaPublica";
 
 function Layout() {
    const location = useLocation();
 
-   const esconderCarrosel = ["/login", "/register", "/minha-conta"].some(
-      (path) => location.pathname.startsWith(path)
-   );
+   const esconderCarrosel = [
+      "/login",
+      "/register",
+      "/minha-conta",
+      "/carrinho",
+      "/finalizar-compra",
+   ].some((path) => location.pathname.startsWith(path));
    const mostrarCarrosel = !esconderCarrosel;
 
    return (
@@ -57,6 +62,14 @@ function Layout() {
                   element={
                      <RotaPrivada>
                         <MinhaConta />
+                     </RotaPrivada>
+                  }
+               />
+               <Route
+                  path="/carrinho"
+                  element={
+                     <RotaPrivada>
+                        <Carrinho />
                      </RotaPrivada>
                   }
                />

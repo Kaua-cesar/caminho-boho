@@ -6,9 +6,7 @@
 @custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
 
 ::-webkit-scrollbar {
-   width: 8px;
-   height: 8px;
-   background-color: rgba(0, 0, 0, 0.2);
+   display: none;
 }
 * {
    font-family: "Montserrat", sans-serif;
