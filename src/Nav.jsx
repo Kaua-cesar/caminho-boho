@@ -104,7 +104,7 @@ export function Nav() {
                         {user ? (
                            <>
                               <DropdownMenuLabel>
-                                 Olá, {user.email}
+                                 Olá, {user.displayName || user.email}
                               </DropdownMenuLabel>
                               <DropdownMenuSeparator />
                               <DropdownMenuItem

@@ -4,6 +4,7 @@ import "./index.css";
 
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
+import { CartProvider } from "./context/CartContext"; // Importe o CartProvider
 
 import { Nav } from "./Nav";
 import { Carrosel } from "./Carrosel";
@@ -31,7 +32,7 @@ function Layout() {
    return (
       <>
          {/* ✅ Toast aqui */}
-         <Toaster position="bottom-right" richColors />
+         {/* A Toaster agora será movida para o createRoot, como mostrado abaixo */}
 
          {/* Nav fixo, sobreposto, sem reservar espaço */}
          <div className="fixed top-0 left-0 w-full z-50 bg-white shadow-xs shadow-amber-600/50 h-17 ">
@@ -77,18 +78,25 @@ function Layout() {
                      </RotaPrivada>
                   }
                />
+               {/* Adicione outras rotas conforme necessário */}
             </Routes>
          </div>
       </>
    );
 }
 
+// O createRoot deve envolver todo o aplicativo com os Providers necessários
 createRoot(document.getElementById("root")).render(
    <StrictMode>
-      <AuthProvider>
-         <BrowserRouter>
-            <Layout />
-         </BrowserRouter>
-      </AuthProvider>
+      <BrowserRouter>
+         <AuthProvider>
+            {/* O CartProvider deve estar DENTRO do AuthProvider */}
+            <CartProvider>
+               <Layout />
+               {/* A Toaster pode ser colocada aqui para estar disponível em toda a aplicação */}
+               <Toaster position="bottom-right" richColors />
+            </CartProvider>
+         </AuthProvider>
+      </BrowserRouter>
    </StrictMode>
 );

@@ -1,14 +1,21 @@
-import { useState } from "react";
+// src/Pages/Login.jsx
+
+import { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
-import { FaFacebookF } from "react-icons/fa";
-import { FaApple } from "react-icons/fa";
+// Removidos FaFacebookF, FaApple, mantido FaEye, FaEyeSlash
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
 import { Footer } from "../components/Footer";
-import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { toast } from "sonner"; // Certifique-se de que sonner está instalado e configurado
 
 export default function Login() {
-   const { login } = useAuth();
+   const {
+      login: loginWithEmailPassword, // Renomeado para evitar conflito com 'loginWithProvider'
+      loginWithProvider,
+      loading,
+      user,
+   } = useAuth();
    const navigate = useNavigate();
 
    const [email, setEmail] = useState("");
@@ -17,16 +24,54 @@ export default function Login() {
    const camposPreenchidos = email.trim() !== "" && senha.trim() !== "";
    const [mostrarSenha, setMostrarSenha] = useState(false);
 
+   // Efeito para redirecionar após o login
+   useEffect(() => {
+      // console.log("Login.jsx useEffect: Estado atual do 'user':", user ? user.email : "NULO", " | Loading:", loading); // Removido
+      // O `!loading` garante que o redirecionamento só aconteça depois que o onAuthStateChanged terminar.
+      if (user && !loading) {
+         // console.log("Usuário detectado em Login.jsx. Redirecionando para /minha-conta."); // Removido
+         navigate("/minha-conta");
+      }
+   }, [user, navigate, loading]); // Adicionado 'loading' como dependência
+
    function handleSubmit(e) {
       e.preventDefault();
-      login(email, senha);
-      navigate("/minha-conta");
+      // Aqui você chamaria uma função de login de e-mail/senha do Firebase se tivesse uma
+      loginWithEmailPassword(email, senha); // Simulando login por e-mail/senha
+      toast.success("Login com e-mail/senha simulado. Verifique o console.");
+   }
+
+   // Função genérica para os cliques dos botões de provedor social
+   const handleSocialLoginClick = async (providerName) => {
+      try {
+         // console.log(`Chamando loginWithProvider para ${providerName}...`); // Removido
+         const success = await loginWithProvider(providerName);
+         if (success) {
+            // Se o login foi bem-sucedido, o useEffect de cima cuidará do redirecionamento
+            toast.success(`Login com ${providerName} bem-sucedido!`);
+         } else {
+            // Mensagem de erro mais genérica, pois o erro específico já foi logado no AuthContext
+            toast.error(
+               `Não foi possível iniciar o login com ${providerName}. Verifique o console para mais detalhes.`
+            );
+         }
+      } catch (error) {
+         // console.error(`Erro inesperado ao iniciar login com ${providerName}:`, error); // Removido
+         toast.error(`Ocorreu um erro ao iniciar o login com ${providerName}.`);
+      }
+   };
+
+   if (loading) {
+      return (
+         <div className="min-h-screen flex items-center justify-center">
+            Carregando autenticação...
+         </div>
+      );
    }
 
    return (
       <>
          <div className="min-h-screen flex flex-col">
-            {/* Conteúdo principal */}
             <div className="flex-grow flex justify-center items-center md:mt-52">
                <div className="flex gap-0 md:border-1 borde-black rounded-xl border-0 flex-col-reverse md:flex-row md:p-5">
                   <span className="text-xs flex justify-center mt-12 md:hidden">
@@ -37,33 +82,19 @@ export default function Login() {
                         Entre ou cadastre-se
                      </h1>
                      <div className=" flex md:flex-col w-full md:gap-4 gap-8 justify-center">
+                        {/* Botão Google */}
                         <button
                            type="button"
-                           className="w-15 h-15 rounded-full md:w-full bg-zinc-200  md:py-2 md:rounded-md hover:bg-zinc-300 transition cursor-pointer flex items-center justify-center gap-2"
-                        >
-                           <FaFacebookF className="md:text-xl text-blue-900 text-2xl" />
-                           <span className="md:flex hidden">
-                              Login com Facebook
-                           </span>
-                        </button>
-                        <button
-                           type="button"
-                           className="w-15 h-15 rounded-full md:md:w-full bg-zinc-200  md:py-2 md:rounded-md hover:bg-zinc-300 transition cursor-pointer flex items-center justify-center gap-2"
-                        >
-                           <FaApple className="md:text-xl text-black text-2xl" />
-                           <span className="md:flex hidden">
-                              Login com Apple
-                           </span>
-                        </button>
-                        <button
-                           type="button"
-                           className="w-15 h-15 rounded-full md:w-full bg-zinc-200  md:py-2 md:rounded-md hover:bg-zinc-300 transition cursor-pointer flex items-center justify-center gap-2"
+                           onClick={() => handleSocialLoginClick("google")}
+                           className="w-15 h-15 rounded-full md:w-full bg-zinc-200 md:py-2 md:rounded-md hover:bg-zinc-300 transition cursor-pointer flex items-center justify-center gap-2"
+                           disabled={loading}
                         >
                            <FcGoogle className="md:text-xl text-2xl" />
                            <span className="md:flex hidden">
                               Login com Google
                            </span>
                         </button>
+                        {/* Removidos os botões de Facebook e Apple */}
                         <span className="text-xs md:flex hidden">
                            Associe uma conta de cada rede para acessar a Caminho
                            Boho.
@@ -121,6 +152,7 @@ export default function Login() {
                            <button
                               type="submit"
                               className="w-full bg-amber-600 text-white md:py-2 py-3 rounded-md hover:bg-amber-700 transition cursor-pointer"
+                              disabled={loading}
                            >
                               Entrar
                            </button>
@@ -144,7 +176,6 @@ export default function Login() {
                </div>
             </div>
 
-            {/* Rodapé no fim da tela */}
             <div className="md:flex hidden">
                <Footer />
             </div>
