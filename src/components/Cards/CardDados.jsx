@@ -46,7 +46,7 @@ export const produtos = [
       categoria: "boholongo",
       cores: [
          { nome: "preto", classe: "bg-black" },
-         { nome: "amarelo", classe: "bg-yellow-500" },
+         { nome: "Amarelo", classe: "bg-yellow-500" },
       ],
 
       tamanhos: [{ nome: "P" }, { nome: "M" }, { nome: "G" }],

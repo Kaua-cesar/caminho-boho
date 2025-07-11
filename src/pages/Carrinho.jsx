@@ -4,7 +4,7 @@ import {
    removerDoCarrinho,
    salvarCarrinho,
 } from "../utils/carrinho";
-import { FaSearchDollar, FaTruck } from "react-icons/fa";
+import { InfoCarrinho } from "../components/Carrinho/InfoCarrinho";
 
 import TabelaItensCarrinho from "../components/Carrinho/TabelaItensCarrinho";
 import CupomDesconto from "../components/Carrinho/CupomDesconto";
@@ -139,7 +139,7 @@ export default function Carrinho() {
 
          {itens.length > 0 && (
             <>
-               <div className="flex items-center my-6 justify-between mb-14">
+               <div className="flex items-center my-6 justify-between md:mb-14 flex-col md:flex-row">
                   <CupomDesconto
                      cupom={cupom}
                      setCupom={setCupom}
@@ -148,20 +148,8 @@ export default function Carrinho() {
                   />
                   <ResumoCarrinho totalFinal={totalFinal} />
                </div>
-               <div className="flex justify-between flex-col md:flex-row gap-4 mb-6">
-                  <div>
-                     <p className="flex items-center gap-2">
-                        <FaSearchDollar className="text-3xl text-amber-600" />
-                        Ver as formas de pagamento e parcelamento
-                     </p>
-                     <p className="flex items-center gap-2">
-                        <FaTruck className="text-3xl text-amber-600" />
-                        Preencha o campo CEP para calcular o valor do frete e o
-                        prazo
-                     </p>
-                  </div>
-               </div>
-               <div className="flex justify-between">
+               <InfoCarrinho />
+               <div className="flex justify-between md:flex-row flex-col md:mt-0 mt-8">
                   <FreteCEP cep={cep} handleChange={handleChange} />
                   <AcoesCarrinho />
                </div>
