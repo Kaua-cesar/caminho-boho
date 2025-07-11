@@ -10,7 +10,7 @@ export default function AcoesCarrinho() {
             Continuar comprando
          </Link>
          <Link to="/finalizar-compra">
-            <button className="p-3 w-91 md:w-auto bg-amber-600 rounded-sm hover:bg-amber-700 text-white cursor-pointer md:mb-0 mb-20">
+            <button className="p-3 w-91 md:w-auto bg-amber-600 rounded-sm hover:bg-amber-700 text-white cursor-pointer md:mb-0 mb-10">
                Finalizar compra
             </button>
          </Link>

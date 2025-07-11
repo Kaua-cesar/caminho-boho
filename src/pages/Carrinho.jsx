@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import {
    getCarrinho,
    removerDoCarrinho,
@@ -55,7 +56,6 @@ export default function Carrinho() {
    ];
 
    const [cupom, setCupom] = useState("");
-   const [mensagem, setMensagem] = useState("");
    const [cuponsAplicados, setCuponsAplicados] = useState([]);
 
    // Calcula o desconto somando todos os descontos aplicados
@@ -75,36 +75,31 @@ export default function Carrinho() {
       const cupomEncontrado = cuponsValidos.find(
          (c) => c.nomeDoCupom === cupomFormatado
       );
-
+      toast.dismiss(); // limpa todos os toasts antes de mostrar um novo
       if (!cupomEncontrado) {
-         setMensagem("❌ Cupom inválido");
+         toast.error(" Cupom inválido");
          return;
       }
-      // Verifica valor mínimo, se definido
       if (
          cupomEncontrado.minimoCompra &&
          total < cupomEncontrado.minimoCompra
       ) {
-         setMensagem(
-            `❌ Este cupom só é válido para compras acima de R$${cupomEncontrado.minimoCompra}`
+         toast.error(
+            ` Este cupom só é válido para compras acima de R$${cupomEncontrado.minimoCompra}`
          );
          return;
       }
-      // Verifica se o cupom já foi aplicado
       if (cuponsAplicados.some((c) => c.nomeDoCupom === cupomFormatado)) {
-         setMensagem("❌ Você já aplicou esse cupom");
+         toast.error(" Você já aplicou esse cupom");
          return;
       }
-
-      // Limite de 2 cupons aplicados
       if (cuponsAplicados.length >= 2) {
-         setMensagem("❌ Limite de 2 cupons aplicados");
+         toast.error(" Limite de 2 cupons aplicados");
          return;
       }
 
-      // Aplica o cupom
       setCuponsAplicados((prev) => [...prev, cupomEncontrado]);
-      setMensagem("✅ Cupom aplicado com sucesso!");
+      toast.success(" Cupom aplicado com sucesso!");
       setCupom(""); // limpa o campo
    };
 
@@ -121,7 +116,7 @@ export default function Carrinho() {
    };
 
    return (
-      <div className="p-6 mx-auto mt-20 max-w-6xl">
+      <div className="p-6 mx-auto md:mt-20 mt-16 max-w-6xl">
          <h1 className="text-2xl font-bold mb-6 text-center">Seu Carrinho</h1>
 
          {itens.length === 0 ? (
@@ -144,7 +139,6 @@ export default function Carrinho() {
                      cupom={cupom}
                      setCupom={setCupom}
                      aplicarCupom={aplicarCupom}
-                     mensagem={mensagem}
                   />
                   <ResumoCarrinho totalFinal={totalFinal} />
                </div>
