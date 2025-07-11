@@ -15,6 +15,8 @@ import {
    DialogTrigger,
 } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
+import { adicionarAoCarrinho } from "../../utils/carrinho"; // ou o caminho correto
+import { toast } from "sonner";
 
 export function CardDialog({
    id,
@@ -37,14 +39,34 @@ export function CardDialog({
 
    function handleSubmit(e) {
       e.preventDefault();
-      if (tamanhoSelecionado && corSelecionada) {
-         console.log(
-            `Cor: ${corSelecionada}, Tamanho: ${tamanhoSelecionado}, Quantidade: ${quantidade}`
-         );
-         setOpen(false);
-      } else {
-         alert("Selecione uma cor e um tamanho antes de continuar.");
+
+      toast.dismiss(); // Fecha todos os toasts antes
+
+      if (!corSelecionada) {
+         toast.error("Selecione uma cor antes de continuar.", {
+            id: "form-error",
+         });
+         return;
       }
+
+      if (!tamanhoSelecionado) {
+         toast.error("Selecione um tamanho antes de continuar.", {
+            id: "form-error-two",
+         });
+         return;
+      }
+
+      adicionarAoCarrinho({
+         imagem,
+         id,
+         nome,
+         preco: Number(preco),
+         cor: corSelecionada,
+         tamanho: tamanhoSelecionado,
+         quantidade,
+      });
+      toast.success(`${nome} adicionado ao carrinho!`);
+      setOpen(false);
    }
 
    return (
@@ -194,7 +216,15 @@ export function CardDialog({
                         onChange={setQuantidade}
                      />
 
-                     <CardButton type="submit" estoque={estoque} />
+                     <CardButton
+                        type="submit"
+                        estoque={estoque}
+                        id={id}
+                        nome={nome}
+                        preco={preco}
+                        imagem={imagem}
+                        desativarClick={true} // <--- essencial para funcionar como botão de submit
+                     />
 
                      <Separator />
 

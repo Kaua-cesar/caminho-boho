@@ -3,6 +3,9 @@ import { CardDialog } from "./components/Cards/CardDialog";
 import { CardButton } from "./components/Cards/CardButton";
 import Rating from "@mui/material/Rating";
 import Stack from "@mui/material/Stack";
+import { adicionarAoCarrinho } from "./utils/carrinho"; // ajuste o path se necessário
+import { toast } from "sonner";
+
 export function Card({
    nome,
    preco,
@@ -15,12 +18,40 @@ export function Card({
    qntavaliacoes,
    avaliacao,
    id,
-   atualizarTotalFavoritos, // << adicionar aqui
+   atualizarTotalFavoritos,
 }) {
    const [corSelecionada, setCorSelecionada] = useState("");
    const [tamanhoSelecionado, setTamanhoSelecionado] = useState("");
 
-   if (!nome || !imagem || !preco) return null; // proteção
+   if (!nome || !imagem || !preco) return null;
+
+   // 👉 Função para adicionar ao carrinho com validação
+   function handleAdicionarAoCarrinho() {
+      toast.dismiss(); // limpa toasts ativos antes de criar um novo
+      if (cores.length > 0 && !corSelecionada) {
+         toast.error("Selecione uma cor antes de continuar.", {
+            id: "form-error",
+         });
+         return;
+      }
+      if (tamanhos.length > 0 && !tamanhoSelecionado) {
+         toast.error("Selecione um tamanho antes de continuar.", {
+            id: "form-error-two",
+         });
+         return;
+      }
+
+      adicionarAoCarrinho({
+         imagem,
+         id,
+         nome,
+         preco: Number(preco),
+         cor: corSelecionada,
+         tamanho: tamanhoSelecionado,
+         quantidade: 1,
+      });
+      toast.success(`${nome} adicionado ao carrinho!`);
+   }
 
    return (
       <div className="basis-1/6 flex justify-center items-center">
@@ -37,7 +68,7 @@ export function Card({
                tamanhos={tamanhos}
                avaliacao={avaliacao}
                qntavaliacoes={qntavaliacoes}
-               atualizarTotalFavoritos={atualizarTotalFavoritos} // << adicionar aqui
+               atualizarTotalFavoritos={atualizarTotalFavoritos}
             />
             <div className="p-3">
                <div className="flex">
@@ -75,7 +106,7 @@ export function Card({
                      <p className="md:mt-4 mt-2 text-sm text-gray-600">
                         Cor:{" "}
                         <span className="font-medium">
-                           {corSelecionada ? corSelecionada : ""}
+                           {corSelecionada || ""}
                         </span>
                      </p>
                      <div className="flex gap-3 ">
@@ -106,7 +137,7 @@ export function Card({
                      <p className="md:mt-4 mt-2 text-sm text-gray-600">
                         Tamanho:{" "}
                         <span className="font-medium">
-                           {tamanhoSelecionado ? tamanhoSelecionado : ""}
+                           {tamanhoSelecionado || ""}
                         </span>
                      </p>
                      <div className="flex gap-3 ">
@@ -130,15 +161,19 @@ export function Card({
                            </button>
                         ))}
                      </div>
-                     <CardButton
-                        id={id}
-                        nome={nome}
-                        preco={preco}
-                        estoque={estoque}
-                        imagem={imagem}
-                     />
                   </>
                )}
+
+               {/* ✅ Botão corrigido */}
+               <CardButton
+                  id={id}
+                  nome={nome}
+                  preco={preco}
+                  estoque={estoque}
+                  imagem={imagem}
+                  desativarClick={true}
+                  onClick={handleAdicionarAoCarrinho}
+               />
             </div>
          </div>
       </div>

@@ -14,6 +14,7 @@ import MinhaConta from "./pages/MinhaConta";
 import Carrinho from "./pages/Carrinho";
 import RotaPrivada from "./components/auth/RotaPrivada";
 import RotaPublica from "./components/auth/RotaPublica";
+import { Toaster } from "sonner";
 
 function Layout() {
    const location = useLocation();
@@ -29,6 +30,9 @@ function Layout() {
 
    return (
       <>
+         {/* ✅ Toast aqui */}
+         <Toaster position="bottom-right" richColors />
+
          {/* Nav fixo, sobreposto, sem reservar espaço */}
          <div className="fixed top-0 left-0 w-full z-50 bg-white shadow-xs shadow-amber-600/50 h-17 ">
             <Nav />

@@ -26,9 +26,13 @@ export default function Carrinho() {
       return () => window.removeEventListener("carrinhoAtualizado", atualizar);
    }, []);
 
-   const atualizarQuantidade = (id, operacao) => {
+   const atualizarQuantidade = (itemParaAtualizar, operacao) => {
       const atualizado = itens.map((item) => {
-         if (item.id === id) {
+         if (
+            item.id === itemParaAtualizar.id &&
+            item.cor === itemParaAtualizar.cor &&
+            item.tamanho === itemParaAtualizar.tamanho
+         ) {
             const novaQtd =
                operacao === "somar"
                   ? item.quantidade + 1
@@ -126,25 +130,24 @@ export default function Carrinho() {
             <TabelaItensCarrinho
                itens={itens}
                atualizarQuantidade={atualizarQuantidade}
-               removerDoCarrinho={(id) => {
-                  removerDoCarrinho(id);
+               removerDoCarrinho={(item) => {
+                  removerDoCarrinho(item);
                   setItens(getCarrinho());
                }}
             />
          )}
 
-         <div className="flex items-center my-6 justify-between mb-14">
-            <CupomDesconto
-               cupom={cupom}
-               setCupom={setCupom}
-               aplicarCupom={aplicarCupom}
-               mensagem={mensagem}
-            />
-            <ResumoCarrinho totalFinal={totalFinal} />
-         </div>
-
          {itens.length > 0 && (
             <>
+               <div className="flex items-center my-6 justify-between mb-14">
+                  <CupomDesconto
+                     cupom={cupom}
+                     setCupom={setCupom}
+                     aplicarCupom={aplicarCupom}
+                     mensagem={mensagem}
+                  />
+                  <ResumoCarrinho totalFinal={totalFinal} />
+               </div>
                <div className="flex justify-between flex-col md:flex-row gap-4 mb-6">
                   <div>
                      <p className="flex items-center gap-2">

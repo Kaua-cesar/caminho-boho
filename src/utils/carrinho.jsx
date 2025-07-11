@@ -1,5 +1,3 @@
-// src/utils/carrinho.js
-
 const KEY = "carrinho";
 
 export function getCarrinho() {
@@ -24,15 +22,22 @@ export function adicionarAoCarrinho(produto) {
    }
 
    const carrinho = getCarrinho();
-   const itemExistente = carrinho.find((item) => item.id === produto.id);
+
+   // Verifica item pelo trio: id + cor + tamanho
+   const itemExistente = carrinho.find(
+      (item) =>
+         item.id === produto.id &&
+         item.cor === produto.cor &&
+         item.tamanho === produto.tamanho
+   );
 
    if (itemExistente) {
-      itemExistente.quantidade += 1;
+      itemExistente.quantidade += produto.quantidade || 1;
    } else {
       carrinho.push({
          ...produto,
          preco: produto.preco ?? produto.precoOriginal,
-         quantidade: 1,
+         quantidade: produto.quantidade || 1,
       });
    }
 
@@ -40,8 +45,15 @@ export function adicionarAoCarrinho(produto) {
    window.dispatchEvent(new Event("carrinhoAtualizado"));
 }
 
-export function removerDoCarrinho(id) {
-   const carrinho = getCarrinho().filter((item) => item.id !== id);
+export function removerDoCarrinho(itemParaRemover) {
+   const carrinho = getCarrinho().filter(
+      (item) =>
+         !(
+            item.id === itemParaRemover.id &&
+            item.cor === itemParaRemover.cor &&
+            item.tamanho === itemParaRemover.tamanho
+         )
+   );
    salvarCarrinho(carrinho);
    window.dispatchEvent(new Event("carrinhoAtualizado"));
 }

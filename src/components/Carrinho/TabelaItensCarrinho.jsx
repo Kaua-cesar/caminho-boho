@@ -32,15 +32,29 @@ export default function TabelaItensCarrinho({
                </TableHeader>
 
                <TableBody>
-                  {itens.map((item) => (
-                     <TableRow key={item.id}>
-                        <TableCell className="flex items-center gap-4">
-                           <img
-                              src={item.imagem}
-                              alt={item.nome}
-                              className="w-24 h-24 object-cover rounded"
-                           />
-                           <span className="font-medium">{item.nome}</span>
+                  {itens.map((item, idx) => (
+                     <TableRow
+                        key={`${item.id}-${item.cor}-${item.tamanho}-${idx}`}
+                     >
+                        <TableCell className="flex flex-col gap-1">
+                           <div className="flex items-center gap-4">
+                              <img
+                                 src={item.imagem}
+                                 alt={item.nome}
+                                 className="w-24 h-24 object-cover rounded"
+                              />
+                              <div>
+                                 <span className="font-medium">
+                                    {item.nome}
+                                 </span>
+                                 <div className="text-sm text-gray-600">
+                                    {item.cor && <span>Cor: {item.cor} </span>}
+                                    {item.tamanho && (
+                                       <span> | Tamanho: {item.tamanho}</span>
+                                    )}
+                                 </div>
+                              </div>
+                           </div>
                         </TableCell>
 
                         <TableCell className="text-center">
@@ -49,7 +63,7 @@ export default function TabelaItensCarrinho({
                                  <button
                                     className="px-2 py-1 border rounded-md cursor-pointer"
                                     onClick={() =>
-                                       atualizarQuantidade(item.id, "subtrair")
+                                       atualizarQuantidade(item, "subtrair")
                                     }
                                  >
                                     -
@@ -58,14 +72,14 @@ export default function TabelaItensCarrinho({
                                  <button
                                     className="px-2 py-1 border rounded-md cursor-pointer"
                                     onClick={() =>
-                                       atualizarQuantidade(item.id, "somar")
+                                       atualizarQuantidade(item, "somar")
                                     }
                                  >
                                     +
                                  </button>
                               </div>
                               <button
-                                 onClick={() => removerDoCarrinho(item.id)}
+                                 onClick={() => removerDoCarrinho(item)}
                                  className="text-zinc-500 hover:text-red-500 hover:underline text-sm flex items-center gap-1 mt-1 cursor-pointer"
                               >
                                  <FaTrashAlt /> Remover
