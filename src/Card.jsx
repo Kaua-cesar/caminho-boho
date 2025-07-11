@@ -3,8 +3,9 @@ import { CardDialog } from "./components/Cards/CardDialog";
 import { CardButton } from "./components/Cards/CardButton";
 import Rating from "@mui/material/Rating";
 import Stack from "@mui/material/Stack";
-import { adicionarAoCarrinho } from "./utils/carrinho"; // ajuste o path se necessário
 import { toast } from "sonner";
+
+import { useCart } from "./context/CartContext";
 
 export function Card({
    nome,
@@ -23,25 +24,39 @@ export function Card({
    const [corSelecionada, setCorSelecionada] = useState("");
    const [tamanhoSelecionado, setTamanhoSelecionado] = useState("");
 
+   const { addItemToCart } = useCart();
+
    if (!nome || !imagem || !preco) return null;
 
-   // 👉 Função para adicionar ao carrinho com validação
-   function handleAdicionarAoCarrinho() {
-      toast.dismiss(); // limpa toasts ativos antes de criar um novo
+   async function handleAdicionarAoCarrinho() {
+      toast.dismiss();
+
+      let errorMessages = [];
+
       if (cores.length > 0 && !corSelecionada) {
-         toast.error("Selecione uma cor antes de continuar.", {
-            id: "form-error",
-         });
-         return;
+         errorMessages.push("selecione uma cor");
       }
       if (tamanhos.length > 0 && !tamanhoSelecionado) {
-         toast.error("Selecione um tamanho antes de continuar.", {
-            id: "form-error-two",
-         });
+         errorMessages.push("selecione um tamanho");
+      }
+
+      if (errorMessages.length > 0) {
+         let message = "Por favor, ";
+         if (errorMessages.length === 1) {
+            message += errorMessages[0]; // Correção aqui: atribua a mensagem
+         } else {
+            message +=
+               errorMessages.slice(0, -1).join(", ") +
+               " e " +
+               errorMessages[errorMessages.length - 1];
+         }
+         toast.error(message + " antes de adicionar ao carrinho.");
          return;
       }
 
-      adicionarAoCarrinho({
+      // A função addItemToCart do CartContext já lida com o toast de sucesso/erro de adição e login.
+      // Não precisamos de um toast adicional aqui para o sucesso.
+      await addItemToCart({
          imagem,
          id,
          nome,
@@ -50,12 +65,11 @@ export function Card({
          tamanho: tamanhoSelecionado,
          quantidade: 1,
       });
-      toast.success(`${nome} adicionado ao carrinho!`);
    }
 
    return (
       <div className="basis-1/6 flex justify-center items-center">
-         <div className="w-80 max-w-full md:mx-0  shadow-md md:h-180 h-155 rounded-md flex-col flex transition-transform duration-300 ease-in-out">
+         <div className="w-80 max-w-full md:mx-0 shadow-md md:h-180 h-155 rounded-md flex-col flex transition-transform duration-300 ease-in-out">
             <CardDialog
                id={id}
                nome={nome}
@@ -119,12 +133,12 @@ export function Card({
                                  )
                               }
                               className={`md:w-7 md:h-7 rounded-full border-2 transition cursor-pointer w-6 h-6
-                                 ${cor.classe} 
-                                 ${
-                                    corSelecionada === cor.nome
-                                       ? "border-black scale-110 "
-                                       : "border-gray-300"
-                                 }`}
+                                                ${cor.classe}
+                                                ${
+                                                   corSelecionada === cor.nome
+                                                      ? "border-black scale-110 "
+                                                      : "border-gray-300"
+                                                }`}
                               title={cor.nome}
                            ></button>
                         ))}
@@ -149,13 +163,15 @@ export function Card({
                                     atual === tamanho.nome ? "" : tamanho.nome
                                  )
                               }
-                              className={`md:w-8 md:h-8 rounded-sm border-1 transition md:text-sm cursor-pointer  w-6 h-6 text-xs
-                                 ${tamanho.classe || ""} 
-                                 ${
-                                    tamanhoSelecionado === tamanho.nome
-                                       ? "bg-black text-white "
-                                       : "border-gray-300 hover:bg-zinc-200/60"
-                                 }`}
+                              className={`md:w-8 md:h-8 rounded-sm border-1 transition md:text-sm cursor-pointer w-6 h-6 text-xs
+                                                ${tamanho.classe || ""}
+                                                ${
+                                                   tamanhoSelecionado ===
+                                                   tamanho.nome
+                                                      ? "bg-black text-white "
+                                                      : "border-gray-300 hover:bg-zinc-200/60"
+                                                }`}
+                              title={tamanho.nome}
                            >
                               {tamanho.nome}
                            </button>
@@ -164,13 +180,15 @@ export function Card({
                   </>
                )}
 
-               {/* ✅ Botão corrigido */}
                <CardButton
                   id={id}
                   nome={nome}
                   preco={preco}
                   estoque={estoque}
                   imagem={imagem}
+                  corSelecionada={corSelecionada}
+                  tamanhoSelecionado={tamanhoSelecionado}
+                  quantidade={1}
                   desativarClick={true}
                   onClick={handleAdicionarAoCarrinho}
                />

@@ -1,38 +1,27 @@
+// src/components/CardButton.jsx
 import { RiShoppingCartFill } from "react-icons/ri";
-import { adicionarAoCarrinho } from "../../utils/carrinho";
+// Não precisamos do useCart aqui, pois a lógica de adicionar
+// será tratada pelo componente pai (CardDialog)
+// import { useCart } from "../../context/CartContext";
 
 export function CardButton({
-   nome,
-   preco,
    estoque,
-   imagem,
-   id,
-   desativarClick = false,
-   type = "button",
-   onClick, // ✅ função externa (opcional)
+   type = "button", // Manter type como "button" por padrão é bom para reuso
+   onClick, // ✅ A função externa que o pai (CardDialog) passa
+   // Removendo props não usadas diretamente pelo CardButton para addItemToCart
+   // id, nome, preco, imagem, corSelecionada, tamanhoSelecionado, quantidade
 }) {
-   function handleClick() {
-      if (desativarClick && typeof onClick === "function") {
-         return onClick(); // chama o que veio de fora
-      }
-      if (!desativarClick) {
-         adicionarAoCarrinho({
-            imagem,
-            id,
-            nome,
-            preco: Number(preco),
-            cor: corSelecionada,
-            tamanho: tamanhoSelecionado,
-            quantidade,
-         });
-      }
-   }
+   // Não precisamos de handleClick interno que chame addItemToCart diretamente.
+   // O onClick do pai (handleSubmit) já fará isso.
 
    return (
       <button
-         type={type}
+         // IMPORTANTE: Definir o tipo como "submit" para que o formulário seja submetido
+         // A menos que você tenha uma boa razão para que ele seja "button" e chame onClick.
+         // Para o CardDialog, ele DEVE ser "submit".
+         type={type} // Permite que o pai decida se é 'button' ou 'submit'
          className="flex justify-center w-full md:min-h-auto min-h-14 mt-4"
-         onClick={handleClick}
+         onClick={onClick} // Passa o onClick recebido diretamente para o botão
          disabled={Number(estoque) <= 0}
       >
          {Number(estoque) > 0 ? (

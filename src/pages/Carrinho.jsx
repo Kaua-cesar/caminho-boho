@@ -1,12 +1,9 @@
+// src/pages/Carrinho.jsx
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import {
-   getCarrinho,
-   removerDoCarrinho,
-   salvarCarrinho,
-} from "../utils/carrinho";
-import { InfoCarrinho } from "../components/Carrinho/InfoCarrinho";
+import { useCart } from "../context/CartContext"; // <--- AJUSTE ESTE CAMINHO SE NECESSÁRIO
 
+import { InfoCarrinho } from "../components/Carrinho/InfoCarrinho";
 import TabelaItensCarrinho from "../components/Carrinho/TabelaItensCarrinho";
 import CupomDesconto from "../components/Carrinho/CupomDesconto";
 import ResumoCarrinho from "../components/Carrinho/ResumoCarrinho";
@@ -14,39 +11,9 @@ import FreteCEP from "../components/Carrinho/FreteCEP";
 import AcoesCarrinho from "../components/Carrinho/AcoesCarrinho";
 
 export default function Carrinho() {
-   const [itens, setItens] = useState([]);
-
-   useEffect(() => {
-      setItens(getCarrinho());
-
-      function atualizar() {
-         setItens(getCarrinho());
-      }
-
-      window.addEventListener("carrinhoAtualizado", atualizar);
-      return () => window.removeEventListener("carrinhoAtualizado", atualizar);
-   }, []);
-
-   const atualizarQuantidade = (itemParaAtualizar, operacao) => {
-      const atualizado = itens.map((item) => {
-         if (
-            item.id === itemParaAtualizar.id &&
-            item.cor === itemParaAtualizar.cor &&
-            item.tamanho === itemParaAtualizar.tamanho
-         ) {
-            const novaQtd =
-               operacao === "somar"
-                  ? item.quantidade + 1
-                  : Math.max(1, item.quantidade - 1);
-            return { ...item, quantidade: novaQtd };
-         }
-         return item;
-      });
-
-      setItens(atualizado);
-      salvarCarrinho(atualizado);
-      window.dispatchEvent(new Event("carrinhoAtualizado"));
-   };
+   // Agora, obtenha os itens do carrinho e as funções de manipulação do useCart
+   const { cartItems, cartLoading, removeItemFromCart, updateItemQuantity } =
+      useCart();
 
    const cuponsValidos = [
       { nomeDoCupom: "PRIMEIRA", descontoTotal: 0.1 },
@@ -64,7 +31,8 @@ export default function Carrinho() {
       0
    );
 
-   const total = itens.reduce(
+   const total = cartItems.reduce(
+      // Use cartItems diretamente
       (soma, item) => soma + item.preco * item.quantidade,
       0
    );
@@ -115,24 +83,42 @@ export default function Carrinho() {
       setCep(formatarCep(valor));
    };
 
+   // Função para atualizar quantidade, agora usa updateItemQuantity do contexto
+   const handleUpdateQuantity = (itemParaAtualizar, operacao) => {
+      const newQuantity =
+         operacao === "somar"
+            ? itemParaAtualizar.quantidade + 1
+            : Math.max(1, itemParaAtualizar.quantidade - 1);
+
+      // CORREÇÃO: Passando id, nova quantidade, cor e tamanho
+      updateItemQuantity(
+         itemParaAtualizar.id,
+         newQuantity,
+         itemParaAtualizar.cor,
+         itemParaAtualizar.tamanho
+      );
+   };
+
    return (
       <div className="p-6 mx-auto md:mt-20 mt-16 max-w-6xl">
          <h1 className="text-2xl font-bold mb-6 text-center">Seu Carrinho</h1>
 
-         {itens.length === 0 ? (
+         {cartLoading ? ( // Mostra um loader enquanto o carrinho está sendo carregado
+            <p className="text-gray-600 text-center">Carregando carrinho...</p>
+         ) : cartItems.length === 0 ? ( // Mostra mensagem de vazio se não houver itens
             <p className="text-gray-600 text-center">O carrinho está vazio.</p>
          ) : (
             <TabelaItensCarrinho
-               itens={itens}
-               atualizarQuantidade={atualizarQuantidade}
+               itens={cartItems} // Use cartItems diretamente
+               atualizarQuantidade={handleUpdateQuantity} // Use a nova função que chama o contexto
                removerDoCarrinho={(item) => {
-                  removerDoCarrinho(item);
-                  setItens(getCarrinho());
+                  // CORREÇÃO: Passando id, cor e tamanho
+                  removeItemFromCart(item.id, item.cor, item.tamanho);
                }}
             />
          )}
 
-         {itens.length > 0 && (
+         {cartItems.length > 0 && ( // Condição baseada em cartItems
             <>
                <div className="flex items-center my-6 justify-between md:mb-14 flex-col md:flex-row">
                   <CupomDesconto

@@ -1,3 +1,4 @@
+// src/components/CardDialog.jsx
 import React, { useState } from "react";
 import { ContadorCliques } from "../ui/contador";
 import { CardButton } from "./CardButton";
@@ -15,8 +16,9 @@ import {
    DialogTrigger,
 } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
-import { adicionarAoCarrinho } from "../../utils/carrinho"; // ou o caminho correto
 import { toast } from "sonner";
+
+import { useCart } from "../../context/CartContext";
 
 export function CardDialog({
    id,
@@ -37,36 +39,52 @@ export function CardDialog({
    const [quantidade, setQuantidade] = useState(1);
    const [open, setOpen] = useState(false);
 
-   function handleSubmit(e) {
+   const { addItemToCart } = useCart();
+
+   async function handleSubmit(e) {
       e.preventDefault();
 
-      toast.dismiss(); // Fecha todos os toasts antes
+      toast.dismiss(); // Garante que toasts anteriores sejam limpos
 
-      if (!corSelecionada) {
-         toast.error("Selecione uma cor antes de continuar.", {
-            id: "form-error",
-         });
+      let errorMessages = [];
+
+      // Validação da cor
+      if (cores.length > 0 && !corSelecionada) {
+         errorMessages.push("selecione uma cor");
+      }
+      if (tamanhos.length > 0 && !tamanhoSelecionado) {
+         errorMessages.push("selecione um tamanho");
+      }
+
+      if (errorMessages.length > 0) {
+         let message = "Por favor, ";
+         if (errorMessages.length === 1) {
+            message += errorMessages[0]; // Correção aqui: atribua a mensagem
+         } else {
+            message +=
+               errorMessages.slice(0, -1).join(", ") +
+               " e " +
+               errorMessages[errorMessages.length - 1];
+         }
+         toast.error(message + " antes de adicionar ao carrinho.");
          return;
       }
 
-      if (!tamanhoSelecionado) {
-         toast.error("Selecione um tamanho antes de continuar.", {
-            id: "form-error-two",
-         });
-         return;
-      }
-
-      adicionarAoCarrinho({
+      const productData = {
          imagem,
          id,
          nome,
          preco: Number(preco),
-         cor: corSelecionada,
-         tamanho: tamanhoSelecionado,
-         quantidade,
-      });
-      toast.success(`${nome} adicionado ao carrinho!`);
-      setOpen(false);
+         cor: cores.length > 0 ? corSelecionada : "",
+         tamanho: tamanhos.length > 0 ? tamanhoSelecionado : "",
+         quantidade: quantidade,
+      };
+
+      const success = await addItemToCart(productData);
+
+      if (success) {
+         setOpen(false);
+      }
    }
 
    return (
@@ -108,7 +126,7 @@ export function CardDialog({
                   <img
                      src={imagem}
                      alt={nome}
-                     className=" rounded-md md:w-100 md:h-auto h-154 object-cover transition-all duration-300 ease-in-out group-hover:scale-110 group-hover:brightness-80"
+                     className="rounded-md md:w-100 md:h-auto h-154 object-cover transition-all duration-300 ease-in-out group-hover:scale-110 group-hover:brightness-80"
                   />
                </div>
 
@@ -153,60 +171,73 @@ export function CardDialog({
                         </span>
                      )}
 
-                     <p className="mt-2 text-sm text-gray-600 font-medium text-start">
-                        Cor:{" "}
-                        <span className="font-semibold">{corSelecionada}</span>
-                     </p>
-                     <div className="flex gap-3">
-                        {cores.map((cor) => (
-                           <button
-                              type="button"
-                              key={cor.nome}
-                              onClick={() =>
-                                 setCorSelecionada((atual) =>
-                                    atual === cor.nome ? "" : cor.nome
-                                 )
-                              }
-                              className={`w-7 h-7 rounded-full border-2 transition cursor-pointer ${
-                                 cor.classe
-                              } ${
-                                 corSelecionada === cor.nome
-                                    ? "border-black scale-110"
-                                    : "border-gray-300"
-                              }`}
-                              title={cor.nome}
-                           ></button>
-                        ))}
-                     </div>
+                     {cores.length > 0 && (
+                        <>
+                           <p className="mt-2 text-sm text-gray-600 font-medium text-start">
+                              Cor:{" "}
+                              <span className="font-semibold">
+                                 {corSelecionada}
+                              </span>
+                           </p>
+                           <div className="flex gap-3">
+                              {cores.map((cor) => (
+                                 <button
+                                    type="button"
+                                    key={cor.nome}
+                                    onClick={() =>
+                                       setCorSelecionada((atual) =>
+                                          atual === cor.nome ? "" : cor.nome
+                                       )
+                                    }
+                                    className={`w-7 h-7 rounded-full border-2 transition cursor-pointer ${
+                                       cor.classe
+                                    } ${
+                                       corSelecionada === cor.nome
+                                          ? "border-black scale-110"
+                                          : "border-gray-300"
+                                    }`}
+                                    title={cor.nome}
+                                 ></button>
+                              ))}
+                           </div>
+                        </>
+                     )}
 
-                     <p className="mt-2 text-sm text-gray-600 font-medium text-start">
-                        Tamanho:{" "}
-                        <span className="font-semibold">
-                           {tamanhoSelecionado}
-                        </span>
-                     </p>
-                     <div className="flex gap-3 ">
-                        {tamanhos.map((tamanho) => (
-                           <button
-                              type="button"
-                              key={tamanho.nome}
-                              onClick={() =>
-                                 setTamanhoSelecionado((atual) =>
-                                    atual === tamanho.nome ? "" : tamanho.nome
-                                 )
-                              }
-                              className={`w-8 h-8 rounded-sm border-1 transition text-xs md:text-sm cursor-pointer ${
-                                 tamanho.classe || ""
-                              } ${
-                                 tamanhoSelecionado === tamanho.nome
-                                    ? "bg-black text-white"
-                                    : "border-gray-300 hover:bg-zinc-200/60"
-                              }`}
-                           >
-                              {tamanho.nome}
-                           </button>
-                        ))}
-                     </div>
+                     {tamanhos.length > 0 && (
+                        <>
+                           <p className="mt-2 text-sm text-gray-600 font-medium text-start">
+                              Tamanho:{" "}
+                              <span className="font-semibold">
+                                 {tamanhoSelecionado}
+                              </span>
+                           </p>
+                           <div className="flex gap-3 ">
+                              {tamanhos.map((tamanho) => (
+                                 <button
+                                    type="button"
+                                    key={tamanho.nome}
+                                    onClick={() =>
+                                       setTamanhoSelecionado((atual) =>
+                                          atual === tamanho.nome
+                                             ? ""
+                                             : tamanho.nome
+                                       )
+                                    }
+                                    className={`w-8 h-8 rounded-sm border-1 transition text-xs md:text-sm cursor-pointer ${
+                                       tamanho.classe || ""
+                                    } ${
+                                       tamanhoSelecionado === tamanho.nome
+                                          ? "bg-black text-white"
+                                          : "border-gray-300 hover:bg-zinc-200/60"
+                                    }`}
+                                    title={tamanho.nome}
+                                 >
+                                    {tamanho.nome}
+                                 </button>
+                              ))}
+                           </div>
+                        </>
+                     )}
 
                      <p className="mt-2 text-sm text-gray-600 font-medium text-start">
                         Quantidade:
@@ -217,13 +248,16 @@ export function CardDialog({
                      />
 
                      <CardButton
-                        type="submit"
-                        estoque={estoque}
                         id={id}
                         nome={nome}
                         preco={preco}
+                        estoque={estoque}
                         imagem={imagem}
-                        desativarClick={true} // <--- essencial para funcionar como botão de submit
+                        corSelecionada={corSelecionada}
+                        tamanhoSelecionado={tamanhoSelecionado}
+                        quantidade={quantidade}
+                        type="submit"
+                        onClick={handleSubmit}
                      />
 
                      <Separator />
@@ -245,7 +279,7 @@ export function CardDialog({
                      </p>
 
                      <DialogDescription />
-                  </form>{" "}
+                  </form>
                </DialogHeader>
             </DialogContent>
          </Dialog>

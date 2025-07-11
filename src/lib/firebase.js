@@ -1,10 +1,15 @@
 // src/lib/firebase.js
 
-// Importa as funções necessárias do Firebase SDK
+// Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
+// Adicione a importação de getFirestore AQUI
+import { getFirestore } from "firebase/firestore";
+import { getAuth } from "firebase/auth"; // Se você estiver usando autenticação, também precisará desta
 
-// Sua configuração do Firebase (substitua pelos seus próprios valores)
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
 const firebaseConfig = {
    apiKey: "AIzaSyDuzs7C2bcwm0fuen7g-Etnf0SYqXDh3lo",
    authDomain: "caminhoboho-66c5b.firebaseapp.com",
@@ -15,9 +20,9 @@ const firebaseConfig = {
    // measurementId: "YOUR_MEASUREMENT_ID", // Opcional, se estiver usando Analytics
 };
 
-// Inicializa o Firebase
+// Initialize Firebase
 const app = initializeApp(firebaseConfig);
 
-// Obtém instâncias dos serviços
+// Inicialize o Firestore AQUI
+export const db = getFirestore(app); // Esta é a linha 23 que está dando erro no seu código
 export const auth = getAuth(app);
-export const db = getFirestore(app); // <-- Agora getFirestore estará definido
