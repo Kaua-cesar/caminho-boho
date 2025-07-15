@@ -1,49 +1,65 @@
+// src/main.jsx
 import React, { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
 
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+
 import { AuthProvider } from "./context/AuthContext";
-import { CartProvider } from "./context/CartContext"; // Importe o CartProvider
+import { CartProvider } from "./context/CartContext";
+import { FavoritesProvider } from "./context/FavoritesContext";
+
+import { Toaster } from "sonner";
 
 import { Nav } from "./Nav";
 import { Carrosel } from "./Carrosel";
+
 import { Home } from "./components/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import MinhaConta from "./pages/MinhaConta";
 import Carrinho from "./pages/Carrinho";
+import { FavoritesPage } from "./pages/FavoritesPage";
+import { CategoriesPage } from "./pages/CategoriesPage";
+import { ProductsByCategoryPage } from "./pages/ProductsByCategoryPage";
+import { ProductsPage } from "./pages/ProductsPage";
+import { AboutPage } from "./pages/AboutPage";
+import { ContactPage } from "./pages/ContactPage";
+
 import RotaPrivada from "./components/auth/RotaPrivada";
 import RotaPublica from "./components/auth/RotaPublica";
-import { Toaster } from "sonner";
 
 function Layout() {
    const location = useLocation();
 
-   const esconderCarrosel = [
+   // Rotas onde o carrosel não deve aparecer
+   const rotasSemCarrosel = [
       "/login",
       "/register",
       "/minha-conta",
       "/carrinho",
       "/finalizar-compra",
-   ].some((path) => location.pathname.startsWith(path));
-   const mostrarCarrosel = !esconderCarrosel;
+      "/favoritos",
+      "/categorias",
+      "/produtos",
+      "/sobre",
+      "/contato",
+   ];
+
+   const isCategoryProductRoute = location.pathname.startsWith(
+      "/produtos/categoria/"
+   );
+   const mostrarCarrosel =
+      !rotasSemCarrosel.some((path) => location.pathname.startsWith(path)) &&
+      !isCategoryProductRoute;
 
    return (
       <>
-         {/* ✅ Toast aqui */}
-         {/* A Toaster agora será movida para o createRoot, como mostrado abaixo */}
-
-         {/* Nav fixo, sobreposto, sem reservar espaço */}
-         <div className="fixed top-0 left-0 w-full z-50 bg-white shadow-xs shadow-amber-600/50 h-17 ">
+         <div className="fixed top-0 left-0 w-full z-50 bg-white shadow-xs shadow-amber-600/50 h-17">
             <Nav />
          </div>
-
-         {/* Aqui, NÃO coloque padding/margin top, pois Nav é sobreposto */}
-
-         <div>
+         <div style={{ paddingTop: "4.25rem" }}>
             {mostrarCarrosel && <Carrosel />}
-
             <Routes>
                <Route path="/" element={<Home />} />
                <Route
@@ -78,23 +94,40 @@ function Layout() {
                      </RotaPrivada>
                   }
                />
-               {/* Adicione outras rotas conforme necessário */}
+               <Route
+                  path="/favoritos"
+                  element={
+                     <RotaPrivada>
+                        <FavoritesPage />
+                     </RotaPrivada>
+                  }
+               />
+               <Route path="/categorias" element={<CategoriesPage />} />
+               <Route path="/sobre" element={<AboutPage />} />
+               <Route path="/contato" element={<ContactPage />} />
+               <Route
+                  path="/produtos/categoria/:categoryName"
+                  element={<ProductsByCategoryPage />}
+               />
+               <Route path="/produtos" element={<ProductsPage />} />
             </Routes>
          </div>
       </>
    );
 }
 
-// O createRoot deve envolver todo o aplicativo com os Providers necessários
 createRoot(document.getElementById("root")).render(
    <StrictMode>
       <BrowserRouter>
          <AuthProvider>
-            {/* O CartProvider deve estar DENTRO do AuthProvider */}
             <CartProvider>
-               <Layout />
-               {/* A Toaster pode ser colocada aqui para estar disponível em toda a aplicação */}
-               <Toaster position="bottom-right" richColors />
+               <FavoritesProvider>
+                  {/* Se estiver usando Stripe, envolva o Layout com <Elements> aqui */}
+                  {/* <Elements stripe={stripePromise}> */}
+                  <Layout />
+                  {/* </Elements> */}
+                  <Toaster position="bottom-right" richColors />
+               </FavoritesProvider>
             </CartProvider>
          </AuthProvider>
       </BrowserRouter>

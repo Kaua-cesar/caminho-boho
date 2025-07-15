@@ -199,6 +199,14 @@ export const CartProvider = ({ children }) => {
       }
    };
 
+   // NOVA FUNÇÃO: Calcula o preço total do carrinho
+   const getTotalPrice = () => {
+      return cartItems.reduce(
+         (total, item) => total + item.preco * item.quantidade,
+         0
+      );
+   };
+
    return (
       <CartContext.Provider
          value={{
@@ -208,6 +216,7 @@ export const CartProvider = ({ children }) => {
             removeItemFromCart,
             updateItemQuantity,
             clearCart,
+            getTotalPrice, // <--- ADICIONE ESTA LINHA AQUI
          }}
       >
          {children}

@@ -1,7 +1,8 @@
+// src/Nav.jsx
 import { IoHeartOutline } from "react-icons/io5";
-import { RiShoppingCartFill } from "react-icons/ri";
-import Logo from "./assets/logo.png";
-import React, { useState, useEffect } from "react";
+import { RiShoppingCartFill } from "react-icons/ri"; // Assumindo que você usa este ícone para o carrinho
+import Logo from "./assets/logo.png"; // Verifique se o caminho do logo está correto
+import React from "react"; // Removido useState, useEffect, pois o contexto os substitui
 import { FiUser } from "react-icons/fi";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import {
@@ -11,9 +12,12 @@ import {
    DropdownMenuLabel,
    DropdownMenuSeparator,
    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from "@/components/ui/dropdown-menu"; // Assumindo shadcn/ui DropdownMenu
 
 import { useAuth } from "./context/AuthContext";
+import { useFavorites } from "./context/FavoritesContext"; // ✨ IMPORTANTE: Use o FavoritesContext aqui!
+// Se você tem um contexto de carrinho, importe-o também para exibir a contagem
+// import { useCart } from './context/CartContext';
 
 function estaNaRota(rotas, caminhoAtual) {
    return rotas.includes(caminhoAtual);
@@ -21,32 +25,14 @@ function estaNaRota(rotas, caminhoAtual) {
 
 export function Nav() {
    const { user, logout } = useAuth();
+   const { totalFavorites } = useFavorites(); // ✨ OBTENHA O TOTAL DE FAVORITOS DIRETAMENTE DO CONTEXTO!
+   // const { totalItems: totalCartItems } = useCart(); // Se usar CartContext
+
    const navigate = useNavigate();
    const location = useLocation();
 
-   const [totalFavoritos, setTotalFavoritos] = useState(0);
-
-   function atualizarTotalFavoritos() {
-      const favoritos = JSON.parse(localStorage.getItem("favoritos")) || [];
-      setTotalFavoritos(favoritos.length);
-   }
-
-   useEffect(() => {
-      atualizarTotalFavoritos();
-
-      function onFavoritosAtualizados() {
-         atualizarTotalFavoritos();
-      }
-
-      window.addEventListener("favoritosAtualizados", onFavoritosAtualizados);
-
-      return () => {
-         window.removeEventListener(
-            "favoritosAtualizados",
-            onFavoritosAtualizados
-         );
-      };
-   }, []);
+   // Removidas as funções 'useState', 'useEffect' e 'atualizarTotalFavoritos'
+   // pois o contexto já gerencia isso reativamente.
 
    const naRotaLoginOuRegister = estaNaRota(
       ["/login", "/register"],
@@ -56,7 +42,7 @@ export function Nav() {
    return (
       <>
          {!naRotaLoginOuRegister && (
-            <div className="  text-amber-600 font-semibold flex items-center justify-between px-8 md:px-32 w-full h-17 bg-white shadow-xs shadow-amber-600/50">
+            <div className="text-amber-600 font-semibold flex items-center justify-between px-8 md:px-32 w-full h-17 bg-white shadow-xs shadow-amber-600/50">
                <div className="flex items-center">
                   <Link to="/">
                      <img
@@ -145,24 +131,30 @@ export function Nav() {
                      </DropdownMenuContent>
                   </DropdownMenu>
 
-                  <div className="relative">
+                  {/* ✨ Ícone de Favoritos usando o totalFavorites do contexto */}
+                  <Link to="/favoritos" className="relative">
                      <IoHeartOutline className="cursor-pointer" />
-                     {totalFavoritos >= 1 && (
-                        <span className="absolute -top-2 -right-2 text-white bg-amber-500 text-xs p-1 rounded-full">
-                           {totalFavoritos}
+                     {totalFavorites > 0 && ( // Exibe a bolha apenas se houver favoritos
+                        <span className="absolute -top-2 -right-2 text-white bg-amber-500 text-xs p-1 rounded-full flex items-center justify-center min-w-[1.25rem] h-[1.25rem]">
+                           {totalFavorites}
                         </span>
                      )}
-                  </div>
+                  </Link>
 
-                  <RiShoppingCartFill
-                     className="cursor-pointer"
-                     onClick={() => navigate("/carrinho")}
-                  />
+                  {/* Ícone de Carrinho (exemplo de como usar se tiver CartContext) */}
+                  <Link to="/carrinho" className="relative">
+                     <RiShoppingCartFill className="cursor-pointer" />
+                     {/* {totalCartItems > 0 && ( // Descomente se tiver CartContext
+                                <span className="absolute -top-2 -right-2 text-white bg-blue-500 text-xs p-1 rounded-full flex items-center justify-center min-w-[1.25rem] h-[1.25rem]">
+                                    {totalCartItems}
+                                </span>
+                            )} */}
+                  </Link>
                </div>
             </div>
          )}
          {naRotaLoginOuRegister && (
-            <div className="  text-amber-600 font-semibold flex items-center justify-center px-8 md:px-32 w-full h-17 bg-white shadow-xs shadow-amber-600/50">
+            <div className="text-amber-600 font-semibold flex items-center justify-center px-8 md:px-32 w-full h-17 bg-white shadow-xs shadow-amber-600/50">
                <div className="flex items-center">
                   <Link to="/">
                      <img

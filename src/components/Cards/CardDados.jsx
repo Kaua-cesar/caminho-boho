@@ -25,7 +25,7 @@ export const produtos = [
       id: "prod2",
       nome: "Vestido Vest Lenco Elegante [ EDICAO ESPECIAL ] ",
 
-      precoOriginal: 399.99,
+      precoOriginal: 1,
       categoria: "vestlenco",
       cores: [
          { nome: "Azul", classe: "bg-blue-500" },
