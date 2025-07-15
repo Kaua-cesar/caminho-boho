@@ -16,6 +16,9 @@ export const CartProvider = ({ children }) => {
    const [cartItems, setCartItems] = useState([]);
    const [cartLoading, setCartLoading] = useState(true);
 
+   // ✨ NOVA LINHA: Calcula o total de itens no carrinho
+   const totalItems = cartItems.reduce((acc, item) => acc + item.quantidade, 0);
+
    useEffect(() => {
       const fetchCart = async () => {
          if (authLoading) return;
@@ -199,7 +202,6 @@ export const CartProvider = ({ children }) => {
       }
    };
 
-   // NOVA FUNÇÃO: Calcula o preço total do carrinho
    const getTotalPrice = () => {
       return cartItems.reduce(
          (total, item) => total + item.preco * item.quantidade,
@@ -212,11 +214,12 @@ export const CartProvider = ({ children }) => {
          value={{
             cartItems,
             cartLoading,
+            totalItems, // ✨ ADICIONE ESTA LINHA AQUI para exportar o total
             addItemToCart,
             removeItemFromCart,
             updateItemQuantity,
             clearCart,
-            getTotalPrice, // <--- ADICIONE ESTA LINHA AQUI
+            getTotalPrice,
          }}
       >
          {children}

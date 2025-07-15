@@ -1,8 +1,8 @@
 // src/Nav.jsx
 import { IoHeartOutline } from "react-icons/io5";
-import { RiShoppingCartFill } from "react-icons/ri"; // Assumindo que você usa este ícone para o carrinho
+import { RiShoppingCartFill } from "react-icons/ri"; // Ícone para o carrinho
 import Logo from "./assets/logo.png"; // Verifique se o caminho do logo está correto
-import React from "react"; // Removido useState, useEffect, pois o contexto os substitui
+import React from "react";
 import { FiUser } from "react-icons/fi";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import {
@@ -15,9 +15,8 @@ import {
 } from "@/components/ui/dropdown-menu"; // Assumindo shadcn/ui DropdownMenu
 
 import { useAuth } from "./context/AuthContext";
-import { useFavorites } from "./context/FavoritesContext"; // ✨ IMPORTANTE: Use o FavoritesContext aqui!
-// Se você tem um contexto de carrinho, importe-o também para exibir a contagem
-// import { useCart } from './context/CartContext';
+import { useFavorites } from "./context/FavoritesContext";
+import { useCart } from "./context/CartContext"; // ✨ IMPORTANTE: Importe o CartContext aqui!
 
 function estaNaRota(rotas, caminhoAtual) {
    return rotas.includes(caminhoAtual);
@@ -25,14 +24,11 @@ function estaNaRota(rotas, caminhoAtual) {
 
 export function Nav() {
    const { user, logout } = useAuth();
-   const { totalFavorites } = useFavorites(); // ✨ OBTENHA O TOTAL DE FAVORITOS DIRETAMENTE DO CONTEXTO!
-   // const { totalItems: totalCartItems } = useCart(); // Se usar CartContext
+   const { totalFavorites } = useFavorites();
+   const { totalItems: totalCartItems } = useCart(); // ✨ OBTENHA O TOTAL DE ITENS DO CARRINHO AQUI!
 
    const navigate = useNavigate();
    const location = useLocation();
-
-   // Removidas as funções 'useState', 'useEffect' e 'atualizarTotalFavoritos'
-   // pois o contexto já gerencia isso reativamente.
 
    const naRotaLoginOuRegister = estaNaRota(
       ["/login", "/register"],
@@ -141,14 +137,14 @@ export function Nav() {
                      )}
                   </Link>
 
-                  {/* Ícone de Carrinho (exemplo de como usar se tiver CartContext) */}
+                  {/* ✨ Ícone de Carrinho usando totalCartItems do contexto */}
                   <Link to="/carrinho" className="relative">
                      <RiShoppingCartFill className="cursor-pointer" />
-                     {/* {totalCartItems > 0 && ( // Descomente se tiver CartContext
-                                <span className="absolute -top-2 -right-2 text-white bg-blue-500 text-xs p-1 rounded-full flex items-center justify-center min-w-[1.25rem] h-[1.25rem]">
-                                    {totalCartItems}
-                                </span>
-                            )} */}
+                     {totalCartItems > 0 && ( // Exibe a bolha apenas se houver itens no carrinho
+                        <span className="absolute -top-2 -right-2 text-white bg-amber-500 text-xs p-1 rounded-full flex items-center justify-center min-w-[1.25rem] h-[1.25rem]">
+                           {totalCartItems}
+                        </span>
+                     )}
                   </Link>
                </div>
             </div>
