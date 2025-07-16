@@ -43,7 +43,7 @@ export default function FreteResultado({
    }
 
    return (
-      <div className="mt-18">
+      <div className=" md:mt-16">
          {freteOptions.length > 0 && (
             <div className="mb-6">
                <h3 className="text-lg font-semibold mb-3">Frete</h3>

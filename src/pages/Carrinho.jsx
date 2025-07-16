@@ -1,5 +1,5 @@
 // src/pages/Carrinho.jsx
-import { useEffect, useState, useMemo } from "react";
+import { useState, useMemo } from "react";
 import { toast } from "sonner";
 import { useCart } from "../context/CartContext";
 
@@ -8,8 +8,11 @@ import TabelaItensCarrinho from "../components/Carrinho/TabelaItensCarrinho";
 import CupomDesconto from "../components/Carrinho/CupomDesconto";
 import ResumoCarrinho from "../components/Carrinho/ResumoCarrinho";
 import FreteCEP from "../components/Carrinho/FreteCEP";
-import AcoesCarrinho from "../components/Carrinho/AcoesCarrinho";
-import FreteResultado from "../components/Carrinho/FreteResultado"; // Importe o FreteResultado
+import {
+   AcoesCarrinhoContinue,
+   AcoesCarrinhoFinish,
+} from "../components/Carrinho/AcoesCarrinho"; // Importação nomeada correta
+import FreteResultado from "../components/Carrinho/FreteResultado";
 
 export default function Carrinho() {
    const { cartItems, cartLoading, removeItemFromCart, updateItemQuantity } =
@@ -123,12 +126,12 @@ export default function Carrinho() {
          // Opção de Retirada (agora com categoria e endereço)
          options.push({
             id: "retirada",
-            name: "Retirada na loja", // Mudado para "Retirada na loja"
+            name: "Retirada na loja",
             value: 0,
             prazo: "Imediato (horário comercial)",
             carrier: "Loja Física",
-            category: "retirada", // Adiciona categoria
-            address: "Rua Prates, 194, São Paulo, São Paulo, 12345-678, Brasil", // Adiciona endereço
+            category: "retirada",
+            address: "Rua Prates, 194, São Paulo, São Paulo, 12345-678, Brasil",
          });
 
          // Simulação Correios (PAC)
@@ -156,7 +159,7 @@ export default function Carrinho() {
             value: fretePadraoValue,
             prazo: fretePadraoPrazo,
             carrier: "Correios",
-            category: "frete", // Adiciona categoria
+            category: "frete",
          });
 
          // Simulação Uber Flash / Entrega Rápida
@@ -185,7 +188,7 @@ export default function Carrinho() {
                value: entregaRapidaValue,
                prazo: entregaRapidaPrazo,
                carrier: "Uber Flash / Transportadora",
-               category: "frete", // Adiciona categoria
+               category: "frete",
             });
          }
 
@@ -254,7 +257,8 @@ export default function Carrinho() {
                   <ResumoCarrinho totalFinal={totalFinal} />
                </div>
                <InfoCarrinho />
-               <div className="flex justify-between md:flex-row flex-col md:mt-0 mt-8">
+               <div className="flex flex-col md:flex-row md:items-start justify-start md:justify-between md:mt-0 mt-8 gap-8">
+                  {/* FreteCEP agora ocupa sua própria seção */}
                   <FreteCEP
                      cep={cep}
                      handleChange={handleCepChange}
@@ -262,19 +266,27 @@ export default function Carrinho() {
                      isCalculatingFrete={freteIsLoading}
                      hasValidCep={hasValidCep}
                   />
-                  <AcoesCarrinho />
                </div>
-
-               {/* CHAMANDO O FreteResultado NO FINAL DE TUDO */}
-               <div className="w-full mt-8">
-                  <FreteResultado
-                     selectedFreteOptionInfo={selectedFreteOptionInfo}
-                     availableFreteOptions={availableFreteOptions}
-                     onSelectFreteOption={setSelectedFreteOptionId}
-                     isLoading={freteIsLoading}
-                     error={freteError}
-                     cep={cep}
-                  />
+               <div className="w-full md:w-auto flex flex-col items-center">
+                  {" "}
+                  {/* Este div agrupa os resultados do frete e os botões de ação */}
+                  <div className="w-full">
+                     <FreteResultado
+                        selectedFreteOptionInfo={selectedFreteOptionInfo}
+                        availableFreteOptions={availableFreteOptions}
+                        onSelectFreteOption={setSelectedFreteOptionId}
+                        isLoading={freteIsLoading}
+                        error={freteError}
+                        cep={cep}
+                     />
+                  </div>
+                  {/* Renderiza AcoesCarrinho apenas se houver opções de frete */}
+                  {availableFreteOptions.length > 0 && (
+                     <div className="flex flex-col items-center justify-center  gap-4 w-full  mt-8">
+                        <AcoesCarrinhoContinue />
+                        <AcoesCarrinhoFinish />
+                     </div>
+                  )}
                </div>
             </>
          )}

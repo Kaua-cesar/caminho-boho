@@ -33,7 +33,7 @@ export default function FreteCEP({
                onChange={handleInternalCEPChange}
                maxLength={9}
                placeholder="00000-000"
-               className="p-3 rounded-sm border w-28" // Estilos originais
+               className="p-3 rounded-sm border w-34" // Estilos originais
                inputMode="numeric"
             />
             <div className="relative inline-block">

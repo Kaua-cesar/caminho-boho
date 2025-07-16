@@ -1,19 +1,31 @@
+// src/components/Carrinho/AcoesCarrinhoFinish.jsx (se for um arquivo separado)
+// OU no mesmo arquivo, mas com exportações nomeadas
+
 import { Link } from "react-router-dom";
 
-export default function AcoesCarrinho() {
+// Exportação nomeada para AcoesCarrinhoFinish
+export function AcoesCarrinhoFinish() {
    return (
-      <div className="flex items-end gap-4 md:flex-row flex-col justify-center">
-         <Link
-            to="/"
-            className="text-sm hover:underline text-gray-600 md:no-underline underline "
-         >
-            <button className="p-3 md:w-auto rounded-sm  cursor-pointer md:mb-0 mb-10 hover:underline">
-               Continuar comprando
+      <div className="flex flex-col items-center justify-center w-full ">
+         <Link to="/finalizar-compra" className="w-full">
+            <button className="w-full p-3 bg-amber-600 rounded-sm hover:bg-amber-700 text-white transition-colors duration-200 cursor-pointer">
+               Finalizar compra
             </button>
          </Link>
-         <Link to="/finalizar-compra">
-            <button className="p-3  md:w-auto bg-amber-600 rounded-sm hover:bg-amber-700 text-white cursor-pointer md:mb-0 mb-10">
-               Finalizar compra
+      </div>
+   );
+}
+
+// Exportação nomeada para AcoesCarrinhoContinue
+export function AcoesCarrinhoContinue() {
+   return (
+      <div className="flex flex-col items-center justify-center w-full  hover:bg-zinc-100 rounded-md">
+         <Link
+            to="/"
+            className="w-full" // Garante que o link ocupe a largura total em telas pequenas
+         >
+            <button className=" w-full p-3 rounded-sm underline cursor-pointer ">
+               Continuar comprando
             </button>
          </Link>
       </div>
