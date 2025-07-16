@@ -29,7 +29,7 @@ export const produtos = [
    {
       id: "prod2",
       nome: "Vestido Vest Lenco Elegante [ EDICAO ESPECIAL ] ",
-      precoOriginal: 1,
+      precoOriginal: 11.11,
       categoria: "vestlenco",
       cores: [
          { nome: "Azul", classe: "bg-blue-500" },
@@ -53,7 +53,7 @@ export const produtos = [
       desconto: -25,
       categoria: "boholongo",
       cores: [
-         { nome: "preto", classe: "bg-black" },
+         { nome: "Preto", classe: "bg-black" },
          { nome: "Amarelo", classe: "bg-yellow-500" },
       ],
       tamanhos: [{ nome: "P" }, { nome: "M" }, { nome: "G" }],
@@ -62,7 +62,7 @@ export const produtos = [
       qntavaliacoes: 7,
       // ✨ ATUALIZADO: Estoque por variação. Era estoque: 2.
       estoque: {
-         preto: { P: 2, M: 1, G: 0 }, // Exemplo: Preto G indisponível
+         Preto: { P: 2, M: 1, G: 0 }, // Exemplo: Preto G indisponível
          Amarelo: { P: 3, M: 2, G: 1 },
       },
    },

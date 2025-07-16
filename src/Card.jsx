@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { CardDialog } from "./components/Cards/CardDialog";
-import { CardButton } from "./components/Cards/CardButton";
+import { CardButton } from "./components/Cards/CardButton"; // Assume que CardButton é um componente que recebe children e lida com estilos
 import Rating from "@mui/material/Rating";
 import Stack from "@mui/material/Stack";
 import { toast } from "sonner";
+import { IoHeartOutline } from "react-icons/io5"; // Adicionado para o botão de favorito
 
 import { useCart } from "./context/CartContext";
 
 export function Card({
    nome,
+   // Garanta que preco e precoOriginal sejam sempre tratados como números
    preco,
    precoOriginal,
    estoque,
@@ -19,7 +21,7 @@ export function Card({
    qntavaliacoes,
    avaliacao,
    id,
-   atualizarTotalFavoritos,
+   atualizarTotalFavoritos, // Manter se for usado para favoritar no Card principal
 }) {
    const checkIfProductHasAnyStock = () => {
       if (!estoque) return false;
@@ -76,7 +78,6 @@ export function Card({
             estoque[corSelecionada]?.[tamanhoSelecionado] || 0;
          setCurrentStock(stockForCombination);
       } else if (cores.length === 0 && tamanhos.length === 0) {
-         // Para produtos simples, onde estoque é um número direto
          setCurrentStock(Number(estoque) || 0);
       } else {
          setCurrentStock(0);
@@ -103,20 +104,29 @@ export function Card({
                tamanhoSelecionado &&
                estoque[corSelecionada]?.[tamanhoSelecionado] > 0
             ) {
-               // Se o tamanho selecionado ainda tem estoque para a cor, mantém
                setTamanhoSelecionado(tamanhoSelecionado);
             } else {
-               // Caso contrário, define o primeiro tamanho com estoque ou o primeiro tamanho
                setTamanhoSelecionado(newTamanho || tamanhos[0]?.nome || "");
             }
          } else {
-            // Se nenhuma cor está selecionada, não deve ter um tamanho selecionado
             setTamanhoSelecionado("");
          }
       }
-   }, [corSelecionada, tamanhos, estoque]);
+   }, [corSelecionada, tamanhos, estoque, tamanhoSelecionado]);
 
-   if (!nome || !imagem || !preco) return null;
+   // ** SOLUÇÃO PARA O ERRO: Garantir que preco e precoOriginal sejam números **
+   // Use Number() para tentar converter. Se for NaN (Not a Number), defina como 0.
+   const numericPreco = Number(preco);
+   const displayPreco = isNaN(numericPreco)
+      ? "0.00"
+      : numericPreco.toFixed(2).replace(".", ",");
+
+   const numericPrecoOriginal = Number(precoOriginal);
+   const displayPrecoOriginal = isNaN(numericPrecoOriginal)
+      ? "0.00"
+      : numericPrecoOriginal.toFixed(2).replace(".", ",");
+
+   if (!nome || !imagem || isNaN(numericPreco)) return null; // Retorna null se o preço principal não for um número válido.
 
    async function handleAdicionarAoCarrinho() {
       toast.dismiss();
@@ -160,7 +170,7 @@ export function Card({
          imagem,
          id,
          nome,
-         preco: Number(preco),
+         preco: numericPreco, // Garante que o preco adicionado ao carrinho é um número
          cor: corSelecionada,
          tamanho: tamanhoSelecionado,
          quantidade: 1,
@@ -177,7 +187,6 @@ export function Card({
       (cores.length > 0 && corSelecionada && tamanhos.length === 0) ||
       (tamanhos.length > 0 && tamanhoSelecionado && cores.length === 0);
 
-   // --- Lógica para a mensagem do botão no Card principal ---
    let buttonMessage = "Adicionar ao carrinho";
    let isButtonDisabled = false;
 
@@ -191,30 +200,35 @@ export function Card({
          tamanhos.length > 0 &&
          !tamanhoSelecionado
       ) {
-         buttonMessage = "Selecione uma cor e tamanho";
+         buttonMessage = "Selecione cor e tamanho";
       } else if (cores.length > 0 && !corSelecionada) {
          buttonMessage = "Selecione uma cor";
       } else if (tamanhos.length > 0 && !tamanhoSelecionado) {
          buttonMessage = "Selecione um tamanho";
       }
-      isButtonDisabled = true; // Desabilita o botão se a seleção não estiver completa
+      isButtonDisabled = true;
    } else if (currentStock <= 0) {
       buttonMessage = `Indisponível (${corSelecionada || ""} ${
          tamanhoSelecionado || ""
       })`;
       isButtonDisabled = true;
    }
-   // --- Fim da lógica da mensagem do botão no Card principal ---
 
    return (
-      <div className="basis-1/6 flex justify-center items-center">
-         <div className="w-80 max-w-full md:mx-0 shadow-md md:h-180 h-155 rounded-md flex-col flex transition-transform duration-300 ease-in-out">
+      <div className="w-full">
+         <div className="bg-white rounded-md shadow-md overflow-hidden flex flex-col h-[650px] sm:h-[650px] lg:h-[650px] transition-transform duration-300 ease-in-out hover:scale-105 mx-auto max-w-xs">
+            {desconto > 0 && (
+               <span className="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded z-10">
+                  -{desconto}%
+               </span>
+            )}
+
             <CardDialog
                id={id}
                nome={nome}
-               preco={preco}
+               preco={numericPreco} // Passa o valor numérico para CardDialog
                estoque={estoque}
-               precoOriginal={precoOriginal}
+               precoOriginal={numericPrecoOriginal} // Passa o valor numérico
                imagem={imagem}
                desconto={desconto}
                cores={cores}
@@ -223,46 +237,49 @@ export function Card({
                qntavaliacoes={qntavaliacoes}
                atualizarTotalFavoritos={atualizarTotalFavoritos}
             />
-            <div className="p-3">
-               <div className="flex">
-                  <Stack spacing={1} className="">
+            <div className="p-3 flex flex-col flex-grow">
+               <div className="flex items-center mb-1">
+                  <Stack spacing={1} className="flex-shrink-0">
                      <Rating
                         name="half-rating-read"
                         className="rating-responsive"
-                        size="medium"
+                        size="small"
                         defaultValue={avaliacao}
                         precision={0.5}
                         readOnly
                      />
                   </Stack>
-                  <span className="text-black/50 ml-2 text-xs md:text-[16px]">
-                     {avaliacao ? `( ${avaliacao} )` : ""}
+                  <span className="text-black/50 ml-2 text-xs flex-shrink-0">
+                     {qntavaliacoes ? `( ${qntavaliacoes} )` : ""}{" "}
                   </span>
                </div>
 
-               <h1 className="my-3 md:text-lg font-bold h-11 overflow-hidden line-clamp-2 md:overflow-visible ">
+               <h1 className="my-2 text-gray-800 text-base md:text-lg font-bold line-clamp-1 sm:min-h-[1rem] min-h-[2rem]">
                   {nome}
                </h1>
-               <div className="flex gap-2 items-center">
-                  <h2 className=" text-amber-600 font-semibold md:text-2xl">
-                     R${preco}
+
+               <div className="flex flex-wrap gap-x-2 items-baseline mb-3">
+                  <h2 className="text-amber-600 font-semibold text-lg sm:text-xl">
+                     R${displayPreco} {/* **SOLUÇÃO APLICADA AQUI** */}
                   </h2>
                   {desconto && desconto !== 0 && (
-                     <h2 className="md:text-sm text-gray-600 line-through text-xs">
-                        R${precoOriginal}
+                     <h2 className="text-gray-600 line-through text-sm sm:text-base">
+                        R${displayPrecoOriginal}{" "}
+                        {/* **SOLUÇÃO APLICADA AQUI** */}
                      </h2>
                   )}
                </div>
 
                {cores.length > 0 && (
-                  <>
-                     <p className="md:mt-4 mt-2 text-sm text-gray-600">
+                  <div className="mb-3">
+                     <p className="text-sm text-gray-600 mb-1">
                         Cor:{" "}
                         <span className="font-medium">
                            {corSelecionada || "Nenhuma"}
                         </span>
                      </p>
-                     <div className="flex gap-3 ">
+                     <div className="flex flex-wrap gap-2">
+                        {" "}
                         {cores.map((cor) => {
                            const hasAnyStockForThisColor = tamanhos.some(
                               (tamanho) => estoque[cor.nome]?.[tamanho.nome] > 0
@@ -279,15 +296,20 @@ export function Card({
                                           : cor.nome
                                     );
                                  }}
-                                 className={`md:w-7 md:h-7 rounded-full border-2 transition cursor-pointer w-6 h-6
-                      ${cor.classe}
-                      ${
-                         corSelecionada === cor.nome
-                            ? "border-black scale-110 "
-                            : "border-gray-300"
-                      }
-                      ${isColorDisabled ? "opacity-50 cursor-not-allowed" : ""}
-                      `}
+                                 className={`
+                                                w-6 h-6 md:w-7 md:h-7 rounded-full border-2 transition
+                                                ${cor.classe}
+                                                ${
+                                                   corSelecionada === cor.nome
+                                                      ? "border-black scale-110"
+                                                      : "border-gray-300"
+                                                }
+                                                ${
+                                                   isColorDisabled
+                                                      ? "opacity-50 cursor-not-allowed"
+                                                      : "cursor-pointer"
+                                                }
+                                            `}
                                  title={cor.nome}
                                  aria-label={`Selecionar cor ${cor.nome}`}
                                  disabled={isColorDisabled}
@@ -295,18 +317,19 @@ export function Card({
                            );
                         })}
                      </div>
-                  </>
+                  </div>
                )}
 
                {tamanhos.length > 0 && (
-                  <>
-                     <p className="md:mt-4 mt-2 text-sm text-gray-600">
+                  <div className="mb-4">
+                     <p className="text-sm text-gray-600 mb-1">
                         Tamanho:{" "}
                         <span className="font-medium">
                            {tamanhoSelecionado || "Nenhum"}
                         </span>
                      </p>
-                     <div className="flex gap-3 ">
+                     <div className="flex flex-wrap gap-2">
+                        {" "}
                         {tamanhos.map((tamanho) => {
                            const stockForThisSize = corSelecionada
                               ? estoque[corSelecionada]?.[tamanho.nome] || 0
@@ -323,19 +346,23 @@ export function Card({
                                           : tamanho.nome
                                     );
                                  }}
-                                 className={`md:w-8 md:h-8 rounded-sm border-1 transition md:text-sm cursor-pointer w-6 h-6 text-xs
-                        ${tamanho.classe || ""}
-                        ${
-                           tamanhoSelecionado === tamanho.nome
-                              ? "bg-black text-white "
-                              : "border-gray-300 hover:bg-zinc-200/60"
-                        }
-                        ${
-                           isSizeUnavailable || !corSelecionada
-                              ? "opacity-50 cursor-not-allowed"
-                              : ""
-                        }
-                      `}
+                                 className={`
+                                                w-8 h-8 flex items-center justify-center border
+                                                rounded-sm text-xs md:text-sm font-medium transition
+                                                ${tamanho.classe || ""}
+                                                ${
+                                                   tamanhoSelecionado ===
+                                                   tamanho.nome
+                                                      ? "bg-black text-white"
+                                                      : "border-gray-300 hover:bg-zinc-200/60"
+                                                }
+                                                ${
+                                                   isSizeUnavailable ||
+                                                   !corSelecionada
+                                                      ? "opacity-50 cursor-not-allowed"
+                                                      : "cursor-pointer"
+                                                }
+                                            `}
                                  title={tamanho.nome}
                                  aria-label={`Selecionar tamanho ${tamanho.nome}`}
                                  disabled={isSizeUnavailable || !corSelecionada}
@@ -345,15 +372,18 @@ export function Card({
                            );
                         })}
                      </div>
-                  </>
+                  </div>
                )}
 
-               <CardButton
-                  onClick={handleAdicionarAoCarrinho}
-                  disabled={isButtonDisabled}
-               >
-                  {buttonMessage}
-               </CardButton>
+               <div className="mt-auto">
+                  {" "}
+                  <CardButton
+                     onClick={handleAdicionarAoCarrinho}
+                     disabled={isButtonDisabled}
+                  >
+                     {buttonMessage}
+                  </CardButton>
+               </div>
             </div>
          </div>
       </div>

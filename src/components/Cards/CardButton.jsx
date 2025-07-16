@@ -25,7 +25,7 @@ export function CardButton({
           transition-colors text-white
         `}
          >
-            <RiShoppingCartFill className="md:text-xl text-2xl" />
+            <RiShoppingCartFill className="md:text-xl text-2xl " />
             {children}
             {/* ✨ O texto do botão vem de fora, do componente pai */}
          </div>

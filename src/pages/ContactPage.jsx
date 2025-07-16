@@ -3,7 +3,6 @@ import React, { useState } from "react";
 import { toast } from "sonner";
 
 export function ContactPage() {
-   // Ou ContatoPage
    const [formData, setFormData] = useState({
       name: "",
       email: "",
@@ -74,24 +73,30 @@ export function ContactPage() {
    };
 
    return (
-      <div className="flex items-center justify-center flex-col mx-46">
-         <h1 className="text-3xl font-bold my-8 text-center text-gray-800">
+      // Contêiner principal da página: padding responsivo, largura máxima e centralização
+      <div className="container mx-auto px-4 py-8 md:px-6 lg:px-8 flex flex-col items-center justify-center min-h-[calc(100vh-100px)]">
+         {/* Título da página */}
+         <h1 className="text-3xl sm:text-4xl font-bold my-8 text-center text-gray-800">
             Fale Conosco
          </h1>
 
-         <div className="bg-white p-8 rounded-lg shadow-md mb-8 max-w-2xl mx-auto">
-            <p className="text-lg text-gray-700 leading-relaxed mb-6 text-center">
+         {/* Contêiner do conteúdo principal: informações de contato e formulário */}
+         <div className="bg-white p-6 sm:p-8 rounded-lg shadow-md mb-8 w-full max-w-4xl">
+            {/* Parágrafo de introdução, com ajuste de texto responsivo */}
+            <p className="text-base sm:text-lg text-gray-700 leading-relaxed mb-6 text-center">
                Tem alguma dúvida, sugestão ou precisa de suporte? Entre em
                contato conosco através do formulário abaixo ou pelos nossos
                canais de atendimento.
             </p>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+            {/* Grid para Nossos Contatos e Envie uma Mensagem: responsividade md:grid-cols-2 */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 mb-8">
+               {/* Seção Nossos Contatos */}
                <div>
-                  <h2 className="text-2xl font-semibold mb-4 text-amber-600">
+                  <h2 className="text-xl sm:text-2xl font-semibold mb-4 text-amber-600 text-center md:text-left">
                      Nossos Contatos
                   </h2>
-                  <p className="text-gray-700 mb-2">
+                  <p className="text-gray-700 mb-2 text-sm sm:text-base text-center md:text-left">
                      <strong>E-mail:</strong>{" "}
                      <a
                         href="mailto:contato@caminhoboho.com.br"
@@ -100,7 +105,7 @@ export function ContactPage() {
                         contato@caminhoboho.com.br
                      </a>
                   </p>
-                  <p className="text-gray-700 mb-2">
+                  <p className="text-gray-700 mb-2 text-sm sm:text-base text-center md:text-left">
                      <strong>Telefone:</strong>{" "}
                      <a
                         href="https://wa.me/5521959227889"
@@ -111,14 +116,15 @@ export function ContactPage() {
                         (21) 95922-7889
                      </a>
                   </p>
-                  <p className="text-gray-700 mb-2">
+                  <p className="text-gray-700 mb-2 text-sm sm:text-base text-center md:text-left">
                      <strong>Horário de Atendimento:</strong> Segunda a Sexta,
                      das 9h às 18h.
                   </p>
                </div>
 
+               {/* Seção Envie uma Mensagem - Formulário */}
                <div>
-                  <h2 className="text-2xl font-semibold mb-4 text-amber-600">
+                  <h2 className="text-xl sm:text-2xl font-semibold mb-4 text-amber-600 text-center md:text-left">
                      Envie uma Mensagem
                   </h2>
                   <form onSubmit={handleSubmit} className="space-y-4">
@@ -192,7 +198,7 @@ export function ContactPage() {
                      </div>
                      <button
                         type="submit"
-                        className="cursor-pointer bg-amber-600 hover:bg-amber-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition-colors duration-200"
+                        className="cursor-pointer bg-amber-600 hover:bg-amber-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition-colors duration-200 w-full"
                         disabled={isSubmitting}
                      >
                         {isSubmitting ? "Enviando..." : "Enviar Mensagem"}

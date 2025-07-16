@@ -9,27 +9,8 @@ export function CategoriesPage() {
 
    useEffect(() => {
       setLoading(true);
-      // Extrai categorias únicas dos seus produtos
       const uniqueCategories = [...new Set(produtos.map((p) => p.categoria))];
 
-      // Se você quiser um nome mais "amigável" para exibir (ex: "costanua" -> "Costa Nua")
-      // Isso pode ser feito com um mapeamento, por exemplo:
-      const formattedCategories = uniqueCategories.map((cat) => ({
-         name: cat, // Nome original da categoria no dado
-         displayName: cat
-            .replace(/([A-Z])/g, " $1")
-            .replace(/^./, (str) => str.toUpperCase()), // Formata para "Nome Bonito"
-         // Ex: "costanua" -> "Costanua" (se quiser primeira letra maiúscula)
-         // Ou "bohochic" -> "Boho Chic" (se quiser separar camelCase e capitalizar)
-         // Para 'costanua', talvez você queira mapear manualmente para 'Vestidos Costa Nua'
-         // Exemplo de mapeamento manual:
-         // "costanua": "Vestidos Costa Nua",
-         // "vestlenco": "Vestidos Lenço",
-         // "boholongo": "Vestidos Boho Longo",
-         // "bohochic": "Vestidos Boho Chic",
-      }));
-
-      // Exemplo de como você poderia usar um mapeamento mais específico se necessário:
       const categoryDisplayNames = {
          costanua: "Vestidos Costa Nua",
          vestlenco: "Vestidos Lenço",
@@ -55,39 +36,41 @@ export function CategoriesPage() {
       return (
          <div className="container mx-auto p-4 text-center mt-20 min-h-[calc(100vh-200px)] flex items-center justify-center">
             <p className="text-lg text-gray-600 animate-pulse">
-               Carregando seus produtos favoritos...
+               Carregando suas categorias...
             </p>
          </div>
       );
    }
 
    return (
-      <div className="flex items-center justify-center flex-col ">
-         <h1 className="text-3xl font-bold my-8 text-center text-gray-800">
+      // Contêiner principal da página, com padding responsivo e centralização
+      <div className="container mx-auto px-4 py-8 md:px-6 lg:px-8 flex flex-col items-center justify-center min-h-[calc(100vh-100px)]">
+         <h1 className="text-3xl sm:text-4xl font-bold my-8 text-center text-gray-800">
             Explore Nossas Categorias
          </h1>
 
          {categories.length === 0 ? (
-            <div className="text-center p-8 border border-dashed border-gray-300 rounded-lg shadow-sm bg-gray-50 max-w-lg mx-auto">
+            <div className="text-center p-8 border border-dashed border-gray-300 rounded-lg shadow-sm bg-gray-50 w-full max-w-lg">
                <p className="text-xl text-gray-700 mb-4">
                   Nenhuma categoria encontrada.
                </p>
                <p className="text-md text-gray-600">
-                  Verifique seus dados de produtos.
+                  Verifique seus dados de produtos ou adicione novas categorias.
                </p>
             </div>
          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            // Grid de categorias, mantendo a responsividade existente e adicionando max-w
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 w-full max-w-6xl">
                {categories.map((category, index) => (
                   <Link
                      key={index}
-                     to={`/produtos/categoria/${category.name}`} // Link para uma página de produtos por categoria
-                     className="block p-6 bg-white border border-gray-200 rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 text-center cursor-pointer"
+                     to={`/produtos/categoria/${category.name}`}
+                     className=" p-6 bg-white border border-gray-200 rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 text-center cursor-pointer flex flex-col justify-between h-full"
                   >
-                     <h2 className="text-xl font-semibold text-amber-600 mb-2">
+                     <h2 className="text-xl sm:text-2xl font-semibold text-amber-600 mb-2">
                         {category.displayName}
                      </h2>
-                     <p className="text-gray-600">
+                     <p className="text-gray-600 text-sm sm:text-base">
                         Ver {category.displayName.toLowerCase()}
                      </p>
                   </Link>

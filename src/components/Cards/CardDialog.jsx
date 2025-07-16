@@ -228,14 +228,14 @@ export function CardDialog({
                   atualizarTotalFavoritos={atualizarTotalFavoritos}
                />
                <DialogTrigger asChild>
-                  <div className="cursor-pointer">
+                  <div className="cursor-pointer ">
                      <img
                         src={imagem}
                         alt={nome}
                         className="object-cover transition-all duration-300 ease-in-out group-hover:scale-110 group-hover:brightness-80"
                      />
 
-                     <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                     <div className=" absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 ">
                         {productHasAnyStock ? (
                            <button className="bg-white text-black cursor-pointer p-3 rounded-md flex items-center gap-2 text-sm font-medium shadow">
                               <FaEye />
@@ -257,7 +257,7 @@ export function CardDialog({
                   <img
                      src={imagem}
                      alt={nome}
-                     className="rounded-md md:w-100 md:h-auto h-154 object-cover transition-all duration-300 ease-in-out group-hover:scale-110 group-hover:brightness-80"
+                     className="rounded-md md:w-100  h-158 object-cover transition-all duration-300 ease-in-out group-hover:scale-110 group-hover:brightness-80 "
                   />
                </div>
 

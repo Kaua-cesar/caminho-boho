@@ -98,73 +98,6 @@ export function Nav() {
 
                {/* Ícone de Menu Hambúrguer (visível apenas em telas pequenas) */}
                <div className="md:hidden flex items-center gap-4">
-                  <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
-                     <SheetTrigger asChild>
-                        <button
-                           className="p-2"
-                           aria-label="Abrir menu de navegação"
-                        >
-                           <FiMenu className="text-2xl cursor-pointer" />
-                        </button>
-                     </SheetTrigger>
-                     <SheetContent side="left">
-                        <SheetHeader>
-                           <SheetTitle>Navegação</SheetTitle>
-                           <SheetDescription>
-                              Explore a Caminho Boho
-                           </SheetDescription>
-                        </SheetHeader>
-                        <nav className="flex flex-col gap-4 mt-8 text-lg">
-                           <SheetClose asChild>
-                              <Link
-                                 to="/"
-                                 className="flex flex-row items-center font-medium ml-6 gap-3 text-xl"
-                              >
-                                 <FaHome />
-                                 <span>Inicio</span> {/* ✨ Corrigido aqui */}
-                              </Link>
-                           </SheetClose>
-                           <SheetClose asChild>
-                              <Link
-                                 to="/produtos"
-                                 className="flex flex-row items-center font-medium ml-6 gap-3 text-xl"
-                              >
-                                 <FaBagShopping />
-                                 <span>Produtos</span> {/* ✨ Corrigido aqui */}
-                              </Link>
-                           </SheetClose>
-                           <SheetClose asChild>
-                              <Link
-                                 to="/categorias"
-                                 className="flex flex-row items-center font-medium ml-6 gap-3 text-xl"
-                              >
-                                 <BiSolidCategory />
-                                 <span>Categorias</span>{" "}
-                                 {/* ✨ Corrigido aqui */}
-                              </Link>
-                           </SheetClose>
-                           <SheetClose asChild>
-                              <Link
-                                 to="/sobre"
-                                 className="flex flex-row items-center font-medium ml-6 gap-3 text-xl"
-                              >
-                                 <HiSparkles />
-                                 <span>Sobre</span> {/* ✨ Corrigido aqui */}
-                              </Link>
-                           </SheetClose>
-                           <SheetClose asChild>
-                              <Link
-                                 to="/contato"
-                                 className="flex flex-row items-center font-medium ml-6 gap-3 text-xl"
-                              >
-                                 <MdSupportAgent /> <span>Contato</span>{" "}
-                                 {/* ✨ Corrigido aqui */}
-                              </Link>
-                           </SheetClose>
-                        </nav>
-                     </SheetContent>
-                  </Sheet>
-
                   {/* Ícones de Usuário, Favoritos e Carrinho para mobile */}
                   <DropdownMenu>
                      <DropdownMenuTrigger>
@@ -232,9 +165,71 @@ export function Nav() {
                         </span>
                      )}
                   </Link>
+                  <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
+                     <SheetTrigger asChild>
+                        <button aria-label="Abrir menu de navegação">
+                           <FiMenu className="text-2xl cursor-pointer" />
+                        </button>
+                     </SheetTrigger>
+                     <SheetContent side="left">
+                        <SheetHeader>
+                           <SheetTitle>Navegação</SheetTitle>
+                           <SheetDescription>
+                              Explore a Caminho Boho
+                           </SheetDescription>
+                        </SheetHeader>
+                        <nav className="flex flex-col gap-4 mt-8 text-lg">
+                           <SheetClose asChild>
+                              <Link
+                                 to="/"
+                                 className="flex flex-row items-center font-medium ml-6 gap-3 text-xl"
+                              >
+                                 <FaHome />
+                                 <span>Inicio</span> {/* ✨ Corrigido aqui */}
+                              </Link>
+                           </SheetClose>
+                           <SheetClose asChild>
+                              <Link
+                                 to="/produtos"
+                                 className="flex flex-row items-center font-medium ml-6 gap-3 text-xl"
+                              >
+                                 <FaBagShopping />
+                                 <span>Produtos</span> {/* ✨ Corrigido aqui */}
+                              </Link>
+                           </SheetClose>
+                           <SheetClose asChild>
+                              <Link
+                                 to="/categorias"
+                                 className="flex flex-row items-center font-medium ml-6 gap-3 text-xl"
+                              >
+                                 <BiSolidCategory />
+                                 <span>Categorias</span>{" "}
+                                 {/* ✨ Corrigido aqui */}
+                              </Link>
+                           </SheetClose>
+                           <SheetClose asChild>
+                              <Link
+                                 to="/sobre"
+                                 className="flex flex-row items-center font-medium ml-6 gap-3 text-xl"
+                              >
+                                 <HiSparkles />
+                                 <span>Sobre</span> {/* ✨ Corrigido aqui */}
+                              </Link>
+                           </SheetClose>
+                           <SheetClose asChild>
+                              <Link
+                                 to="/contato"
+                                 className="flex flex-row items-center font-medium ml-6 gap-3 text-xl"
+                              >
+                                 <MdSupportAgent /> <span>Contato</span>{" "}
+                                 {/* ✨ Corrigido aqui */}
+                              </Link>
+                           </SheetClose>
+                        </nav>
+                     </SheetContent>
+                  </Sheet>
                </div>
 
-               {/* Ícones de Usuário, Favoritos e Carrinho para Desktop */}
                <div className="hidden md:flex items-center gap-8 md:gap-10 text-2xl md:text-3xl">
                   <DropdownMenu>
                      <DropdownMenuTrigger>
