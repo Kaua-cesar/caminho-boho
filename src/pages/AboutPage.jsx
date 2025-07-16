@@ -4,8 +4,8 @@ import React from "react";
 export function AboutPage() {
    // Ou SobrePage
    return (
-      <div className="container mx-auto p-4 mt-20">
-         <h1 className="text-3xl font-bold mb-8 text-center text-amber-700">
+      <div className="flex items-center justify-center flex-col mx-46">
+         <h1 className="text-3xl font-bold my-8 text-center text-gray-800">
             Sobre a Caminho Boho
          </h1>
 
@@ -38,7 +38,7 @@ export function AboutPage() {
             </p>
          </div>
 
-         <div className="bg-white p-8 rounded-lg shadow-md text-center">
+         <div className="text-sm text-center">
             <h2 className="text-2xl font-semibold mb-4 text-amber-600">
                Nossos Valores
             </h2>

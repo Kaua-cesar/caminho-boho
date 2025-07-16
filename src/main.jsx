@@ -122,10 +122,7 @@ createRoot(document.getElementById("root")).render(
          <AuthProvider>
             <CartProvider>
                <FavoritesProvider>
-                  {/* Se estiver usando Stripe, envolva o Layout com <Elements> aqui */}
-                  {/* <Elements stripe={stripePromise}> */}
                   <Layout />
-                  {/* </Elements> */}
                   <Toaster position="bottom-right" richColors />
                </FavoritesProvider>
             </CartProvider>

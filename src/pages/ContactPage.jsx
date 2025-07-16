@@ -74,8 +74,8 @@ export function ContactPage() {
    };
 
    return (
-      <div className="container mx-auto p-4 mt-20">
-         <h1 className="text-3xl font-bold mb-8 text-center text-amber-700">
+      <div className="flex items-center justify-center flex-col mx-46">
+         <h1 className="text-3xl font-bold my-8 text-center text-gray-800">
             Fale Conosco
          </h1>
 
@@ -103,19 +103,17 @@ export function ContactPage() {
                   <p className="text-gray-700 mb-2">
                      <strong>Telefone:</strong>{" "}
                      <a
-                        href="tel:+5521999999999"
+                        href="https://wa.me/5521959227889"
+                        target="_blank"
+                        rel="noopener noreferrer"
                         className="text-blue-600 hover:underline"
                      >
-                        (21) 99999-9999
+                        (21) 95922-7889
                      </a>
                   </p>
                   <p className="text-gray-700 mb-2">
                      <strong>Horário de Atendimento:</strong> Segunda a Sexta,
                      das 9h às 18h.
-                  </p>
-                  <p className="text-gray-700">
-                     <strong>Endereço:</strong> Rua da Paz, 123 - Centro, Maricá
-                     - RJ
                   </p>
                </div>
 
@@ -161,7 +159,7 @@ export function ContactPage() {
                      <div>
                         <label
                            htmlFor="subject"
-                           className="block text-gray-700 text-sm font-bold mb-2"
+                           className="block text-gray-700 text-sm font-bold mb-2 "
                         >
                            Assunto
                         </label>
@@ -171,7 +169,7 @@ export function ContactPage() {
                            name="subject"
                            value={formData.subject}
                            onChange={handleChange}
-                           className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                           className="font-semibold shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                            required
                         />
                      </div>
@@ -194,7 +192,7 @@ export function ContactPage() {
                      </div>
                      <button
                         type="submit"
-                        className="bg-amber-600 hover:bg-amber-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition-colors duration-200"
+                        className="cursor-pointer bg-amber-600 hover:bg-amber-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition-colors duration-200"
                         disabled={isSubmitting}
                      >
                         {isSubmitting ? "Enviando..." : "Enviar Mensagem"}

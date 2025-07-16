@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { CardDialog } from "./components/Cards/CardDialog";
 import { CardButton } from "./components/Cards/CardButton";
 import Rating from "@mui/material/Rating";
@@ -21,41 +21,141 @@ export function Card({
    id,
    atualizarTotalFavoritos,
 }) {
-   const [corSelecionada, setCorSelecionada] = useState("");
-   const [tamanhoSelecionado, setTamanhoSelecionado] = useState("");
+   const checkIfProductHasAnyStock = () => {
+      if (!estoque) return false;
+
+      if (cores.length === 0 && tamanhos.length === 0) {
+         return Number(estoque) > 0;
+      }
+
+      for (const cor of cores) {
+         for (const tamanho of tamanhos) {
+            if (estoque[cor.nome]?.[tamanho.nome] > 0) {
+               return true;
+            }
+         }
+      }
+      return false;
+   };
+
+   const productHasAnyStock = checkIfProductHasAnyStock();
+
+   const getInitialSelection = (options, stockData, parentSelection = null) => {
+      if (options.length === 0) return "";
+
+      for (const option of options) {
+         if (parentSelection === null) {
+            const hasStock = tamanhos.some(
+               (t) => stockData[option.nome]?.[t.nome] > 0
+            );
+            if (hasStock) {
+               return option.nome;
+            }
+         } else {
+            if (stockData[parentSelection]?.[option.nome] > 0) {
+               return option.nome;
+            }
+         }
+      }
+      return options[0]?.nome || "";
+   };
+
+   const [corSelecionada, setCorSelecionada] = useState(() =>
+      getInitialSelection(cores, estoque)
+   );
+   const [tamanhoSelecionado, setTamanhoSelecionado] = useState(() =>
+      getInitialSelection(tamanhos, estoque, corSelecionada)
+   );
+   const [currentStock, setCurrentStock] = useState(0);
 
    const { addItemToCart } = useCart();
+
+   useEffect(() => {
+      if (estoque && corSelecionada && tamanhoSelecionado) {
+         const stockForCombination =
+            estoque[corSelecionada]?.[tamanhoSelecionado] || 0;
+         setCurrentStock(stockForCombination);
+      } else if (cores.length === 0 && tamanhos.length === 0) {
+         // Para produtos simples, onde estoque é um número direto
+         setCurrentStock(Number(estoque) || 0);
+      } else {
+         setCurrentStock(0);
+      }
+   }, [
+      estoque,
+      corSelecionada,
+      tamanhoSelecionado,
+      cores.length,
+      tamanhos.length,
+   ]);
+
+   useEffect(() => {
+      if (tamanhos.length > 0) {
+         let newTamanho = "";
+         if (corSelecionada) {
+            for (const tamanho of tamanhos) {
+               if (estoque[corSelecionada]?.[tamanho.nome] > 0) {
+                  newTamanho = tamanho.nome;
+                  break;
+               }
+            }
+            if (
+               tamanhoSelecionado &&
+               estoque[corSelecionada]?.[tamanhoSelecionado] > 0
+            ) {
+               // Se o tamanho selecionado ainda tem estoque para a cor, mantém
+               setTamanhoSelecionado(tamanhoSelecionado);
+            } else {
+               // Caso contrário, define o primeiro tamanho com estoque ou o primeiro tamanho
+               setTamanhoSelecionado(newTamanho || tamanhos[0]?.nome || "");
+            }
+         } else {
+            // Se nenhuma cor está selecionada, não deve ter um tamanho selecionado
+            setTamanhoSelecionado("");
+         }
+      }
+   }, [corSelecionada, tamanhos, estoque]);
 
    if (!nome || !imagem || !preco) return null;
 
    async function handleAdicionarAoCarrinho() {
       toast.dismiss();
 
-      let errorMessages = [];
+      const isVariationProduct = cores.length > 0 || tamanhos.length > 0;
+      const isSelectionComplete =
+         !isVariationProduct ||
+         (cores.length > 0 &&
+            corSelecionada &&
+            tamanhos.length > 0 &&
+            tamanhoSelecionado) ||
+         (cores.length > 0 && corSelecionada && tamanhos.length === 0) ||
+         (tamanhos.length > 0 && tamanhoSelecionado && cores.length === 0);
 
-      if (cores.length > 0 && !corSelecionada) {
-         errorMessages.push("selecione uma cor");
-      }
-      if (tamanhos.length > 0 && !tamanhoSelecionado) {
-         errorMessages.push("selecione um tamanho");
-      }
-
-      if (errorMessages.length > 0) {
+      if (isVariationProduct && !isSelectionComplete) {
          let message = "Por favor, ";
-         if (errorMessages.length === 1) {
-            message += errorMessages[0]; // Correção aqui: atribua a mensagem
-         } else {
-            message +=
-               errorMessages.slice(0, -1).join(", ") +
-               " e " +
-               errorMessages[errorMessages.length - 1];
+         if (
+            cores.length > 0 &&
+            !corSelecionada &&
+            tamanhos.length > 0 &&
+            !tamanhoSelecionado
+         ) {
+            message += "selecione uma cor e tamanho";
+         } else if (cores.length > 0 && !corSelecionada) {
+            message += "selecione uma cor";
+         } else if (tamanhos.length > 0 && !tamanhoSelecionado) {
+            message += "selecione um tamanho";
          }
          toast.error(message + " antes de adicionar ao carrinho.");
          return;
       }
 
-      // A função addItemToCart do CartContext já lida com o toast de sucesso/erro de adição e login.
-      // Não precisamos de um toast adicional aqui para o sucesso.
+      if (currentStock <= 0) {
+         toast.error(
+            `"${nome}" (${corSelecionada} / ${tamanhoSelecionado}) está indisponível no momento.`
+         );
+         return;
+      }
+
       await addItemToCart({
          imagem,
          id,
@@ -66,6 +166,45 @@ export function Card({
          quantidade: 1,
       });
    }
+
+   const isVariationProduct = cores.length > 0 || tamanhos.length > 0;
+   const isSelectionComplete =
+      !isVariationProduct ||
+      (cores.length > 0 &&
+         corSelecionada &&
+         tamanhos.length > 0 &&
+         tamanhoSelecionado) ||
+      (cores.length > 0 && corSelecionada && tamanhos.length === 0) ||
+      (tamanhos.length > 0 && tamanhoSelecionado && cores.length === 0);
+
+   // --- Lógica para a mensagem do botão no Card principal ---
+   let buttonMessage = "Adicionar ao carrinho";
+   let isButtonDisabled = false;
+
+   if (!productHasAnyStock) {
+      buttonMessage = "Produto Indisponível";
+      isButtonDisabled = true;
+   } else if (isVariationProduct && !isSelectionComplete) {
+      if (
+         cores.length > 0 &&
+         !corSelecionada &&
+         tamanhos.length > 0 &&
+         !tamanhoSelecionado
+      ) {
+         buttonMessage = "Selecione uma cor e tamanho";
+      } else if (cores.length > 0 && !corSelecionada) {
+         buttonMessage = "Selecione uma cor";
+      } else if (tamanhos.length > 0 && !tamanhoSelecionado) {
+         buttonMessage = "Selecione um tamanho";
+      }
+      isButtonDisabled = true; // Desabilita o botão se a seleção não estiver completa
+   } else if (currentStock <= 0) {
+      buttonMessage = `Indisponível (${corSelecionada || ""} ${
+         tamanhoSelecionado || ""
+      })`;
+      isButtonDisabled = true;
+   }
+   // --- Fim da lógica da mensagem do botão no Card principal ---
 
    return (
       <div className="basis-1/6 flex justify-center items-center">
@@ -120,28 +259,41 @@ export function Card({
                      <p className="md:mt-4 mt-2 text-sm text-gray-600">
                         Cor:{" "}
                         <span className="font-medium">
-                           {corSelecionada || ""}
+                           {corSelecionada || "Nenhuma"}
                         </span>
                      </p>
                      <div className="flex gap-3 ">
-                        {cores.map((cor) => (
-                           <button
-                              key={cor.nome}
-                              onClick={() =>
-                                 setCorSelecionada((atual) =>
-                                    atual === cor.nome ? "" : cor.nome
-                                 )
-                              }
-                              className={`md:w-7 md:h-7 rounded-full border-2 transition cursor-pointer w-6 h-6
-                                                ${cor.classe}
-                                                ${
-                                                   corSelecionada === cor.nome
-                                                      ? "border-black scale-110 "
-                                                      : "border-gray-300"
-                                                }`}
-                              title={cor.nome}
-                           ></button>
-                        ))}
+                        {cores.map((cor) => {
+                           const hasAnyStockForThisColor = tamanhos.some(
+                              (tamanho) => estoque[cor.nome]?.[tamanho.nome] > 0
+                           );
+                           const isColorDisabled = !hasAnyStockForThisColor;
+
+                           return (
+                              <button
+                                 key={cor.nome}
+                                 onClick={() => {
+                                    setCorSelecionada(
+                                       corSelecionada === cor.nome
+                                          ? ""
+                                          : cor.nome
+                                    );
+                                 }}
+                                 className={`md:w-7 md:h-7 rounded-full border-2 transition cursor-pointer w-6 h-6
+                      ${cor.classe}
+                      ${
+                         corSelecionada === cor.nome
+                            ? "border-black scale-110 "
+                            : "border-gray-300"
+                      }
+                      ${isColorDisabled ? "opacity-50 cursor-not-allowed" : ""}
+                      `}
+                                 title={cor.nome}
+                                 aria-label={`Selecionar cor ${cor.nome}`}
+                                 disabled={isColorDisabled}
+                              ></button>
+                           );
+                        })}
                      </div>
                   </>
                )}
@@ -151,47 +303,57 @@ export function Card({
                      <p className="md:mt-4 mt-2 text-sm text-gray-600">
                         Tamanho:{" "}
                         <span className="font-medium">
-                           {tamanhoSelecionado || ""}
+                           {tamanhoSelecionado || "Nenhum"}
                         </span>
                      </p>
                      <div className="flex gap-3 ">
-                        {tamanhos.map((tamanho) => (
-                           <button
-                              key={tamanho.nome}
-                              onClick={() =>
-                                 setTamanhoSelecionado((atual) =>
-                                    atual === tamanho.nome ? "" : tamanho.nome
-                                 )
-                              }
-                              className={`md:w-8 md:h-8 rounded-sm border-1 transition md:text-sm cursor-pointer w-6 h-6 text-xs
-                                                ${tamanho.classe || ""}
-                                                ${
-                                                   tamanhoSelecionado ===
-                                                   tamanho.nome
-                                                      ? "bg-black text-white "
-                                                      : "border-gray-300 hover:bg-zinc-200/60"
-                                                }`}
-                              title={tamanho.nome}
-                           >
-                              {tamanho.nome}
-                           </button>
-                        ))}
+                        {tamanhos.map((tamanho) => {
+                           const stockForThisSize = corSelecionada
+                              ? estoque[corSelecionada]?.[tamanho.nome] || 0
+                              : 0;
+                           const isSizeUnavailable = stockForThisSize === 0;
+
+                           return (
+                              <button
+                                 key={tamanho.nome}
+                                 onClick={() => {
+                                    setTamanhoSelecionado(
+                                       tamanhoSelecionado === tamanho.nome
+                                          ? ""
+                                          : tamanho.nome
+                                    );
+                                 }}
+                                 className={`md:w-8 md:h-8 rounded-sm border-1 transition md:text-sm cursor-pointer w-6 h-6 text-xs
+                        ${tamanho.classe || ""}
+                        ${
+                           tamanhoSelecionado === tamanho.nome
+                              ? "bg-black text-white "
+                              : "border-gray-300 hover:bg-zinc-200/60"
+                        }
+                        ${
+                           isSizeUnavailable || !corSelecionada
+                              ? "opacity-50 cursor-not-allowed"
+                              : ""
+                        }
+                      `}
+                                 title={tamanho.nome}
+                                 aria-label={`Selecionar tamanho ${tamanho.nome}`}
+                                 disabled={isSizeUnavailable || !corSelecionada}
+                              >
+                                 {tamanho.nome}
+                              </button>
+                           );
+                        })}
                      </div>
                   </>
                )}
 
                <CardButton
-                  id={id}
-                  nome={nome}
-                  preco={preco}
-                  estoque={estoque}
-                  imagem={imagem}
-                  corSelecionada={corSelecionada}
-                  tamanhoSelecionado={tamanhoSelecionado}
-                  quantidade={1}
-                  desativarClick={true}
                   onClick={handleAdicionarAoCarrinho}
-               />
+                  disabled={isButtonDisabled}
+               >
+                  {buttonMessage}
+               </CardButton>
             </div>
          </div>
       </div>

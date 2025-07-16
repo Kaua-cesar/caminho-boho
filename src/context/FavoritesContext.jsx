@@ -1,6 +1,8 @@
-// src/context/FavoritesContext.jsx
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { toast } from "sonner"; // Para notificações
+import { db } from "../lib/firebase"; // Certifique-se de que o caminho para o firebase é este
+import { doc, getDoc, setDoc } from "firebase/firestore";
+import { useAuth } from "./AuthContext"; // Importa o contexto de autenticação
+import { toast } from "sonner";
 
 const FavoritesContext = createContext();
 
@@ -9,74 +11,118 @@ export const useFavorites = () => {
 };
 
 export const FavoritesProvider = ({ children }) => {
-   const [favorites, setFavorites] = useState([]); // Array de IDs de produtos favoritos
+   const { user, loading: authLoading } = useAuth();
+   const [favorites, setFavorites] = useState([]);
+   const [favoritesLoading, setFavoritesLoading] = useState(true);
 
-   // Carregar favoritos do localStorage ao iniciar
+   // Efeito para carregar os favoritos do Firebase quando o usuário ou authLoading mudar
    useEffect(() => {
-      try {
-         const storedFavorites = localStorage.getItem("favorites");
-         if (storedFavorites) {
-            setFavorites(JSON.parse(storedFavorites));
-         }
-      } catch (error) {
-         console.error("Erro ao carregar favoritos do localStorage", error);
-         // Opcional: toast.error("Erro ao carregar favoritos.");
-      }
-   }, []);
+      const fetchFavorites = async () => {
+         if (authLoading) return;
 
-   // Salvar favoritos no localStorage sempre que forem alterados
-   useEffect(() => {
-      try {
-         localStorage.setItem("favorites", JSON.stringify(favorites));
-      } catch (error) {
-         console.error("Erro ao salvar favoritos no localStorage", error);
-         // Opcional: toast.error("Erro ao salvar favoritos.");
-      }
-   }, [favorites]);
+         if (user) {
+            setFavoritesLoading(true);
+            try {
+               const userFavoritesRef = doc(db, "favorites", user.uid);
+               const docSnap = await getDoc(userFavoritesRef);
 
-   const addFavorite = (productId) => {
-      setFavorites((prevFavorites) => {
-         if (!prevFavorites.includes(productId)) {
-            toast.success("Produto adicionado aos favoritos!");
-            return [...prevFavorites, productId];
+               if (docSnap.exists()) {
+                  setFavorites(docSnap.data().items || []);
+               } else {
+                  await setDoc(userFavoritesRef, { items: [] });
+                  setFavorites([]);
+               }
+            } catch (error) {
+               console.error("Erro ao carregar favoritos do Firebase:", error);
+               toast.error("Erro ao carregar seus favoritos.");
+               setFavorites([]);
+            } finally {
+               setFavoritesLoading(false);
+            }
+         } else {
+            setFavorites([]);
+            setFavoritesLoading(false);
          }
+      };
+
+      fetchFavorites();
+   }, [user, authLoading]);
+
+   // Função auxiliar para atualizar os favoritos no Firebase
+   const updateFavoritesInFirebase = async (updatedItems) => {
+      if (!user) return false;
+
+      setFavoritesLoading(true);
+      try {
+         const userFavoritesRef = doc(db, "favorites", user.uid);
+         await setDoc(userFavoritesRef, { items: updatedItems });
+         setFavorites(updatedItems);
+         return true;
+      } catch (error) {
+         console.error("Erro ao salvar favoritos no Firebase:", error);
+         toast.error("Erro ao salvar favoritos. Tente novamente.");
+         return false;
+      } finally {
+         setFavoritesLoading(false);
+      }
+   };
+
+   const addFavorite = async (productId) => {
+      if (!user) {
+         toast.info(
+            "Você precisa estar logado para adicionar produtos aos favoritos."
+         );
+         return false;
+      }
+
+      if (favorites.includes(productId)) {
          toast.info("Este produto já está nos seus favoritos.");
-         return prevFavorites;
-      });
+         return false;
+      }
+
+      const newFavorites = [...favorites, productId];
+      const success = await updateFavoritesInFirebase(newFavorites);
+      if (success) {
+         // ✨ Notificação de sucesso ao adicionar
+         toast.success("Produto adicionado aos favoritos!");
+      }
+      return success;
    };
 
-   const removeFavorite = (productId) => {
-      setFavorites((prevFavorites) => {
-         const newFavorites = prevFavorites.filter((id) => id !== productId);
-         if (newFavorites.length < prevFavorites.length) {
-            // Verifica se realmente removeu
-            toast.info("Produto removido dos favoritos.");
-         }
-         return newFavorites;
-      });
+   const removeFavorite = async (productId) => {
+      if (!user) {
+         toast.info(
+            "Você precisa estar logado para remover produtos dos favoritos."
+         );
+         return false;
+      }
+
+      const filteredFavorites = favorites.filter((id) => id !== productId);
+      if (filteredFavorites.length === favorites.length) {
+         toast.info("Este produto não foi encontrado nos seus favoritos.");
+         return false;
+      }
+
+      const success = await updateFavoritesInFirebase(filteredFavorites);
+      if (success) {
+         // ✨ Notificação de sucesso ao remover
+         toast.info("Produto removido dos favoritos.");
+      }
+      return success;
    };
 
-   const isFavorite = (productId) => {
-      return favorites.includes(productId);
-   };
+   const isFavorite = (productId) => favorites.includes(productId);
 
-   const getFavoriteIds = () => {
-      return favorites;
-   };
-
-   const clearFavorites = () => {
-      setFavorites([]);
-      toast.info("Todos os favoritos foram removidos.");
-   };
+   // ✨ A função `clearFavorites` e toda a sua lógica foram removidas.
 
    const value = {
-      favorites, // Lista de IDs de favoritos
+      favorites,
+      favoritesLoading,
       addFavorite,
       removeFavorite,
       isFavorite,
-      getFavoriteIds,
-      clearFavorites,
-      totalFavorites: favorites.length, // Para o contador
+      totalFavorites: favorites.length,
+      // ✨ `clearFavorites` não é mais exportado.
    };
 
    return (

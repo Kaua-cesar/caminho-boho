@@ -25,8 +25,8 @@ export function ProductsPage() {
    }
 
    return (
-      <div className="container mx-auto p-4 mt-20">
-         <h1 className="text-3xl font-bold mb-8 text-center text-gray-800">
+      <div className="flex items-center justify-center flex-col ">
+         <h1 className="text-3xl font-bold my-8 text-center text-gray-800">
             Todos os Nossos Produtos
          </h1>
 

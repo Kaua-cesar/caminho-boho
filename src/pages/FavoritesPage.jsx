@@ -1,31 +1,33 @@
 // src/pages/FavoritesPage.jsx
 import React, { useState, useEffect } from "react";
-import { useFavorites } from "../context/FavoritesContext";
-import { Card } from "../Card";
+import { useFavorites } from "../context/FavoritesContext"; // Ajuste o caminho se necessário
+import { Card } from "../Card"; // Certifique-se de que o caminho para o seu componente Card está correto
 import { Button } from "@/components/ui/button"; // Descomente se usa Shadcn UI Button
 
-// ✨ IMPORTANTE: Importe seus dados reais de produtos aqui!
-import { produtos } from "../components/Cards/CardDados"; // ✨ CORRIGIDO: O caminho e o nome da constante de importação
+// IMPORTANTE: Importe seus dados reais de produtos aqui!
+import { produtos } from "../components/Cards/CardDados"; // O caminho e o nome da constante de importação
 
 export function FavoritesPage() {
-   const { favorites, clearFavorites, totalFavorites } = useFavorites();
+   // Agora pegamos 'favoritesLoading' diretamente do contexto
+   const { favorites, totalFavorites, favoritesLoading } = useFavorites();
    const [favoriteProductsData, setFavoriteProductsData] = useState([]);
-   const [loading, setLoading] = useState(true);
 
+   // O useEffect agora só filtra os dados quando 'favorites' (a lista do Firestore) muda ou é carregada
    useEffect(() => {
-      setLoading(true);
-      // ✨ AGORA FILTRE A PARTIR DA SUA LISTA DE DADOS REAIS:
+      // Não é mais necessário um estado 'loading' local aqui,
+      // pois 'favoritesLoading' do contexto já gerencia isso.
+      // Contudo, a lógica de filtragem continua a mesma.
       const fetchedData = produtos.filter((product) =>
          favorites.includes(product.id)
       );
       setFavoriteProductsData(fetchedData);
-      setLoading(false);
-   }, [favorites]); // Este efeito roda sempre que a lista de favoritos muda
+   }, [favorites]); // Este efeito roda sempre que a lista de favoritos do contexto muda
 
-   if (loading) {
+   // Usamos 'favoritesLoading' diretamente do contexto para exibir o estado de carregamento
+   if (favoritesLoading) {
       return (
-         <div className="container mx-auto p-4 text-center mt-20">
-            <p className="text-lg text-gray-600">
+         <div className="container mx-auto p-4 text-center mt-20 min-h-[calc(100vh-200px)] flex items-center justify-center">
+            <p className="text-lg text-gray-600 animate-pulse">
                Carregando seus produtos favoritos...
             </p>
          </div>
@@ -33,8 +35,8 @@ export function FavoritesPage() {
    }
 
    return (
-      <div className="container mx-auto p-4 mt-20">
-         <h1 className="text-3xl font-bold mb-6 text-center text-gray-800">
+      <div className="flex items-center justify-center flex-col ">
+         <h1 className="text-3xl font-bold my-8 text-center text-gray-800">
             Meus Favoritos ({totalFavorites})
          </h1>
          {totalFavorites === 0 ? (
@@ -61,21 +63,13 @@ export function FavoritesPage() {
                         cores={product.cores}
                         tamanhos={product.tamanhos}
                         imagem={product.imagem}
-                        desconto={product.desconto} // Se o desconto for negativo, você pode querer ajustá-lo para ser um valor positivo no Card
+                        desconto={product.desconto}
                         qntavaliacoes={product.qntavaliacoes}
                         avaliacao={product.avaliacao}
                      />
                   ))}
                </div>
-               <div className="text-center mt-8">
-                  <Button
-                     variant="destructive"
-                     onClick={clearFavorites}
-                     className="bg-red-600 hover:bg-red-700 text-white px-6 py-3 text-base rounded-md shadow-lg transition-colors duration-200"
-                  >
-                     Limpar Todos os Favoritos
-                  </Button>
-               </div>
+               <div className="text-center mt-8"></div>
             </>
          )}
       </div>

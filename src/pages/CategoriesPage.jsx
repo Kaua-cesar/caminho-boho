@@ -53,15 +53,17 @@ export function CategoriesPage() {
 
    if (loading) {
       return (
-         <div className="container mx-auto p-4 text-center mt-20">
-            <p className="text-lg text-gray-600">Carregando categorias...</p>
+         <div className="container mx-auto p-4 text-center mt-20 min-h-[calc(100vh-200px)] flex items-center justify-center">
+            <p className="text-lg text-gray-600 animate-pulse">
+               Carregando seus produtos favoritos...
+            </p>
          </div>
       );
    }
 
    return (
-      <div className="container mx-auto p-4 mt-20">
-         <h1 className="text-3xl font-bold mb-8 text-center text-gray-800">
+      <div className="flex items-center justify-center flex-col ">
+         <h1 className="text-3xl font-bold my-8 text-center text-gray-800">
             Explore Nossas Categorias
          </h1>
 

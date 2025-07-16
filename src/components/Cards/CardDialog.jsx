@@ -1,5 +1,4 @@
-// src/components/CardDialog.jsx
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { ContadorCliques } from "../ui/contador";
 import { CardButton } from "./CardButton";
 import { CardFavorits } from "./CardFavorits";
@@ -34,21 +33,106 @@ export function CardDialog({
    avaliacao,
    atualizarTotalFavoritos,
 }) {
-   const [corSelecionada, setCorSelecionada] = useState("");
-   const [tamanhoSelecionado, setTamanhoSelecionado] = useState("");
+   const getInitialSelection = (options, stockData, parentSelection = null) => {
+      if (options.length === 0) return "";
+
+      for (const option of options) {
+         if (parentSelection === null) {
+            const hasStock = tamanhos.some(
+               (t) => stockData[option.nome]?.[t.nome] > 0
+            );
+            if (hasStock) {
+               return option.nome;
+            }
+         } else {
+            if (stockData[parentSelection]?.[option.nome] > 0) {
+               return option.nome;
+            }
+         }
+      }
+      return options[0]?.nome || "";
+   };
+
+   const [corSelecionada, setCorSelecionada] = useState(() =>
+      getInitialSelection(cores, estoque)
+   );
+   const [tamanhoSelecionado, setTamanhoSelecionado] = useState(() =>
+      getInitialSelection(tamanhos, estoque, corSelecionada)
+   );
    const [quantidade, setQuantidade] = useState(1);
    const [open, setOpen] = useState(false);
+   const [currentStock, setCurrentStock] = useState(0);
 
    const { addItemToCart } = useCart();
+
+   useEffect(() => {
+      if (estoque && corSelecionada && tamanhoSelecionado) {
+         const stockForCombination =
+            estoque[corSelecionada]?.[tamanhoSelecionado] || 0;
+         setCurrentStock(stockForCombination);
+      } else if (cores.length === 0 && tamanhos.length === 0) {
+         setCurrentStock(Number(estoque) || 0);
+      } else {
+         setCurrentStock(0);
+      }
+   }, [
+      estoque,
+      corSelecionada,
+      tamanhoSelecionado,
+      cores.length,
+      tamanhos.length,
+   ]);
+
+   useEffect(() => {
+      if (tamanhos.length > 0) {
+         let newTamanho = "";
+         if (corSelecionada) {
+            for (const tamanho of tamanhos) {
+               if (estoque[corSelecionada]?.[tamanho.nome] > 0) {
+                  newTamanho = tamanho.nome;
+                  break;
+               }
+            }
+            if (
+               tamanhoSelecionado &&
+               estoque[corSelecionada]?.[tamanhoSelecionado] > 0
+            ) {
+               setTamanhoSelecionado(tamanhoSelecionado);
+            } else {
+               setTamanhoSelecionado(newTamanho || tamanhos[0]?.nome || "");
+            }
+         } else {
+            setTamanhoSelecionado("");
+         }
+      }
+   }, [corSelecionada, tamanhos, estoque]);
+
+   const checkIfProductHasAnyStock = () => {
+      if (!estoque) return false;
+
+      if (cores.length === 0 && tamanhos.length === 0) {
+         return Number(estoque) > 0;
+      }
+
+      for (const cor of cores) {
+         for (const tamanho of tamanhos) {
+            if (estoque[cor.nome]?.[tamanho.nome] > 0) {
+               return true;
+            }
+         }
+      }
+      return false;
+   };
+
+   const productHasAnyStock = checkIfProductHasAnyStock();
 
    async function handleSubmit(e) {
       e.preventDefault();
 
-      toast.dismiss(); // Garante que toasts anteriores sejam limpos
+      toast.dismiss();
 
       let errorMessages = [];
 
-      // Validação da cor
       if (cores.length > 0 && !corSelecionada) {
          errorMessages.push("selecione uma cor");
       }
@@ -59,7 +143,7 @@ export function CardDialog({
       if (errorMessages.length > 0) {
          let message = "Por favor, ";
          if (errorMessages.length === 1) {
-            message += errorMessages[0]; // Correção aqui: atribua a mensagem
+            message += errorMessages[0];
          } else {
             message +=
                errorMessages.slice(0, -1).join(", ") +
@@ -70,13 +154,20 @@ export function CardDialog({
          return;
       }
 
+      if (currentStock < quantidade) {
+         toast.error(
+            `Não há estoque suficiente para "${nome}" (${corSelecionada} / ${tamanhoSelecionado}). Disponível: ${currentStock}`
+         );
+         return;
+      }
+
       const productData = {
          imagem,
          id,
          nome,
          preco: Number(preco),
-         cor: cores.length > 0 ? corSelecionada : "",
-         tamanho: tamanhos.length > 0 ? tamanhoSelecionado : "",
+         cor: corSelecionada,
+         tamanho: tamanhoSelecionado,
          quantidade: quantidade,
       };
 
@@ -86,6 +177,46 @@ export function CardDialog({
          setOpen(false);
       }
    }
+
+   const isVariationProduct = cores.length > 0 || tamanhos.length > 0;
+   const isSelectionComplete =
+      !isVariationProduct ||
+      (cores.length > 0 &&
+         corSelecionada &&
+         tamanhos.length > 0 &&
+         tamanhoSelecionado) ||
+      (cores.length > 0 && corSelecionada && tamanhos.length === 0) ||
+      (tamanhos.length > 0 && tamanhoSelecionado && cores.length === 0);
+
+   // Determina se o botão principal de adicionar ao carrinho deve estar desabilitado
+   const isAddToCartButtonDisabled =
+      currentStock <= 0 || !isSelectionComplete || quantidade <= 0;
+
+   // --- Lógica aprimorada para a mensagem do botão ---
+   let buttonMessage = "Adicionar ao carrinho";
+
+   if (isVariationProduct && !isSelectionComplete) {
+      // Prioriza a mensagem de seleção se for um produto com variação e a seleção não estiver completa
+      if (
+         cores.length > 0 &&
+         !corSelecionada &&
+         tamanhos.length > 0 &&
+         !tamanhoSelecionado
+      ) {
+         buttonMessage = "Selecione uma cor e tamanho";
+      } else if (cores.length > 0 && !corSelecionada) {
+         buttonMessage = "Selecione uma cor";
+      } else if (tamanhos.length > 0 && !tamanhoSelecionado) {
+         buttonMessage = "Selecione um tamanho";
+      }
+   } else if (!productHasAnyStock) {
+      // Se não tem estoque NENHUM, essa é a mensagem final
+      buttonMessage = "Produto Indisponível";
+   } else if (currentStock <= 0) {
+      // Se a combinação selecionada está sem estoque
+      buttonMessage = `Indisponível (${corSelecionada} / ${tamanhoSelecionado})`;
+   }
+   // --- Fim da lógica aprimorada ---
 
    return (
       <>
@@ -105,7 +236,7 @@ export function CardDialog({
                      />
 
                      <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                        {Number(estoque) > 0 ? (
+                        {productHasAnyStock ? (
                            <button className="bg-white text-black cursor-pointer p-3 rounded-md flex items-center gap-2 text-sm font-medium shadow">
                               <FaEye />
                               Veja Detalhes
@@ -161,7 +292,7 @@ export function CardDialog({
                         )}
                      </div>
 
-                     {Number(estoque) > 0 ? (
+                     {productHasAnyStock ? (
                         <span className="bg-green-200 text-green-900 rounded-2xl px-3 py-1 w-23 text-[10px] font-bold">
                            em estoque
                         </span>
@@ -176,29 +307,46 @@ export function CardDialog({
                            <p className="mt-2 text-sm text-gray-600 font-medium text-start">
                               Cor:{" "}
                               <span className="font-semibold">
-                                 {corSelecionada}
+                                 {corSelecionada || "Nenhuma selecionada"}
                               </span>
                            </p>
                            <div className="flex gap-3">
-                              {cores.map((cor) => (
-                                 <button
-                                    type="button"
-                                    key={cor.nome}
-                                    onClick={() =>
-                                       setCorSelecionada((atual) =>
-                                          atual === cor.nome ? "" : cor.nome
-                                       )
-                                    }
-                                    className={`w-7 h-7 rounded-full border-2 transition cursor-pointer ${
-                                       cor.classe
-                                    } ${
-                                       corSelecionada === cor.nome
-                                          ? "border-black scale-110"
-                                          : "border-gray-300"
-                                    }`}
-                                    title={cor.nome}
-                                 ></button>
-                              ))}
+                              {cores.map((cor) => {
+                                 const hasAnyStockForThisColor = tamanhos.some(
+                                    (tamanho) =>
+                                       estoque[cor.nome]?.[tamanho.nome] > 0
+                                 );
+                                 const isColorDisabled =
+                                    !hasAnyStockForThisColor;
+
+                                 return (
+                                    <button
+                                       type="button"
+                                       key={cor.nome}
+                                       onClick={() => {
+                                          setCorSelecionada(
+                                             corSelecionada === cor.nome
+                                                ? ""
+                                                : cor.nome
+                                          );
+                                          setQuantidade(1);
+                                       }}
+                                       className={`w-7 h-7 rounded-full border-2 transition cursor-pointer ${
+                                          cor.classe
+                                       } ${
+                                          corSelecionada === cor.nome
+                                             ? "border-black scale-110"
+                                             : "border-gray-300"
+                                       } ${
+                                          isColorDisabled
+                                             ? "opacity-50 cursor-not-allowed"
+                                             : ""
+                                       }`}
+                                       title={cor.nome}
+                                       disabled={isColorDisabled}
+                                    ></button>
+                                 );
+                              })}
                            </div>
                         </>
                      )}
@@ -208,33 +356,49 @@ export function CardDialog({
                            <p className="mt-2 text-sm text-gray-600 font-medium text-start">
                               Tamanho:{" "}
                               <span className="font-semibold">
-                                 {tamanhoSelecionado}
+                                 {tamanhoSelecionado || "Nenhum selecionado"}
                               </span>
                            </p>
                            <div className="flex gap-3 ">
-                              {tamanhos.map((tamanho) => (
-                                 <button
-                                    type="button"
-                                    key={tamanho.nome}
-                                    onClick={() =>
-                                       setTamanhoSelecionado((atual) =>
-                                          atual === tamanho.nome
-                                             ? ""
-                                             : tamanho.nome
-                                       )
-                                    }
-                                    className={`w-8 h-8 rounded-sm border-1 transition text-xs md:text-sm cursor-pointer ${
-                                       tamanho.classe || ""
-                                    } ${
-                                       tamanhoSelecionado === tamanho.nome
-                                          ? "bg-black text-white"
-                                          : "border-gray-300 hover:bg-zinc-200/60"
-                                    }`}
-                                    title={tamanho.nome}
-                                 >
-                                    {tamanho.nome}
-                                 </button>
-                              ))}
+                              {tamanhos.map((tamanho) => {
+                                 const stockForThisSize = corSelecionada
+                                    ? estoque[corSelecionada]?.[tamanho.nome] ||
+                                      0
+                                    : 0;
+                                 const isSizeDisabled = stockForThisSize <= 0;
+
+                                 return (
+                                    <button
+                                       type="button"
+                                       key={tamanho.nome}
+                                       onClick={() => {
+                                          setTamanhoSelecionado(
+                                             tamanhoSelecionado === tamanho.nome
+                                                ? ""
+                                                : tamanho.nome
+                                          );
+                                          setQuantidade(1);
+                                       }}
+                                       className={`w-8 h-8 rounded-sm border-1 transition text-xs md:text-sm cursor-pointer ${
+                                          tamanho.classe || ""
+                                       } ${
+                                          tamanhoSelecionado === tamanho.nome
+                                             ? "bg-black text-white"
+                                             : "border-gray-300 hover:bg-zinc-200/60"
+                                       } ${
+                                          isSizeDisabled || !corSelecionada
+                                             ? "opacity-50 cursor-not-allowed"
+                                             : ""
+                                       }`}
+                                       title={tamanho.nome}
+                                       disabled={
+                                          isSizeDisabled || !corSelecionada
+                                       }
+                                    >
+                                       {tamanho.nome}
+                                    </button>
+                                 );
+                              })}
                            </div>
                         </>
                      )}
@@ -245,20 +409,17 @@ export function CardDialog({
                      <ContadorCliques
                         value={quantidade}
                         onChange={setQuantidade}
+                        max={currentStock}
+                        disabled={isAddToCartButtonDisabled}
                      />
 
                      <CardButton
-                        id={id}
-                        nome={nome}
-                        preco={preco}
-                        estoque={estoque}
-                        imagem={imagem}
-                        corSelecionada={corSelecionada}
-                        tamanhoSelecionado={tamanhoSelecionado}
-                        quantidade={quantidade}
                         type="submit"
                         onClick={handleSubmit}
-                     />
+                        disabled={isAddToCartButtonDisabled}
+                     >
+                        {buttonMessage}
+                     </CardButton>
 
                      <Separator />
 

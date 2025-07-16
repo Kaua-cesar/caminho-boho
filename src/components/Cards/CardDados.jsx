@@ -19,12 +19,16 @@ export const produtos = [
       imagem: vestido1,
       avaliacao: 2.5,
       qntavaliacoes: 2,
-      estoque: 0,
+      // ✨ ATUALIZADO: Estoque por variação. Era estoque: 0, então uma combinação terá 0.
+      estoque: {
+         Verde: { S: 0, M: 0, G: 0, GG: 0 }, // Exemplo: Verde G indisponível
+         Roxo: { S: 0, M: 0, G: 0, GG: 0 },
+         Rosa: { S: 0, M: 0, G: 0, GG: 0 },
+      },
    },
    {
       id: "prod2",
       nome: "Vestido Vest Lenco Elegante [ EDICAO ESPECIAL ] ",
-
       precoOriginal: 1,
       categoria: "vestlenco",
       cores: [
@@ -36,7 +40,11 @@ export const produtos = [
       imagem: vestido2,
       avaliacao: 1.7,
       qntavaliacoes: 10,
-      estoque: 1,
+      // ✨ ATUALIZADO: Estoque por variação. Era estoque: 1.
+      estoque: {
+         Azul: { P: 1, M: 0, G: 1 }, // Exemplo: Azul M indisponível
+         Verde: { P: 2, M: 1, G: 2 },
+      },
    },
    {
       id: "prod3",
@@ -48,12 +56,15 @@ export const produtos = [
          { nome: "preto", classe: "bg-black" },
          { nome: "Amarelo", classe: "bg-yellow-500" },
       ],
-
       tamanhos: [{ nome: "P" }, { nome: "M" }, { nome: "G" }],
       imagem: vestido3,
       avaliacao: 4.5,
       qntavaliacoes: 7,
-      estoque: 2,
+      // ✨ ATUALIZADO: Estoque por variação. Era estoque: 2.
+      estoque: {
+         preto: { P: 2, M: 1, G: 0 }, // Exemplo: Preto G indisponível
+         Amarelo: { P: 3, M: 2, G: 1 },
+      },
    },
    {
       id: "prod4",
@@ -69,7 +80,11 @@ export const produtos = [
       imagem: vestido3,
       avaliacao: 4.6,
       qntavaliacoes: 11,
-      estoque: 2,
+      // ✨ ATUALIZADO: Estoque por variação. Assumindo estoque genérico de 2 para todas as variações.
+      estoque: {
+         Azul: { P: 2, M: 2, G: 2 },
+         Verde: { P: 2, M: 2, G: 2 },
+      },
    },
    {
       id: "prod5",
@@ -85,7 +100,11 @@ export const produtos = [
       imagem: vestido3,
       avaliacao: 4.6,
       qntavaliacoes: 11,
-      estoque: 0,
+      // ✨ ATUALIZADO: Estoque por variação. Era estoque: 0, então uma combinação terá 0.
+      estoque: {
+         Azul: { P: 1, M: 0, G: 1 }, // Exemplo: Azul M indisponível
+         Verde: { P: 1, M: 1, G: 0 }, // Exemplo: Verde G indisponível
+      },
    },
    {
       id: "prod6",
@@ -101,7 +120,11 @@ export const produtos = [
       imagem: vestido3,
       avaliacao: 4.6,
       qntavaliacoes: 11,
-      estoque: 2,
+      // ✨ ATUALIZADO: Estoque por variação. Assumindo estoque genérico de 2 para todas as variações.
+      estoque: {
+         Azul: { P: 2, M: 2, G: 2 },
+         Verde: { P: 2, M: 2, G: 2 },
+      },
    },
    {
       id: "prod7",
@@ -117,7 +140,11 @@ export const produtos = [
       imagem: vestido3,
       avaliacao: 4.6,
       qntavaliacoes: 11,
-      estoque: 2,
+      // ✨ ATUALIZADO: Estoque por variação. Assumindo estoque genérico de 2 para todas as variações.
+      estoque: {
+         Azul: { P: 2, M: 2, G: 2 },
+         Verde: { P: 2, M: 2, G: 2 },
+      },
    },
    {
       id: "prod8",
@@ -134,7 +161,12 @@ export const produtos = [
       imagem: vestido1,
       avaliacao: 4.5,
       qntavaliacoes: 2,
-      estoque: 2,
+      // ✨ ATUALIZADO: Estoque por variação. Assumindo estoque genérico de 2 para todas as variações.
+      estoque: {
+         Verde: { S: 2, M: 2, G: 2, GG: 2 },
+         Roxo: { S: 2, M: 2, G: 2, GG: 2 },
+         Rosa: { S: 2, M: 2, G: 2, GG: 2 },
+      },
    },
    {
       id: "prod9",
@@ -151,7 +183,12 @@ export const produtos = [
       imagem: vestido1,
       avaliacao: 4.5,
       qntavaliacoes: 2,
-      estoque: 2,
+      // ✨ ATUALIZADO: Estoque por variação. Assumindo estoque genérico de 2 para todas as variações.
+      estoque: {
+         Verde: { S: 2, M: 2, G: 2, GG: 2 },
+         Roxo: { S: 2, M: 2, G: 2, GG: 2 },
+         Rosa: { S: 2, M: 2, G: 2, GG: 2 },
+      },
    },
    {
       id: "prod10",
@@ -168,7 +205,12 @@ export const produtos = [
       imagem: vestido1,
       avaliacao: 4.5,
       qntavaliacoes: 2,
-      estoque: 2,
+      // ✨ ATUALIZADO: Estoque por variação. Assumindo estoque genérico de 2 para todas as variações.
+      estoque: {
+         Verde: { S: 2, M: 2, G: 2, GG: 2 },
+         Roxo: { S: 2, M: 2, G: 2, GG: 2 },
+         Rosa: { S: 2, M: 2, G: 2, GG: 2 },
+      },
    },
    {
       id: "prod11",
@@ -185,7 +227,12 @@ export const produtos = [
       imagem: vestido1,
       avaliacao: 4.5,
       qntavaliacoes: 2,
-      estoque: 2,
+      // ✨ ATUALIZADO: Estoque por variação. Assumindo estoque genérico de 2 para todas as variações.
+      estoque: {
+         Verde: { S: 2, M: 2, G: 2, GG: 2 },
+         Roxo: { S: 2, M: 2, G: 2, GG: 2 },
+         Rosa: { S: 2, M: 2, G: 2, GG: 2 },
+      },
    },
    {
       id: "prod12",
@@ -202,7 +249,12 @@ export const produtos = [
       imagem: vestido1,
       avaliacao: 4.5,
       qntavaliacoes: 2,
-      estoque: 2,
+      // ✨ ATUALIZADO: Estoque por variação. Assumindo estoque genérico de 2 para todas as variações.
+      estoque: {
+         Verde: { S: 2, M: 2, G: 2, GG: 2 },
+         Roxo: { S: 2, M: 2, G: 2, GG: 2 },
+         Rosa: { S: 2, M: 2, G: 2, GG: 2 },
+      },
    },
    {
       id: "prod13",
@@ -219,7 +271,12 @@ export const produtos = [
       imagem: vestido1,
       avaliacao: 4.5,
       qntavaliacoes: 2,
-      estoque: 2,
+      // ✨ ATUALIZADO: Estoque por variação. Assumindo estoque genérico de 2 para todas as variações.
+      estoque: {
+         Verde: { S: 2, M: 2, G: 2, GG: 2 },
+         Roxo: { S: 2, M: 2, G: 2, GG: 2 },
+         Rosa: { S: 2, M: 2, G: 2, GG: 2 },
+      },
    },
    {
       id: "prod14",
@@ -236,7 +293,12 @@ export const produtos = [
       imagem: vestido1,
       avaliacao: 4.5,
       qntavaliacoes: 2,
-      estoque: 2,
+      // ✨ ATUALIZADO: Estoque por variação. Assumindo estoque genérico de 2 para todas as variações.
+      estoque: {
+         Verde: { S: 2, M: 2, G: 2, GG: 2 },
+         Roxo: { S: 2, M: 2, G: 2, GG: 2 },
+         Rosa: { S: 2, M: 2, G: 2, GG: 2 },
+      },
    },
    {
       id: "prod15",
@@ -253,7 +315,12 @@ export const produtos = [
       imagem: vestido1,
       avaliacao: 4.5,
       qntavaliacoes: 2,
-      estoque: 2,
+      // ✨ ATUALIZADO: Estoque por variação. Assumindo estoque genérico de 2 para todas as variações.
+      estoque: {
+         Verde: { S: 2, M: 2, G: 2, GG: 2 },
+         Roxo: { S: 2, M: 2, G: 2, GG: 2 },
+         Rosa: { S: 2, M: 2, G: 2, GG: 2 },
+      },
    },
    {
       id: "prod16",
@@ -270,7 +337,12 @@ export const produtos = [
       imagem: vestido1,
       avaliacao: 4.5,
       qntavaliacoes: 2,
-      estoque: 2,
+      // ✨ ATUALIZADO: Estoque por variação. Assumindo estoque genérico de 2 para todas as variações.
+      estoque: {
+         Verde: { S: 2, M: 2, G: 2, GG: 2 },
+         Roxo: { S: 2, M: 2, G: 2, GG: 2 },
+         Rosa: { S: 2, M: 2, G: 2, GG: 2 },
+      },
    },
    {
       id: "prod17",
@@ -287,7 +359,11 @@ export const produtos = [
       imagem: vestido1,
       avaliacao: 4.5,
       qntavaliacoes: 2,
-      estoque: 2,
+      // ✨ ATUALIZADO: Estoque por variação. Assumindo estoque genérico de 2 para todas as variações.
+      estoque: {
+         Verde: { S: 2, M: 2, G: 2, GG: 2 },
+         Roxo: { S: 2, M: 2, G: 2, GG: 2 },
+         Rosa: { S: 2, M: 2, G: 2, GG: 2 },
+      },
    },
-   // Adicione os outros produtos aqui
 ];
