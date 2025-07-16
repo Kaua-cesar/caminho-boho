@@ -1,6 +1,6 @@
 // src/pages/ProductsPage.jsx
 import React, { useState, useEffect } from "react";
-import { produtos } from "../components/cards/CardDados"; // Importa seus dados de produtos reais
+import { produtos } from "../components/Cards/CardDados"; // Importa seus dados de produtos reais
 import { Card } from "..//Card"; // Importa seu componente Card
 
 export function ProductsPage() {
