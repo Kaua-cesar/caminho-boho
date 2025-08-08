@@ -12,6 +12,7 @@ import {
    FaEdit,
 } from "react-icons/fa";
 import { FaXmark } from "react-icons/fa6";
+import { Link } from "react-router-dom"; // Adicione esta linha
 import { useFavorites } from "../context/FavoritesContext";
 import { Card } from "../Card";
 import { produtos } from "../components/Cards/CardDados";
@@ -25,6 +26,9 @@ import {
    DialogTrigger,
 } from "@/components/ui/dialog";
 import { AddressForm } from "@/components/AddressForm"; // Importe o novo componente
+import moment from "moment";
+import "moment/locale/pt-br";
+import { toast } from "sonner"; // Adicionei o toast para mensagens de erro
 
 // Exemplo de dados mockados para Pedidos e Cartões, mantidos por enquanto
 const pedidosMock = [
@@ -36,32 +40,138 @@ const cartoesMock = [
    { id: 1, bandeira: "Visa", final: "1234", validade: "12/28" },
 ];
 
-function Pedidos() {
-   const [pedidos] = useState(pedidosMock);
+export function Pedidos() {
+   const { user } = useAuth();
+   const [pedidos, setPedidos] = useState([]);
+   const [loading, setLoading] = useState(true);
+
+   useEffect(() => {
+      const fetchPedidos = async () => {
+         if (!user) {
+            setLoading(false);
+            return;
+         }
+
+         try {
+            const response = await fetch(
+               `${import.meta.env.VITE_API_URL}/api/pedidos?userId=${user.uid}`
+            );
+
+            if (!response.ok) {
+               throw new Error("Falha ao buscar pedidos.");
+            }
+
+            const data = await response.json();
+            setPedidos(data);
+         } catch (error) {
+            console.error("Erro ao buscar pedidos:", error);
+            toast.error("Não foi possível carregar o histórico de pedidos.");
+         } finally {
+            setLoading(false);
+         }
+      };
+
+      fetchPedidos();
+   }, [user]);
+
+   if (loading) {
+      return <div className="text-center mt-8">Carregando seus pedidos...</div>;
+   }
 
    return (
-      <div className="p-4">
-         <h2 className="text-xl font-bold mb-4">Meus pedidos</h2>
+      <div className="container mx-auto p-4">
+         <h2 className="text-2xl font-bold mb-6 text-gray-800">Meus Pedidos</h2>
+
          {pedidos.length === 0 ? (
-            <p>Você ainda não fez nenhum pedido.</p>
+            <div className="bg-white p-6 rounded-lg shadow-md text-center">
+                              
+               <p className="text-gray-600">Você ainda não tem pedidos.</p>     
+                        
+               <Link
+                  to="/"
+                  className="text-blue-600 hover:underline mt-2 inline-block"
+               >
+                                    Voltar para a loja                
+               </Link>
+                          {" "}
+            </div>
          ) : (
-            <ul className="space-y-2">
+            <div className="space-y-6">
                {pedidos.map((pedido) => (
-                  <li
+                  <div
                      key={pedido.id}
-                     className="border rounded p-3 flex flex-col md:flex-row md:items-center md:justify-between"
+                     className="bg-white p-6 rounded-lg shadow-md"
                   >
-                     <span>
-                        <b>Pedido #{pedido.id}</b> - {pedido.status}
-                     </span>
-                     <span>
-                        Total:
-                        <b>R${pedido.total.toFixed(2)}</b> | Data:
-                        {pedido.data}
-                     </span>
-                  </li>
+                     <div className="flex justify-between items-center border-b pb-4 mb-4">
+                        <div>
+                           <p className="font-semibold text-gray-900">
+                              Pedido #{pedido.id}
+                           </p>
+                           <p className="text-sm text-gray-500">
+                              Data do pedido:{" "}
+                              {moment(pedido.dataCriacao)
+                                 .locale("pt-br")
+                                 .format("LL")}
+                           </p>
+                        </div>
+                        <div className="text-right">
+                           <span
+                              className={`px-3 py-1 rounded-full text-xs font-bold ${
+                                 pedido.status === "aprovado"
+                                    ? "bg-green-100 text-green-800"
+                                    : pedido.status === "rejeitado"
+                                    ? "bg-red-100 text-red-800"
+                                    : "bg-yellow-100 text-yellow-800"
+                              }`}
+                           >
+                              {pedido.status
+                                 ? pedido.status.toUpperCase()
+                                 : "DESCONHECIDO"}
+                           </span>
+                        </div>
+                     </div>
+
+                     <div className="space-y-4">
+                        {pedido.items &&
+                           pedido.items.map((item, index) => (
+                              <div
+                                 key={index}
+                                 className="flex items-center space-x-4"
+                              >
+                                 <img
+                                    src={item.image}
+                                    alt={item.title}
+                                    className="w-16 h-16 object-cover rounded-md"
+                                 />
+                                 <div className="flex-1">
+                                    <p className="font-medium text-gray-900">
+                                       {item.title}
+                                    </p>
+                                    <p className="text-sm text-gray-600">
+                                       Quantidade: {item.quantity}
+                                    </p>
+                                 </div>
+                                 <p className="font-semibold text-gray-900">
+                                    R${" "}
+                                    {(item.unit_price * item.quantity).toFixed(
+                                       2
+                                    )}
+                                 </p>
+                              </div>
+                           ))}
+                     </div>
+
+                     <Separator className="my-4" />
+
+                     <div className="text-right">
+                        <p className="text-lg font-bold text-gray-900">
+                           Total: R${" "}
+                           {pedido.total ? pedido.total.toFixed(2) : "0.00"}
+                        </p>
+                     </div>
+                  </div>
                ))}
-            </ul>
+            </div>
          )}
       </div>
    );

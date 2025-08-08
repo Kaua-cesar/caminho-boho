@@ -12,59 +12,72 @@ export default function StatusPagamento() {
 
    useEffect(() => {
       const status = searchParams.get("status");
-      const pedidoId = searchParams.get("pedidoId");
-      const payment_id = searchParams.get("payment_id"); // Opcional, mas útil
+      const pedidoId =
+         searchParams.get("external_reference") || searchParams.get("pedidoId");
+      const paymentId = searchParams.get("payment_id");
 
-      if (status === "approved" && pedidoId && !pedidoFinalizado) {
-         // Se o pagamento foi aprovado e o pedido ainda não foi finalizado...
-         async function finalizarPedido() {
-            try {
-               // ⭐ Passo 1: Chama a nova rota do seu back-end para atualizar o status do pedido ⭐
-               const response = await fetch(
-                  `${
-                     import.meta.env.VITE_API_URL
-                  }/api/pedidos/atualizar-status`,
-                  {
-                     method: "POST",
-                     headers: {
-                        "Content-Type": "application/json",
-                     },
-                     body: JSON.stringify({
-                        pedidoId: pedidoId,
-                        status: "aprovado",
-                        paymentId: payment_id,
-                     }),
+      if (!status) {
+         setStatusPagamento("erro");
+         toast.error("Não foi possível identificar o status do pagamento.");
+         return;
+      }
+
+      async function verificarStatusEFinalizar() {
+         try {
+            // A sua rota de webhook já atualiza o status do pedido no back-end.
+            // Agora, o front-end só precisa esperar a confirmação do back-end
+            // para exibir o status e limpar o carrinho.
+
+            // Vamos simular uma espera para dar tempo do webhook processar
+            // e o Firestore atualizar.
+            await new Promise((resolve) => setTimeout(resolve, 2000));
+
+            const response = await fetch(
+               `${
+                  import.meta.env.VITE_API_URL
+               }/api/pedidos?pedidoId=${pedidoId}`
+            );
+
+            const data = await response.json();
+
+            if (response.ok && data.status) {
+               const statusDoServidor = data.status;
+
+               if (statusDoServidor === "aprovado") {
+                  setStatusPagamento("sucesso");
+                  if (!pedidoFinalizado) {
+                     // Limpa o carrinho apenas uma vez
+                     clearCart();
+                     setPedidoFinalizado(true);
                   }
-               );
-
-               if (!response.ok) {
-                  throw new Error("Erro ao finalizar o pedido no servidor.");
+                  toast.success("Pagamento aprovado e pedido finalizado!");
+               } else if (statusDoServidor === "pendente") {
+                  setStatusPagamento("pendente");
+                  toast.info("Seu pagamento está pendente.");
+               } else if (statusDoServidor === "rejeitado") {
+                  setStatusPagamento("erro");
+                  toast.error(
+                     "Pagamento rejeitado. Seu carrinho foi preservado."
+                  );
                }
-
-               // ⭐ Passo 2: Limpa o carrinho e o estado do frete se a atualização for bem-sucedida ⭐
-               clearCart();
-               setStatusPagamento("sucesso");
-               setPedidoFinalizado(true); // Impede que a lógica rode mais de uma vez
-               toast.success("Pagamento aprovado e pedido finalizado!");
-            } catch (error) {
-               console.error("Erro ao finalizar pedido:", error);
-               setStatusPagamento("erro");
-               toast.error(
-                  "Erro ao processar o pedido. Entre em contato com o suporte."
-               );
+            } else {
+               throw new Error("Erro ao verificar o status do pedido.");
             }
+         } catch (error) {
+            console.error("Erro ao verificar o status do pedido:", error);
+            setStatusPagamento("erro");
+            toast.error(
+               "Erro ao processar o pedido. Entre em contato com o suporte."
+            );
          }
-         finalizarPedido();
-      } else if (status === "pending") {
-         setStatusPagamento("pendente");
+      }
+
+      // Evita chamadas múltiplas
+      if (pedidoId && !pedidoFinalizado) {
+         verificarStatusEFinalizar();
       } else if (status === "failure") {
          setStatusPagamento("erro");
-      } else {
-         // Se o status for nulo ou desconhecido, ainda está processando
-         // Ou se a página for acessada sem os parâmetros corretos
-         if (!pedidoFinalizado) {
-            setStatusPagamento("processando");
-         }
+         toast.error("O pagamento falhou. Tente novamente.");
       }
    }, [searchParams, clearCart, pedidoFinalizado, cartItems]);
 
@@ -74,14 +87,14 @@ export default function StatusPagamento() {
             return {
                titulo: "Pagamento Aprovado! 🎉",
                mensagem:
-                  "Seu pedido foi recebido com sucesso e será processado em breve. Em poucos instantes você receberá um e-mail de confirmação.",
+                  "Seu pedido foi recebido e está sendo processado. Em poucos instantes você receberá um e-mail de confirmação.",
                icone: "✅",
             };
          case "pendente":
             return {
                titulo: "Pagamento Pendente",
                mensagem:
-                  "Estamos aguardando a confirmação do seu pagamento. Verifique seu e-mail para mais detalhes.",
+                  "Aguardando a confirmação do pagamento. Verifique seu e-mail para mais detalhes e não feche a página.",
                icone: "⏳",
             };
          case "erro":
@@ -120,10 +133,10 @@ export default function StatusPagamento() {
          )}
          {statusPagamento === "sucesso" && (
             <button
-               onClick={() => (window.location.href = "/")}
+               onClick={() => (window.location.href = "/minha-conta")}
                className="mt-4 px-6 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition duration-300"
             >
-               Voltar para a Página Inicial
+               Ir para Meus Pedidos
             </button>
          )}
       </div>

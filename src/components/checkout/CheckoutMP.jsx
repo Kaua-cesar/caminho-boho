@@ -1,9 +1,11 @@
 // src/components/checkout/CheckoutMP.jsx
-import React, { useState } from "react"; // Removed useEffect
+
+import React, { useState, useEffect } from "react";
 import { initMercadoPago, Wallet } from "@mercadopago/sdk-react";
 import { useAuth } from "../../context/AuthContext";
+import { useCart } from "../../context/CartContext";
 import { toast } from "sonner";
-import { useNavigate } from "react-router-dom"; // ⭐ NOVO: Importa o useNavigate para redirecionar
+import { v4 as uuidv4 } from "uuid";
 
 export function CheckoutMP({
    cartItems,
@@ -14,26 +16,21 @@ export function CheckoutMP({
 }) {
    const [preferenceId, setPreferenceId] = useState(null);
    const { user } = useAuth();
-   const navigate = useNavigate(); // ⭐ NOVO: Instancia o hook
+   const { clearCart } = useCart();
    const publicKey = import.meta.env.VITE_MERCADOPAGO_PUBLIC_KEY;
 
-   if (!publicKey) {
-      console.error("A chave pública do Mercado Pago não foi encontrada.");
-      return <div>Erro: Chave de pagamento não configurada.</div>;
-   }
+   useEffect(() => {
+      if (publicKey) {
+         initMercadoPago(publicKey, { locale: "pt-BR" });
+      }
+   }, [publicKey]);
 
-   initMercadoPago(publicKey, { locale: "pt-BR" });
-
-   // ⭐ ALTERADO: Lógica movida para uma função que será chamada pelo botão ⭐
    const handleFinalizarCompra = async () => {
-      // ... (sua validação original)
-      if (isPaymentProcessing || preferenceId) return;
-
+      if (isPaymentProcessing) return;
       if (cartItems.length === 0) {
          toast.error("Seu carrinho está vazio.");
          return;
       }
-
       if (!selectedEndereco) {
          toast.error("Por favor, selecione um endereço de entrega.");
          return;
@@ -42,11 +39,13 @@ export function CheckoutMP({
       setIsPaymentProcessing(true);
       toast.info("Criando seu pedido, aguarde...");
 
+      const orderId = uuidv4();
+
       try {
          const requestBody = {
             items: cartItems,
             payer: {
-               id: user.uid, // ⭐ NOVO: Adicione o user.uid para o back-end associar o pedido ao usuário
+               id: user.uid,
                name: selectedEndereco.nomeCompleto,
                lastname: selectedEndereco.sobrenome,
                email: user?.email,
@@ -55,32 +54,44 @@ export function CheckoutMP({
                cost: selectedFreteOption.value,
                option: selectedFreteOption,
             },
-            selectedEnderecoId: selectedEndereco.id, // ⭐ NOVO: Envie o ID do endereço selecionado
+            selectedEnderecoId: selectedEndereco.id,
+            external_reference: orderId,
          };
 
          const response = await fetch(
             `${import.meta.env.VITE_API_URL}/create_preference`,
             {
                method: "POST",
-               headers: {
-                  "Content-Type": "application/json",
-               },
+               headers: { "Content-Type": "application/json" },
                body: JSON.stringify(requestBody),
             }
          );
 
          const result = await response.json();
 
+         // A MUDANÇA CRÍTICA ESTÁ AQUI:
+         // SÓ PROSSEGUIMOS SE A API RETORNAR SUCESSO E O ID DA PREFERÊNCIA
          if (response.ok && result.id) {
+            console.log("✅ Pedido criado com sucesso! ID:", orderId);
+            console.log(
+               "✅ Preferência do Mercado Pago criada com sucesso! ID:",
+               result.id
+            );
+
             setPreferenceId(result.id);
+            clearCart();
+
+            toast.success(
+               "Pedido criado com sucesso! Redirecionando para o pagamento."
+            );
          } else {
-            console.error("Erro na resposta da API:", result);
+            console.error("❌ Erro ao criar o pedido ou preferência:", result);
             toast.error(
                `Erro ao criar o pedido: ${result.error || "Tente novamente."}`
             );
          }
       } catch (error) {
-         console.error("Erro ao criar preferência:", error);
+         console.error("❌ Erro de conexão com o servidor:", error);
          toast.error("Não foi possível conectar ao servidor de pagamento.");
       } finally {
          setIsPaymentProcessing(false);
@@ -88,13 +99,12 @@ export function CheckoutMP({
    };
 
    return (
-      <div className="mt-4">
-         {/* ⭐ ALTERADO: O botão agora chama a função 'handleFinalizarCompra' ⭐ */}
+      <div>
          {!preferenceId && (
             <button
                onClick={handleFinalizarCompra}
                disabled={isPaymentProcessing || !selectedFreteOption}
-               className="w-full py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+               className="w-full py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition duration-300 disabled:opacity-50 disabled:cursor-not-allowed p-3 cursor-pointer"
             >
                {isPaymentProcessing
                   ? "Processando..."
@@ -102,7 +112,6 @@ export function CheckoutMP({
             </button>
          )}
 
-         {/* ⭐ Este bloco só aparece após a preferência ser criada com sucesso ⭐ */}
          {preferenceId && (
             <div className="p-4 bg-white rounded-lg shadow-md text-center">
                <p className="text-gray-700 mb-4">

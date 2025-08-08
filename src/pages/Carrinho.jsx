@@ -382,10 +382,8 @@ export default function Carrinho() {
                   </div>
                                    {" "}
                   {selectedFreteOptionId ? (
-                     <div className="mt-8 w-full flex justify-center">
-                                                 
+                     <div className="my-8 w-full flex justify-center gap-6 items-center">
                         {/* ⭐ NOVO: Passe as props necessárias para o CheckoutMP ⭐ */}
-                                                 
                         <CheckoutMP
                            cartItems={cartItems}
                            selectedEndereco={enderecos.find(
@@ -395,7 +393,10 @@ export default function Carrinho() {
                            isPaymentProcessing={isPaymentProcessing}
                            setIsPaymentProcessing={setIsPaymentProcessing}
                         />
-                                             
+                        <div className="flex items-center justify-center gap-4 w-auto">
+                           <AcoesCarrinhoContinue />
+                        </div>
+                                       
                      </div>
                   ) : (
                      <div className="flex flex-col items-center justify-center gap-4 w-full my-8">
