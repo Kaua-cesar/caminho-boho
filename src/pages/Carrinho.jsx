@@ -8,6 +8,8 @@ import TabelaItensCarrinho from "../components/Carrinho/TabelaItensCarrinho";
 import CupomDesconto from "../components/Carrinho/CupomDesconto";
 import ResumoCarrinho from "../components/Carrinho/ResumoCarrinho";
 import FreteCEP from "../components/Carrinho/FreteCEP";
+import { CheckoutMP } from "../components/checkout/CheckoutMP"; // Importe o componente
+
 import {
    AcoesCarrinhoContinue,
    AcoesCarrinhoFinish,
@@ -229,7 +231,7 @@ export default function Carrinho() {
    const hasValidCep = cep.replace(/\D/g, "").length === 8;
 
    return (
-      <div className="p-6 mx-auto md:mt-8 mt-16 max-w-6xl">
+      <div className="px-6 mx-auto md:mt-8 mt-8 max-w-6xl">
          <h1 className="text-2xl font-bold mb-6 text-center">Seu Carrinho</h1>
 
          {cartLoading ? (
@@ -281,10 +283,15 @@ export default function Carrinho() {
                      />
                   </div>
                   {/* Renderiza AcoesCarrinho apenas se houver opções de frete */}
-                  {availableFreteOptions.length > 0 && (
-                     <div className="flex flex-col items-center justify-center  gap-4 w-full  mt-8">
+                  {selectedFreteOptionId ? (
+                     // ✨ Mostra o botão de pagamento do MP apenas quando o frete é selecionado
+                     <div className="mt-8 w-full flex justify-center">
+                        <CheckoutMP />
+                     </div>
+                  ) : (
+                     // ✨ Mostra o botão de continuar comprando se o frete ainda não foi selecionado
+                     <div className="flex flex-col items-center justify-center gap-4 w-full my-8">
                         <AcoesCarrinhoContinue />
-                        <AcoesCarrinhoFinish />
                      </div>
                   )}
                </div>

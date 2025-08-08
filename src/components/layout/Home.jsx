@@ -1,9 +1,9 @@
 import React, { useState, useMemo } from "react";
-import { Card } from "../Card";
-import { produtos } from "./Cards/CardDados";
-import { CardsHome } from "./CardsHome";
+import { Card } from "../../Card";
+import { produtos } from "../Cards/CardDados";
+import { CardsHome } from "../CardsHome";
 import { Footer } from "./Footer";
-import { Filters } from "./Filters";
+import { Filters } from "../Filters";
 
 function calcularPrecoComDesconto(produto) {
    return produto.precoOriginal * (1 + produto.desconto / 100);

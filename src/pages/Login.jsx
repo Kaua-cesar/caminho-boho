@@ -2,75 +2,120 @@
 
 import { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
-import { useNavigate } from "react-router-dom";
-// Removidos FaFacebookF, FaApple, mantido FaEye, FaEyeSlash
+import { useNavigate, useLocation } from "react-router-dom";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
-import { Footer } from "../components/Footer";
-import { toast } from "sonner"; // Certifique-se de que sonner está instalado e configurado
+import { Footer } from "../components/layout/Footer";
+import { toast } from "sonner";
 
 export default function Login() {
    const {
-      login: loginWithEmailPassword, // Renomeado para evitar conflito com 'loginWithProvider'
+      loginWithEmailPassword,
       loginWithProvider,
       loading,
       user,
+      resendVerificationEmail,
    } = useAuth();
    const navigate = useNavigate();
+   const location = useLocation();
 
    const [email, setEmail] = useState("");
    const [senha, setSenha] = useState("");
-
-   const camposPreenchidos = email.trim() !== "" && senha.trim() !== "";
    const [mostrarSenha, setMostrarSenha] = useState(false);
 
-   // Efeito para redirecionar após o login
-   useEffect(() => {
-      // console.log("Login.jsx useEffect: Estado atual do 'user':", user ? user.email : "NULO", " | Loading:", loading); // Removido
-      // O `!loading` garante que o redirecionamento só aconteça depois que o onAuthStateChanged terminar.
-      if (user && !loading) {
-         // console.log("Usuário detectado em Login.jsx. Redirecionando para /minha-conta."); // Removido
-         navigate("/minha-conta");
-      }
-   }, [user, navigate, loading]); // Adicionado 'loading' como dependência
+   const camposPreenchidos = email.trim() !== "" && senha.trim() !== "";
 
-   function handleSubmit(e) {
+   // Alerta se veio de rota privada
+   useEffect(() => {
+      if (location.state?.from) {
+         toast.info("Você precisa fazer login para acessar esta página.");
+      }
+   }, [location.state]);
+
+   // Redireciona após login
+   useEffect(() => {
+      if (user && !loading) {
+         const from = location.state?.from?.pathname || "/minha-conta";
+         navigate(from, { replace: true });
+      }
+   }, [user, loading, navigate, location.state]);
+
+   async function handleSubmit(e) {
       e.preventDefault();
-      // Aqui você chamaria uma função de login de e-mail/senha do Firebase se tivesse uma
-      loginWithEmailPassword(email, senha); // Simulando login por e-mail/senha
-      toast.success("Login com e-mail/senha simulado. Verifique o console.");
+      try {
+         await loginWithEmailPassword(email, senha);
+         toast.success("Login realizado com sucesso!");
+      } catch (error) {
+         console.log("Erro de login:", error.code); // Loga apenas o código do erro
+
+         if (error.code === "auth/email-not-verified") {
+            toast.error("Seu e-mail ainda não foi verificado.", {
+               description:
+                  "Por favor, verifique sua caixa de entrada ou clique para reenviar o e-mail.",
+               action: {
+                  label: "Reenviar e-mail",
+                  onClick: () => resendVerificationEmail(error.user),
+               },
+               duration: 10000,
+            });
+            return; // Interrompe a execução para não mostrar outros toasts
+         }
+
+         switch (error.code) {
+            case "auth/user-not-found":
+               toast.error("Nenhuma conta encontrada com este e-mail.");
+               break;
+            case "auth/wrong-password":
+               toast.error("Senha incorreta. Tente novamente.");
+               break;
+            case "auth/invalid-credential":
+               // Este erro é mais genérico e seguro, usado nas versões mais recentes do Firebase.
+               // Pode significar tanto e-mail não encontrado quanto senha incorreta.
+               toast.error(
+                  "Credenciais inválidas. Verifique o e-mail e a senha."
+               );
+               break;
+            case "auth/invalid-email":
+               toast.error("O formato do e-mail é inválido.");
+               break;
+            case "auth/too-many-requests":
+               toast.error(
+                  "Acesso bloqueado por muitas tentativas. Tente mais tarde."
+               );
+               break;
+            default:
+               toast.error("Erro ao tentar fazer login. Tente novamente.");
+               break;
+         }
+      }
    }
 
-   // Função genérica para os cliques dos botões de provedor social
    const handleSocialLoginClick = async (providerName) => {
       try {
-         // console.log(`Chamando loginWithProvider para ${providerName}...`); // Removido
          const success = await loginWithProvider(providerName);
          if (success) {
-            // Se o login foi bem-sucedido, o useEffect de cima cuidará do redirecionamento
             toast.success(`Login com ${providerName} bem-sucedido!`);
          } else {
-            // Mensagem de erro mais genérica, pois o erro específico já foi logado no AuthContext
             toast.error(
                `Não foi possível iniciar o login com ${providerName}. Verifique o console para mais detalhes.`
             );
          }
       } catch (error) {
-         // console.error(`Erro inesperado ao iniciar login com ${providerName}:`, error); // Removido
          toast.error(`Ocorreu um erro ao iniciar o login com ${providerName}.`);
       }
    };
 
-   if (loading) {
-      return (
-         <div className="min-h-screen flex items-center justify-center">
-            Carregando autenticação...
-         </div>
-      );
-   }
-
    return (
       <>
+         {/* Overlay global de loading */}
+         {loading && (
+            <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 backdrop-blur-[2px]">
+               <span className="text-white text-2xl font-medium">
+                  Verificando credenciais...
+               </span>
+            </div>
+         )}
+
          <div className="min-h-screen flex flex-col">
             <div className="flex-grow flex justify-center items-center md:mt-52">
                <div className="flex gap-0 md:border-1 borde-black rounded-xl border-0 flex-col-reverse md:flex-row md:p-5">
@@ -81,8 +126,7 @@ export default function Login() {
                      <h1 className="text-2xl mb-4 md:flex hidden">
                         Entre ou cadastre-se
                      </h1>
-                     <div className=" flex md:flex-col w-full md:gap-4 gap-8 justify-center">
-                        {/* Botão Google */}
+                     <div className="flex md:flex-col w-full md:gap-4 gap-8 justify-center">
                         <button
                            type="button"
                            onClick={() => handleSocialLoginClick("google")}
@@ -94,7 +138,6 @@ export default function Login() {
                               Login com Google
                            </span>
                         </button>
-                        {/* Removidos os botões de Facebook e Apple */}
                         <span className="text-xs md:flex hidden">
                            Associe uma conta de cada rede para acessar a Caminho
                            Boho.
@@ -111,7 +154,7 @@ export default function Login() {
                      </span>
                      <div className="flex-grow h-px bg-gray-300 md:h-96 md:w-px" />
                   </div>
-                  <div className="max-w-sm md:mx-auto mx-6 p-6 bg-white rounded flex flex-col gap-3">
+                  <div className="max-w-sm md:mx-auto mx-6 p-6 bg-white rounded flex flex-col gap-3 relative">
                      <h1 className="text-2xl font-medium mb-4 md:flex hidden">
                         Entre ou cadastre-se
                      </h1>
@@ -169,13 +212,17 @@ export default function Login() {
                      <span className="md:flex justify-center underline cursor-pointer hidden">
                         Esqueceu seus dados de acesso?
                      </span>
-                     <button className="mt-4 w-full border-2 py-2 rounded-md transition cursor-pointer md:flex hidden justify-center">
+                     <button
+                        className="mt-4 w-full border-2 py-2 rounded-md transition cursor-pointer md:flex hidden justify-center"
+                        onClick={() => navigate("/register")}
+                        type="button"
+                        disabled={loading}
+                     >
                         Criar Conta
                      </button>
                   </div>
                </div>
             </div>
-
             <div className="md:flex hidden">
                <Footer />
             </div>

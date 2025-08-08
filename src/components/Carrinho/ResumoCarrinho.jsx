@@ -1,8 +1,8 @@
 export default function ResumoCarrinho({ totalFinal }) {
    return (
       <div className="text-right">
-         <p className="md:text-lg font-semibold text-amber-600 text-3xl ">
-            <span className="md:text-sm text-xl text-gray-600 mr-2">
+         <p className="lg:text-4xl font-semibold text-amber-600  md:text-3xl text-3xl">
+            <span className=" text-gray-600 mr-2 lg:text-2xl md:text-2xl">
                SubTotal:
             </span>{" "}
             R$

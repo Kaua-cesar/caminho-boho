@@ -7,7 +7,7 @@ export const produtos = [
    {
       id: "prod1",
       nome: "Vestido Costa Nua Longo",
-      precoOriginal: 629.99,
+      precoOriginal: 0.99,
       categoria: "costanua",
       cores: [
          { nome: "Verde", classe: "bg-green-500" },
@@ -21,7 +21,7 @@ export const produtos = [
       qntavaliacoes: 2,
       // ✨ ATUALIZADO: Estoque por variação. Era estoque: 0, então uma combinação terá 0.
       estoque: {
-         Verde: { S: 0, M: 0, G: 0, GG: 0 }, // Exemplo: Verde G indisponível
+         Verde: { S: 1, M: 0, G: 0, GG: 0 }, // Exemplo: Verde G indisponível
          Roxo: { S: 0, M: 0, G: 0, GG: 0 },
          Rosa: { S: 0, M: 0, G: 0, GG: 0 },
       },

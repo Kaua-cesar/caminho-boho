@@ -1,8 +1,8 @@
 // src/pages/ProductsByCategoryPage.jsx
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom"; // Para pegar o parâmetro da URL
-import { produtos } from "../components/Cards/CardDados"; // Importa seus dados de produtos reais
-import { Card } from "../Card"; // Importa seu componente Card
+import { produtos } from "../../components/Cards/CardDados"; // Importa seus dados de produtos reais
+import { Card } from "../../Card"; // Importa seu componente Card
 
 export function ProductsByCategoryPage() {
    const { categoryName } = useParams(); // Pega o 'categoryName' da URL

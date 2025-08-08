@@ -11,18 +11,18 @@ import { FavoritesProvider } from "./context/FavoritesContext";
 
 import { Toaster } from "sonner";
 
-import { Nav } from "./Nav";
+import { Nav } from "./components/layout/Nav";
 import { Carrosel } from "./Carrosel";
+import { Home } from "./components/layout/Home";
 
-import { Home } from "./components/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import MinhaConta from "./pages/MinhaConta";
 import Carrinho from "./pages/Carrinho";
 import { FavoritesPage } from "./pages/FavoritesPage";
 import { CategoriesPage } from "./pages/CategoriesPage";
-import { ProductsByCategoryPage } from "./pages/ProductsByCategoryPage";
-import { ProductsPage } from "./pages/ProductsPage";
+import { ProductsByCategoryPage } from "./pages/products/ProductsByCategoryPage";
+import { ProductsPage } from "./pages/products/ProductsPage";
 import { AboutPage } from "./pages/AboutPage";
 import { ContactPage } from "./pages/ContactPage";
 

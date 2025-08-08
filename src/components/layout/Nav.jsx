@@ -1,15 +1,17 @@
 import { IoHeartOutline } from "react-icons/io5";
 import { RiShoppingCartFill } from "react-icons/ri";
 import { BiSolidCategory } from "react-icons/bi";
-import { IoCubeOutline } from "react-icons/io5";
 import { FaBagShopping } from "react-icons/fa6";
 import { HiSparkles } from "react-icons/hi2";
-import Logo from "./assets/logo.png";
+import Logo from "../../assets/logo.png";
 import { FaHome } from "react-icons/fa";
 import { MdSupportAgent } from "react-icons/md";
 import React, { useState } from "react";
 import { FiUser, FiMenu } from "react-icons/fi";
 import { Link, useNavigate, useLocation } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
+import { useFavorites } from "../../context/FavoritesContext";
+import { useCart } from "../../context/CartContext";
 import {
    DropdownMenu,
    DropdownMenuContent,
@@ -27,10 +29,6 @@ import {
    SheetTrigger,
    SheetClose,
 } from "@/components/ui/sheet";
-
-import { useAuth } from "./context/AuthContext";
-import { useFavorites } from "./context/FavoritesContext";
-import { useCart } from "./context/CartContext";
 
 function estaNaRota(rotas, caminhoAtual) {
    return rotas.includes(caminhoAtual);
@@ -115,11 +113,7 @@ export function Nav() {
                               >
                                  Minha conta
                               </DropdownMenuItem>
-                              <DropdownMenuItem
-                                 onClick={() => navigate("/meus-pedidos")}
-                              >
-                                 Meus pedidos
-                              </DropdownMenuItem>
+
                               <DropdownMenuItem
                                  onClick={() => {
                                     logout();
@@ -247,11 +241,7 @@ export function Nav() {
                               >
                                  Minha conta
                               </DropdownMenuItem>
-                              <DropdownMenuItem
-                                 onClick={() => navigate("/meus-pedidos")}
-                              >
-                                 Meus pedidos
-                              </DropdownMenuItem>
+
                               <DropdownMenuItem
                                  onClick={() => {
                                     logout();
