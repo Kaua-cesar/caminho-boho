@@ -1,6 +1,6 @@
 import { Separator } from "@/components/ui/separator";
 import { useAuth } from "../context/AuthContext";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
    FaTruck,
    FaMapMarkerAlt,
@@ -9,26 +9,33 @@ import {
    FaHeart,
    FaHeadset,
    FaSignOutAlt,
+   FaEdit,
 } from "react-icons/fa";
-import { useFavorites } from "../context/FavoritesContext"; // ajuste o caminho se necessário
-import { Card } from "../Card"; // ajuste o caminho se necessário
-import { produtos } from "../components/Cards/CardDados"; // ajuste o caminho se necessário
+import { FaXmark } from "react-icons/fa6";
+import { useFavorites } from "../context/FavoritesContext";
+import { Card } from "../Card";
+import { produtos } from "../components/Cards/CardDados";
+import { Button } from "@/components/ui/button";
+import {
+   Dialog,
+   DialogContent,
+   DialogDescription,
+   DialogHeader,
+   DialogTitle,
+   DialogTrigger,
+} from "@/components/ui/dialog";
+import { AddressForm } from "@/components/AddressForm"; // Importe o novo componente
 
-// Exemplo de dados mockados (substitua por dados reais do backend)
+// Exemplo de dados mockados para Pedidos e Cartões, mantidos por enquanto
 const pedidosMock = [
    { id: 1, status: "Entregue", total: 199.9, data: "01/08/2025" },
    { id: 2, status: "Em transporte", total: 89.5, data: "15/07/2025" },
-];
-
-const enderecosMock = [
-   { id: 1, rua: "Rua das Flores, 123", cidade: "Rio de Janeiro", uf: "RJ" },
 ];
 
 const cartoesMock = [
    { id: 1, bandeira: "Visa", final: "1234", validade: "12/28" },
 ];
 
-// Função para exibir pedidos
 function Pedidos() {
    const [pedidos] = useState(pedidosMock);
 
@@ -48,7 +55,8 @@ function Pedidos() {
                         <b>Pedido #{pedido.id}</b> - {pedido.status}
                      </span>
                      <span>
-                        Total: <b>R${pedido.total.toFixed(2)}</b> | Data:{" "}
+                        Total:
+                        <b>R${pedido.total.toFixed(2)}</b> | Data:
                         {pedido.data}
                      </span>
                   </li>
@@ -59,63 +67,160 @@ function Pedidos() {
    );
 }
 
-// Função para exibir e editar endereços
 function Enderecos() {
-   const [enderecos, setEnderecos] = useState(enderecosMock);
-   const [novoEndereco, setNovoEndereco] = useState("");
+   const { user } = useAuth();
+   const [enderecos, setEnderecos] = useState([]);
+   const [loading, setLoading] = useState(true);
+   const [error, setError] = useState(null);
+   const [isModalOpen, setIsModalOpen] = useState(false);
+   const [enderecoParaEditar, setEnderecoParaEditar] = useState(null); // Estado para o endereço sendo editado
 
-   function adicionarEndereco() {
-      if (novoEndereco.trim() === "") return;
-      setEnderecos([
-         ...enderecos,
-         { id: Date.now(), rua: novoEndereco, cidade: "Cidade", uf: "UF" },
-      ]);
-      setNovoEndereco("");
+   const fetchEnderecos = async () => {
+      if (!user) return;
+      setLoading(true);
+      try {
+         const response = await fetch(
+            `http://localhost:3001/api/enderecos?userId=${user.uid}`
+         );
+         if (!response.ok) {
+            throw new Error("Erro ao buscar endereços");
+         }
+         const data = await response.json();
+         setEnderecos(data);
+      } catch (err) {
+         setError(err.message);
+      } finally {
+         setLoading(false);
+      }
+   };
+
+   const removerEndereco = async (id) => {
+      try {
+         const response = await fetch(
+            `http://localhost:3001/api/enderecos/${id}`,
+            {
+               method: "DELETE",
+            }
+         );
+
+         if (!response.ok) {
+            throw new Error("Erro ao remover endereço");
+         }
+
+         await fetchEnderecos();
+      } catch (err) {
+         setError(err.message);
+      }
+   };
+
+   // Nova função para abrir o modal de edição
+   const handleEdit = (endereco) => {
+      setEnderecoParaEditar(endereco);
+      setIsModalOpen(true);
+   };
+
+   // Nova função para abrir o modal de adição
+   const handleAdd = () => {
+      setEnderecoParaEditar(null); // Garante que o formulário está em modo de adição
+      setIsModalOpen(true);
+   };
+
+   useEffect(() => {
+      if (user) {
+         fetchEnderecos();
+      }
+   }, [user]);
+
+   if (loading) {
+      return <div className="p-4">Carregando endereços...</div>;
+   }
+
+   if (error) {
+      return <div className="p-4 text-red-600">Erro: {error}</div>;
    }
 
    return (
       <div className="p-4">
          <h2 className="text-xl font-bold mb-4">Meus endereços</h2>
-         <ul className="space-y-2 mb-4">
-            {enderecos.map((end) => (
-               <li
-                  key={end.id}
-                  className="border rounded p-3 flex justify-between items-center"
-               >
-                  <span>
-                     {end.rua} - {end.cidade}/{end.uf}
-                  </span>
-                  <button
-                     className="text-red-600 hover:underline"
-                     onClick={() =>
-                        setEnderecos(enderecos.filter((e) => e.id !== end.id))
-                     }
+         {enderecos.length === 0 ? (
+            <p>Você ainda não tem endereços cadastrados.</p>
+         ) : (
+            <ul className="space-y-2 mb-4">
+               {enderecos.map((end) => (
+                  <li
+                     key={end.id}
+                     className="border rounded p-3 flex flex-col justify-between items-start"
                   >
-                     Remover
-                  </button>
-               </li>
-            ))}
-         </ul>
-         <div className="flex gap-2">
-            <input
-               type="text"
-               value={novoEndereco}
-               onChange={(e) => setNovoEndereco(e.target.value)}
-               placeholder="Novo endereço"
-               className="border rounded px-2 py-1 flex-1"
-            />
-            <button
-               onClick={adicionarEndereco}
-               className="bg-amber-600 text-white px-3 py-1 rounded hover:bg-amber-700"
-            >
-               Adicionar
-            </button>
-         </div>
+                     <div className="flex justify-between items-center w-full">
+                        <div className="flex flex-col">
+                           <span className="font-semibold">
+                              {end.nomeCompleto} {end.sobrenome}
+                           </span>
+                           <span>
+                              {end.nome}: {end.rua} - {end.cidade}/{end.uf} -{" "}
+                              {end.cep}
+                           </span>
+                        </div>
+                        <div className="flex gap-3 items-center">
+                           {/* Botão de edição */}
+                           <button
+                              className="text-gray-500 hover:text-amber-600 transition cursor-pointer text-xl"
+                              onClick={() => handleEdit(end)}
+                           >
+                              <FaEdit />
+                           </button>
+                           {/* Botão de remoção */}
+                           <button
+                              className="text-gray-500 hover:text-red-600 transition cursor-pointer text-xl"
+                              onClick={() => removerEndereco(end.id)}
+                           >
+                              <FaXmark />
+                           </button>
+                        </div>
+                     </div>
+                  </li>
+               ))}
+            </ul>
+         )}
+
+         {/* Abertura do modal para Adicionar ou Editar */}
+         <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+            <DialogTrigger asChild>
+               <Button
+                  onClick={handleAdd}
+                  className="bg-amber-600 text-white hover:bg-amber-700 cursor-pointer"
+               >
+                  Adicionar novo endereço
+               </Button>
+            </DialogTrigger>
+            <DialogContent className="">
+               <DialogHeader>
+                  <DialogTitle>
+                     {enderecoParaEditar
+                        ? "Editar endereço"
+                        : "Adicionar novo endereço"}
+                  </DialogTitle>
+                  <DialogDescription>
+                     {enderecoParaEditar
+                        ? "Edite os campos abaixo para atualizar seu endereço."
+                        : "Preencha os campos abaixo para salvar um novo endereço de entrega."}
+                  </DialogDescription>
+               </DialogHeader>
+               <div className="py-4">
+                  <AddressForm
+                     onAddressAdded={fetchEnderecos}
+                     onClose={() => setIsModalOpen(false)}
+                     userId={user?.uid}
+                     enderecoParaEditar={enderecoParaEditar} // Passa o endereço para o formulário
+                  />
+               </div>
+            </DialogContent>
+         </Dialog>
       </div>
    );
 }
 
-// Função para alterar senha (exemplo)
+// O restante dos componentes e a exportação permanecem os mesmos
 function Seguranca() {
    const [senhaAtual, setSenhaAtual] = useState("");
    const [novaSenha, setNovaSenha] = useState("");
@@ -123,7 +228,6 @@ function Seguranca() {
 
    function alterarSenha(e) {
       e.preventDefault();
-      // Aqui você faria a chamada para o backend
       setMensagem("Senha alterada com sucesso!");
       setSenhaAtual("");
       setNovaSenha("");
@@ -161,7 +265,6 @@ function Seguranca() {
    );
 }
 
-// Função para exibir cartões salvos
 function Pagamentos() {
    const [cartoes, setCartoes] = useState(cartoesMock);
 
@@ -195,24 +298,15 @@ function Pagamentos() {
                ))}
             </ul>
          )}
-         {/* Aqui você pode adicionar um formulário para adicionar novo cartão */}
       </div>
    );
 }
 
-// Função para exibir favoritos reais
 function Favoritos() {
    const { favorites, favoritesLoading } = useFavorites();
-
-   // Garante que favorites é sempre um array de string
    const favoritosArray = Array.isArray(favorites) ? favorites.map(String) : [];
    const produtosArray = Array.isArray(produtos) ? produtos : [];
 
-   // Veja o que está vindo
-   console.log("favorites:", favoritosArray);
-   console.log("produtos:", produtosArray);
-
-   // Filtra os produtos favoritos (comparando como string)
    const produtosFavoritos = produtosArray.filter((produto) =>
       favoritosArray.includes(String(produto.id))
    );
@@ -290,7 +384,7 @@ export default function MinhaConta() {
          <div className="w-1/5 pr-5 flex flex-col">
             <h1 className="text-2xl font-bold mb-4">Minha Conta</h1>
             <p className="text-sm">
-               {user.displayName}, Email: {user.email}
+               {user?.displayName}, Email: {user?.email}
             </p>
             <div className="space-y-4 mt-8 flex-1 flex flex-col">
                <div className="flex flex-col space-y-2 flex-1">
@@ -299,11 +393,11 @@ export default function MinhaConta() {
                         key={index}
                         onClick={() => setSelecionado(index)}
                         className={`flex items-center gap-3 cursor-pointer px-3 py-2 rounded transition select-none
-                        ${
-                           selecionado === index
-                              ? "bg-gray-100 font-semibold"
-                              : "hover:bg-gray-50 text-gray-800 font-medium"
-                        }`}
+                ${
+                   selecionado === index
+                      ? "bg-gray-100 font-semibold"
+                      : "hover:bg-gray-50 text-gray-800 font-medium"
+                }`}
                         role="button"
                         aria-pressed={selecionado === index}
                      >

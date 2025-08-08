@@ -1,21 +1,20 @@
-import React, { useState } from "react";
+// src/components/checkout/CheckoutMP.jsx
+import React, { useState } from "react"; // Removed useEffect
 import { initMercadoPago, Wallet } from "@mercadopago/sdk-react";
-import { useCart } from "../../context/CartContext";
 import { useAuth } from "../../context/AuthContext";
 import { toast } from "sonner";
+import { useNavigate } from "react-router-dom"; // ⭐ NOVO: Importa o useNavigate para redirecionar
 
-export function CheckoutMP() {
+export function CheckoutMP({
+   cartItems,
+   selectedEndereco,
+   selectedFreteOption,
+   isPaymentProcessing,
+   setIsPaymentProcessing,
+}) {
    const [preferenceId, setPreferenceId] = useState(null);
-   const [isLoading, setIsLoading] = useState(false);
-   const { cartItems } = useCart();
    const { user } = useAuth();
-
-   const [payerData, setPayerData] = useState({
-      name: "",
-      lastname: "",
-      email: "",
-   });
-
+   const navigate = useNavigate(); // ⭐ NOVO: Instancia o hook
    const publicKey = import.meta.env.VITE_MERCADOPAGO_PUBLIC_KEY;
 
    if (!publicKey) {
@@ -25,38 +24,39 @@ export function CheckoutMP() {
 
    initMercadoPago(publicKey, { locale: "pt-BR" });
 
-   const handleInputChange = (e) => {
-      const { name, value } = e.target;
-      setPayerData((prevData) => ({
-         ...prevData,
-         [name]: value,
-      }));
-   };
-
-   const handlePayment = async (e) => {
-      e.preventDefault();
+   // ⭐ ALTERADO: Lógica movida para uma função que será chamada pelo botão ⭐
+   const handleFinalizarCompra = async () => {
+      // ... (sua validação original)
+      if (isPaymentProcessing || preferenceId) return;
 
       if (cartItems.length === 0) {
          toast.error("Seu carrinho está vazio.");
          return;
       }
 
-      if (!payerData.name || !payerData.lastname || !payerData.email) {
-         toast.error("Por favor, preencha todos os seus dados.");
+      if (!selectedEndereco) {
+         toast.error("Por favor, selecione um endereço de entrega.");
          return;
       }
 
-      const externalReference = `REF-${user?.id || "guest"}-${Date.now()}`;
+      setIsPaymentProcessing(true);
+      toast.info("Criando seu pedido, aguarde...");
 
-      setIsLoading(true);
       try {
          const requestBody = {
             items: cartItems,
-            payer: payerData,
-            external_reference: externalReference,
+            payer: {
+               id: user.uid, // ⭐ NOVO: Adicione o user.uid para o back-end associar o pedido ao usuário
+               name: selectedEndereco.nomeCompleto,
+               lastname: selectedEndereco.sobrenome,
+               email: user?.email,
+            },
+            shipping: {
+               cost: selectedFreteOption.value,
+               option: selectedFreteOption,
+            },
+            selectedEnderecoId: selectedEndereco.id, // ⭐ NOVO: Envie o ID do endereço selecionado
          };
-
-         console.log("Dados enviados para o back-end:", requestBody);
 
          const response = await fetch(
             `${import.meta.env.VITE_API_URL}/create_preference`,
@@ -69,59 +69,48 @@ export function CheckoutMP() {
             }
          );
 
-         const preference = await response.json();
-         if (preference.id) {
-            setPreferenceId(preference.id);
-         } else if (preference.error) {
-            toast.error(
-               `Erro do servidor: ${preference.details || preference.error}`
-            );
+         const result = await response.json();
+
+         if (response.ok && result.id) {
+            setPreferenceId(result.id);
          } else {
-            toast.error("Erro ao iniciar o pagamento. Tente novamente.");
+            console.error("Erro na resposta da API:", result);
+            toast.error(
+               `Erro ao criar o pedido: ${result.error || "Tente novamente."}`
+            );
          }
       } catch (error) {
+         console.error("Erro ao criar preferência:", error);
          toast.error("Não foi possível conectar ao servidor de pagamento.");
-         console.error(error);
       } finally {
-         setIsLoading(false);
+         setIsPaymentProcessing(false);
       }
    };
 
    return (
-      <div>
-         <form onSubmit={handlePayment}>
-            <h3>Dados do Comprador</h3>
-            <input
-               type="text"
-               name="name"
-               placeholder="Nome"
-               value={payerData.name}
-               onChange={handleInputChange}
-               required
-            />
-            <input
-               type="text"
-               name="lastname"
-               placeholder="Sobrenome"
-               value={payerData.lastname}
-               onChange={handleInputChange}
-               required
-            />
-            <input
-               type="email"
-               name="email"
-               placeholder="E-mail"
-               value={payerData.email}
-               onChange={handleInputChange}
-               required
-            />
-            <button type="submit" disabled={isLoading || preferenceId}>
-               {isLoading
+      <div className="mt-4">
+         {/* ⭐ ALTERADO: O botão agora chama a função 'handleFinalizarCompra' ⭐ */}
+         {!preferenceId && (
+            <button
+               onClick={handleFinalizarCompra}
+               disabled={isPaymentProcessing || !selectedFreteOption}
+               className="w-full py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+               {isPaymentProcessing
                   ? "Processando..."
                   : "Finalizar Compra com Mercado Pago"}
             </button>
-         </form>
-         {preferenceId && <Wallet initialization={{ preferenceId }} />}
+         )}
+
+         {/* ⭐ Este bloco só aparece após a preferência ser criada com sucesso ⭐ */}
+         {preferenceId && (
+            <div className="p-4 bg-white rounded-lg shadow-md text-center">
+               <p className="text-gray-700 mb-4">
+                  Finalize sua compra no ambiente seguro do Mercado Pago:
+               </p>
+               <Wallet initialization={{ preferenceId }} />
+            </div>
+         )}
       </div>
    );
 }

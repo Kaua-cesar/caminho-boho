@@ -1,24 +1,95 @@
 // src/pages/Carrinho.jsx
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { toast } from "sonner";
 import { useCart } from "../context/CartContext";
+import { useAuth } from "../context/AuthContext";
 
 import { InfoCarrinho } from "../components/Carrinho/InfoCarrinho";
 import TabelaItensCarrinho from "../components/Carrinho/TabelaItensCarrinho";
 import CupomDesconto from "../components/Carrinho/CupomDesconto";
 import ResumoCarrinho from "../components/Carrinho/ResumoCarrinho";
-import FreteCEP from "../components/Carrinho/FreteCEP";
-import { CheckoutMP } from "../components/checkout/CheckoutMP"; // Importe o componente
-
+import { CheckoutMP } from "../components/checkout/CheckoutMP";
 import {
    AcoesCarrinhoContinue,
    AcoesCarrinhoFinish,
-} from "../components/Carrinho/AcoesCarrinho"; // Importação nomeada correta
+} from "../components/Carrinho/AcoesCarrinho";
 import FreteResultado from "../components/Carrinho/FreteResultado";
 
+// Componente para selecionar o endereço
+function FreteEndereco({
+   enderecos,
+   selectedEnderecoId,
+   onSelectEndereco,
+   isLoading,
+   error,
+}) {
+   if (isLoading) {
+      return <p className="text-gray-600">Carregando endereços...</p>;
+   }
+   if (error) {
+      return (
+         <p className="text-red-600">Erro ao carregar endereços: {error}</p>
+      );
+   }
+   if (!enderecos || enderecos.length === 0) {
+      return (
+         <p className="text-gray-600">
+                        Você não tem endereços salvos. Adicione em{" "}
+            <a href="/minha-conta" className="text-blue-600 hover:underline">
+                              Minha Conta        
+            </a>
+            .          
+         </p>
+      );
+   }
+
+   return (
+      <div className="flex flex-col gap-2 w-full max-w-sm">
+                  
+         <p className="font-bold">
+                        Selecione o endereço para o cálculo do frete:          
+         </p>
+                  
+         {enderecos.map((endereco) => (
+            <label
+               key={endereco.id}
+               className={`flex items-center gap-2 p-3 border rounded-md cursor-pointer ${
+                  selectedEnderecoId === endereco.id
+                     ? "border-amber-600 bg-amber-50"
+                     : "border-gray-300"
+               }`}
+            >
+                              
+               <input
+                  type="radio"
+                  name="endereco"
+                  value={endereco.id}
+                  checked={selectedEnderecoId === endereco.id}
+                  onChange={() => onSelectEndereco(endereco)}
+                  className="form-radio text-amber-600"
+               />
+                              
+               <span>
+                                    {endereco.nome} ({endereco.cep})            
+                     
+               </span>
+                          {" "}
+            </label>
+         ))}
+              {" "}
+      </div>
+   );
+}
+
 export default function Carrinho() {
+   const { user } = useAuth();
    const { cartItems, cartLoading, removeItemFromCart, updateItemQuantity } =
       useCart();
+
+   const [enderecos, setEnderecos] = useState([]);
+   const [enderecosLoading, setEnderecosLoading] = useState(true);
+   const [enderecosError, setEnderecosError] = useState("");
+   const [selectedEnderecoId, setSelectedEnderecoId] = useState(null);
 
    const cuponsValidos = [
       { nomeDoCupom: "PRIMEIRA", descontoTotal: 0.1 },
@@ -29,12 +100,42 @@ export default function Carrinho() {
    const [cupom, setCupom] = useState("");
    const [cuponsAplicados, setCuponsAplicados] = useState([]);
 
-   // Estados para gerenciar o frete
-   const [cep, setCep] = useState("");
    const [freteIsLoading, setFreteIsLoading] = useState(false);
    const [freteError, setFreteError] = useState("");
-   const [availableFreteOptions, setAvailableFreteOptions] = useState([]); // Opções de frete calculadas
-   const [selectedFreteOptionId, setSelectedFreteOptionId] = useState(null); // ID da opção de frete selecionada
+   const [availableFreteOptions, setAvailableFreteOptions] = useState([]);
+   const [selectedFreteOptionId, setSelectedFreteOptionId] = useState(null); // ⭐ NOVO ESTADO: Para controlar o botão do Mercado Pago ⭐
+
+   const [isPaymentProcessing, setIsPaymentProcessing] = useState(false);
+
+   const fetchEnderecos = async () => {
+      setEnderecosLoading(true);
+      setEnderecosError("");
+      try {
+         const response = await fetch(
+            `http://localhost:3001/api/enderecos?userId=${user.uid}`
+         );
+         if (!response.ok) throw new Error("Erro ao carregar endereços.");
+         const data = await response.json();
+         setEnderecos(data); // ⭐ NOVO: Define o primeiro endereço como o selecionado por padrão ⭐
+         if (data && data.length > 0) {
+            setSelectedEnderecoId(data[0].id); // ⭐ Bônus: Chama o cálculo de frete para o CEP deste endereço ⭐
+            calculateFreteOptions(data[0].cep);
+         } else {
+            setSelectedEnderecoId(null);
+         }
+      } catch (err) {
+         setEnderecosError(err.message);
+         toast.error(err.message);
+      } finally {
+         setEnderecosLoading(false);
+      }
+   };
+
+   useEffect(() => {
+      if (user) {
+         fetchEnderecos();
+      }
+   }, [user]);
 
    const descontoPercentual = cuponsAplicados.reduce(
       (acc, cupom) => acc + cupom.descontoTotal,
@@ -46,14 +147,12 @@ export default function Carrinho() {
       0
    );
 
-   // Encontra a informação completa da opção de frete selecionada
    const selectedFreteOptionInfo = useMemo(() => {
       return availableFreteOptions.find(
          (option) => option.id === selectedFreteOptionId
       );
    }, [availableFreteOptions, selectedFreteOptionId]);
 
-   // Calcula o valor total final, incluindo o frete
    const totalFinal = useMemo(() => {
       let currentTotal = totalItens - totalItens * descontoPercentual;
       if (
@@ -72,7 +171,7 @@ export default function Carrinho() {
       );
       toast.dismiss();
       if (!cupomEncontrado) {
-         toast.error(" Cupom inválido");
+         toast.error("Cupom inválido");
          return;
       }
       if (
@@ -80,39 +179,31 @@ export default function Carrinho() {
          totalItens < cupomEncontrado.minimoCompra
       ) {
          toast.error(
-            ` Este cupom só é válido para compras acima de R$${cupomEncontrado.minimoCompra}`
+            `Este cupom só é válido para compras acima de R$${cupomEncontrado.minimoCompra}`
          );
          return;
       }
       if (cuponsAplicados.some((c) => c.nomeDoCupom === cupomFormatado)) {
-         toast.error(" Você já aplicou esse cupom");
+         toast.error("Você já aplicou esse cupom");
          return;
       }
       if (cuponsAplicados.length >= 2) {
-         toast.error(" Limite de 2 cupons aplicados");
+         toast.error("Limite de 2 cupons aplicados");
          return;
       }
 
       setCuponsAplicados((prev) => [...prev, cupomEncontrado]);
-      toast.success(" Cupom aplicado com sucesso!");
+      toast.success("Cupom aplicado com sucesso!");
       setCupom("");
    };
 
-   const handleCepChange = (newCepValue) => {
-      setCep(newCepValue);
-      // Limpar resultados de frete anteriores quando o CEP muda
-      setAvailableFreteOptions([]);
-      setSelectedFreteOptionId(null);
-      setFreteError("");
-   };
-
-   const calculateFreteOptions = async () => {
+   const calculateFreteOptions = async (cepParaCalcular) => {
       setFreteIsLoading(true);
       setAvailableFreteOptions([]);
       setSelectedFreteOptionId(null);
       setFreteError("");
 
-      const cleanCep = cep.replace(/\D/g, "");
+      const cleanCep = cepParaCalcular.replace(/\D/g, "");
 
       if (cleanCep.length !== 8) {
          toast.error("Por favor, informe um CEP válido com 8 dígitos.");
@@ -121,11 +212,10 @@ export default function Carrinho() {
       }
 
       try {
-         await new Promise((resolve) => setTimeout(resolve, 1500)); // Simula delay
+         await new Promise((resolve) => setTimeout(resolve, 1500));
 
          const options = [];
 
-         // Opção de Retirada (agora com categoria e endereço)
          options.push({
             id: "retirada",
             name: "Retirada na loja",
@@ -136,57 +226,50 @@ export default function Carrinho() {
             address: "Rua Prates, 194, São Paulo, São Paulo, 12345-678, Brasil",
          });
 
-         // Simulação Correios (PAC)
          let fretePadraoValue = null;
          let fretePadraoPrazo = null;
-         const maricaCEPRangePrefix = "249"; // Prefixo de CEP para Maricá e região
-
+         const maricaCEPRangePrefix = "249";
          if (cleanCep.startsWith(maricaCEPRangePrefix)) {
-            // Dentro da área de Maricá
-            fretePadraoValue = 15.0; // Valor ajustado conforme a imagem
-            fretePadraoPrazo = "3-5 dias úteis"; // Prazo ajustado conforme a imagem
+            fretePadraoValue = 15.0;
+            fretePadraoPrazo = "3-5 dias úteis";
          } else if (cleanCep.startsWith("2") || cleanCep.startsWith("0")) {
-            // Outros CEPs no estado do RJ ou SP (exemplo)
             fretePadraoValue = 25.0;
             fretePadraoPrazo = "5-9 dias úteis";
          } else {
-            // Demais regiões
             fretePadraoValue = 40.0;
             fretePadraoPrazo = "7-15 dias úteis";
          }
 
          options.push({
-            id: "frete-padrao", // ID mais específico
-            name: "Frete padrão", // Nome ajustado conforme a imagem
+            id: "frete-padrao",
+            name: "Frete padrão",
             value: fretePadraoValue,
             prazo: fretePadraoPrazo,
             carrier: "Correios",
             category: "frete",
          });
 
-         // Simulação Uber Flash / Entrega Rápida
          let entregaRapidaValue = null;
          let entregaRapidaPrazo = null;
-
          if (cleanCep.startsWith(maricaCEPRangePrefix)) {
-            entregaRapidaValue = 50.0; // Valor ajustado conforme a imagem
-            entregaRapidaPrazo = "até 2 dias úteis"; // Prazo ajustado conforme a imagem
+            entregaRapidaValue = 50.0;
+            entregaRapidaPrazo = "até 2 dias úteis";
          } else if (
             (cleanCep.startsWith("240") ||
                cleanCep.startsWith("241") ||
                cleanCep.startsWith("242") ||
                cleanCep.startsWith("243") ||
-               cleanCep.startsWith("244")) && // Niterói, São Gonçalo
-            totalItens >= 200 // Condição: apenas para compras de valor mais alto
+               cleanCep.startsWith("244")) &&
+            totalItens >= 200
          ) {
-            entregaRapidaValue = 75.0; // Exemplo de valor mais alto para cidades próximas
+            entregaRapidaValue = 75.0;
             entregaRapidaPrazo = "até 2 dias úteis";
          }
 
          if (entregaRapidaValue) {
             options.push({
-               id: "entrega-rapida", // ID mais específico
-               name: "Entrega rápida", // Nome ajustado conforme a imagem
+               id: "entrega-rapida",
+               name: "Entrega rápida",
                value: entregaRapidaValue,
                prazo: entregaRapidaPrazo,
                carrier: "Uber Flash / Transportadora",
@@ -196,7 +279,6 @@ export default function Carrinho() {
 
          setAvailableFreteOptions(options);
          if (options.length > 0) {
-            // Tenta selecionar a opção mais barata por padrão
             const cheapestOption = options.reduce((min, current) =>
                current.value < min.value ? current : min
             );
@@ -214,6 +296,13 @@ export default function Carrinho() {
       }
    };
 
+   const handleEnderecoSelection = (enderecoSelecionado) => {
+      setSelectedEnderecoId(enderecoSelecionado.id);
+      if (enderecoSelecionado.cep) {
+         calculateFreteOptions(enderecoSelecionado.cep);
+      }
+   };
+
    const handleUpdateQuantity = (itemParaAtualizar, operacao) => {
       const newQuantity =
          operacao === "somar"
@@ -228,12 +317,11 @@ export default function Carrinho() {
       );
    };
 
-   const hasValidCep = cep.replace(/\D/g, "").length === 8;
-
    return (
       <div className="px-6 mx-auto md:mt-8 mt-8 max-w-6xl">
-         <h1 className="text-2xl font-bold mb-6 text-center">Seu Carrinho</h1>
-
+                  
+         <h1 className="text-2xl font-bold mb-6 text-center">Seu Carrinho</h1> 
+                
          {cartLoading ? (
             <p className="text-gray-600 text-center">Carregando carrinho...</p>
          ) : cartItems.length === 0 ? (
@@ -247,56 +335,80 @@ export default function Carrinho() {
                }}
             />
          )}
-
+                  
          {cartItems.length > 0 && (
             <>
+                              
                <div className="flex items-center my-6 justify-between md:mb-14 flex-col md:flex-row">
+                                   {" "}
                   <CupomDesconto
                      cupom={cupom}
                      setCupom={setCupom}
                      aplicarCupom={aplicarCupom}
                   />
-                  <ResumoCarrinho totalFinal={totalFinal} />
+                                    <ResumoCarrinho totalFinal={totalFinal} /> 
+                               
                </div>
-               <InfoCarrinho />
+                              <InfoCarrinho />               
                <div className="flex flex-col md:flex-row md:items-start justify-start md:justify-between md:mt-0 mt-8 gap-8">
-                  {/* FreteCEP agora ocupa sua própria seção */}
-                  <FreteCEP
-                     cep={cep}
-                     handleChange={handleCepChange}
-                     onCalculateFrete={calculateFreteOptions}
-                     isCalculatingFrete={freteIsLoading}
-                     hasValidCep={hasValidCep}
+                                   {" "}
+                  <FreteEndereco
+                     enderecos={enderecos}
+                     selectedEnderecoId={selectedEnderecoId}
+                     onSelectEndereco={handleEnderecoSelection}
+                     isLoading={enderecosLoading}
+                     error={enderecosError}
                   />
+                                 
                </div>
+                              
                <div className="w-full md:w-auto flex flex-col items-center">
-                  {" "}
-                  {/* Este div agrupa os resultados do frete e os botões de ação */}
+                                   {" "}
                   <div className="w-full">
+                                          
                      <FreteResultado
                         selectedFreteOptionInfo={selectedFreteOptionInfo}
                         availableFreteOptions={availableFreteOptions}
                         onSelectFreteOption={setSelectedFreteOptionId}
                         isLoading={freteIsLoading}
                         error={freteError}
-                        cep={cep}
+                        cep={
+                           enderecos.find(
+                              (end) => end.id === selectedEnderecoId
+                           )?.cep || ""
+                        }
                      />
+                                      {" "}
                   </div>
-                  {/* Renderiza AcoesCarrinho apenas se houver opções de frete */}
+                                   {" "}
                   {selectedFreteOptionId ? (
-                     // ✨ Mostra o botão de pagamento do MP apenas quando o frete é selecionado
                      <div className="mt-8 w-full flex justify-center">
-                        <CheckoutMP />
+                                                 
+                        {/* ⭐ NOVO: Passe as props necessárias para o CheckoutMP ⭐ */}
+                                                 
+                        <CheckoutMP
+                           cartItems={cartItems}
+                           selectedEndereco={enderecos.find(
+                              (end) => end.id === selectedEnderecoId
+                           )}
+                           selectedFreteOption={selectedFreteOptionInfo}
+                           isPaymentProcessing={isPaymentProcessing}
+                           setIsPaymentProcessing={setIsPaymentProcessing}
+                        />
+                                             
                      </div>
                   ) : (
-                     // ✨ Mostra o botão de continuar comprando se o frete ainda não foi selecionado
                      <div className="flex flex-col items-center justify-center gap-4 w-full my-8">
-                        <AcoesCarrinhoContinue />
+                                                 <AcoesCarrinhoContinue />     
+                                       
                      </div>
                   )}
+                                 
                </div>
+                          {" "}
             </>
          )}
+              {" "}
       </div>
    );
 }

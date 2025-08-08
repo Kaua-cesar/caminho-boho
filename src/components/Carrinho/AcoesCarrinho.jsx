@@ -19,7 +19,7 @@ export function AcoesCarrinhoFinish() {
 // Exportação nomeada para AcoesCarrinhoContinue
 export function AcoesCarrinhoContinue() {
    return (
-      <div className="flex flex-col items-center justify-center w-full  hover:bg-zinc-100 rounded-md">
+      <div className="flex flex-col items-center justify-center w-auto  hover:bg-zinc-100 rounded-md">
          <Link
             to="/"
             className="w-full" // Garante que o link ocupe a largura total em telas pequenas
