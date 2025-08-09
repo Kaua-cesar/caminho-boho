@@ -6,11 +6,7 @@ export function InfoCarrinho() {
             <div>
                <p className="flex items-center gap-2 ">
                   <FaSearchDollar className="text-3xl text-amber-600 w-8 md:w-auto" />
-                  Ver as formas de pagamento e parcelamento
-               </p>
-               <p className="flex items-center gap-2 ">
-                  <FaTruck className="text-3xl text-amber-600 w-11 md:w-auto" />
-                  Preencha o campo CEP para calcular o valor do frete e o prazo
+                  Veja as formas de pagamento e parcelamento
                </p>
             </div>
          </div>

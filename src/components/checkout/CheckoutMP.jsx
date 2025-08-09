@@ -104,7 +104,7 @@ export function CheckoutMP({
          <button
             onClick={handleFinalizarCompra}
             disabled={isPaymentProcessing || !selectedFreteOption}
-            className="w-full py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition duration-300 disabled:opacity-50 disabled:cursor-not-allowed p-3 cursor-pointer"
+            className="w-full py-3 bg-amber-600 text-white rounded-lg font-semibold hover:bg-amber-700 transition duration-300 disabled:opacity-50 disabled:cursor-not-allowed p-3 cursor-pointer"
          >
             {isPaymentProcessing
                ? "Processando..."

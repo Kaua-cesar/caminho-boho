@@ -19,12 +19,12 @@ export function AcoesCarrinhoFinish() {
 // Exportação nomeada para AcoesCarrinhoContinue
 export function AcoesCarrinhoContinue() {
    return (
-      <div className="flex flex-col items-center justify-center w-auto  hover:bg-zinc-100 rounded-md">
+      <div className="flex flex-col items-center justify-center w-auto   rounded-md">
          <Link
             to="/"
             className="w-full" // Garante que o link ocupe a largura total em telas pequenas
          >
-            <button className=" w-full p-3 rounded-sm underline cursor-pointer ">
+            <button className=" w-full p-3 rounded-sm hover:underline cursor-pointer ">
                Continuar comprando
             </button>
          </Link>

@@ -1,8 +1,18 @@
-// src/pages/Carrinho.jsx
 import { useState, useMemo, useEffect } from "react";
 import { toast } from "sonner";
 import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
+import { Link } from "react-router-dom";
+
+// Importando componentes do Shadcn
+import {
+   Dialog,
+   DialogContent,
+   DialogHeader,
+   DialogTitle,
+   DialogDescription,
+} from "../components/ui/dialog";
+import { Button } from "../components/ui/button";
 
 import { InfoCarrinho } from "../components/Carrinho/InfoCarrinho";
 import TabelaItensCarrinho from "../components/Carrinho/TabelaItensCarrinho";
@@ -14,7 +24,7 @@ import {
    AcoesCarrinhoFinish,
 } from "../components/Carrinho/AcoesCarrinho";
 import FreteResultado from "../components/Carrinho/FreteResultado";
-// A linha abaixo foi removida:
+import { Separator } from "../components/ui/separator";
 
 export default function Carrinho() {
    const { user } = useAuth();
@@ -23,13 +33,14 @@ export default function Carrinho() {
       cartLoading,
       removeItemFromCart,
       updateItemQuantity,
-      clearCart, // <-- A função de limpar o carrinho já está aqui
+      clearCart,
    } = useCart();
 
    const [enderecos, setEnderecos] = useState([]);
    const [enderecosLoading, setEnderecosLoading] = useState(true);
    const [enderecosError, setEnderecosError] = useState("");
    const [selectedEnderecoId, setSelectedEnderecoId] = useState(null);
+   const [isModalOpen, setIsModalOpen] = useState(false);
 
    const cuponsValidos = [
       { nomeDoCupom: "PRIMEIRA", descontoTotal: 0.1 },
@@ -62,6 +73,7 @@ export default function Carrinho() {
             calculateFreteOptions(data[0].cep);
          } else {
             setSelectedEnderecoId(null);
+            handleRetiradaSelection();
          }
       } catch (err) {
          setEnderecosError(err.message);
@@ -156,16 +168,7 @@ export default function Carrinho() {
 
          const options = [];
 
-         options.push({
-            id: "retirada",
-            name: "Retirada na loja",
-            value: 0,
-            prazo: "Imediato (horário comercial)",
-            carrier: "Loja Física",
-            category: "retirada",
-            address: "Rua Prates, 194, São Paulo, São Paulo, 12345-678, Brasil",
-         });
-
+         // Lógica para frete padrão
          let fretePadraoValue = null;
          let fretePadraoPrazo = null;
          const maricaCEPRangePrefix = "249";
@@ -189,6 +192,7 @@ export default function Carrinho() {
             category: "frete",
          });
 
+         // Lógica para frete rápido
          let entregaRapidaValue = null;
          let entregaRapidaPrazo = null;
          if (cleanCep.startsWith(maricaCEPRangePrefix)) {
@@ -235,13 +239,6 @@ export default function Carrinho() {
       }
    };
 
-   const handleEnderecoSelection = (enderecoSelecionado) => {
-      setSelectedEnderecoId(enderecoSelecionado.id);
-      if (enderecoSelecionado.cep) {
-         calculateFreteOptions(enderecoSelecionado.cep);
-      }
-   };
-
    const handleUpdateQuantity = (itemParaAtualizar, operacao) => {
       const newQuantity =
          operacao === "somar"
@@ -256,96 +253,299 @@ export default function Carrinho() {
       );
    };
 
+   const handleEnderecoSelection = (enderecoSelecionado) => {
+      setSelectedEnderecoId(enderecoSelecionado.id);
+      if (enderecoSelecionado.cep) {
+         calculateFreteOptions(enderecoSelecionado.cep);
+      }
+      setIsModalOpen(false);
+   };
+
+   const handleRetiradaSelection = () => {
+      setSelectedEnderecoId("retirada");
+      setAvailableFreteOptions([
+         {
+            id: "retirada",
+            name: "Retirada na loja",
+            value: 0,
+            prazo: "Imediato",
+            carrier: "Loja Física",
+            category: "retirada",
+            address: "Rua Prates, 194, São Paulo, São Paulo, 12345-678, Brasil",
+         },
+      ]);
+      setSelectedFreteOptionId("retirada");
+      setFreteIsLoading(false);
+      setFreteError("");
+   };
+
+   const handleSelectDefaultDelivery = () => {
+      if (defaultEndereco) {
+         setSelectedEnderecoId(defaultEndereco.id);
+         calculateFreteOptions(defaultEndereco.cep);
+      }
+   };
+
+   const selectedEndereco = useMemo(() => {
+      if (selectedEnderecoId === "retirada") return null;
+      return enderecos.find((end) => end.id === selectedEnderecoId);
+   }, [enderecos, selectedEnderecoId]);
+
+   const defaultEndereco = useMemo(() => {
+      return enderecos.length > 0 ? enderecos[0] : null;
+   }, [enderecos]);
+
+   const retiradaNaLojaInfo = {
+      id: "retirada",
+      name: "Retirada na loja",
+      value: 0,
+      prazo: "Imediato (horário comercial)",
+      carrier: "Loja Física",
+      address: "Rua Prates, 194, São Paulo, São Paulo, 12345-678, Brasil",
+   };
+
+   const isRetiradaSelected = selectedEnderecoId === "retirada";
+   const enderecoParaExibir = isRetiradaSelected
+      ? defaultEndereco
+      : selectedEndereco;
+
    return (
-      <div className="px-6 mx-auto md:mt-8 mt-8 max-w-6xl">
-                  
-         <h1 className="text-2xl font-bold mb-6 text-center">Seu Carrinho</h1> 
-                  
-         {cartLoading ? (
-            <p className="text-gray-600 text-center">Carregando carrinho...</p>
-         ) : cartItems.length === 0 ? (
-            <p className="text-gray-600 text-center">O carrinho está vazio.</p>
-         ) : (
-            <TabelaItensCarrinho
-               itens={cartItems}
-               atualizarQuantidade={handleUpdateQuantity}
-               removerDoCarrinho={(item) => {
-                  removeItemFromCart(item.id, item.cor, item.tamanho);
-               }}
-            />
-         )}
-                  
-         {cartItems.length > 0 && (
-            <>
-                              
-               <div className="flex items-center my-6 justify-between md:mb-14 flex-col md:flex-row">
-                                   {" "}
-                  <CupomDesconto
-                     cupom={cupom}
-                     setCupom={setCupom}
-                     aplicarCupom={aplicarCupom}
-                  />
-                                    <ResumoCarrinho totalFinal={totalFinal} /> 
-                                 
-               </div>
-                              <InfoCarrinho />                               
-               <div className="flex flex-col md:flex-row md:items-start justify-start md:justify-between md:mt-0 mt-8 gap-8">
-                                   {" "}
-                  {/* A chamada para o FreteEndereco foi removida daqui */}     
-                           
-               </div>
-                              
-               <div className="w-full md:w-auto flex flex-col items-center">
-                                   {" "}
-                  <div className="w-full">
-                                          
-                     <FreteResultado
-                        selectedFreteOptionInfo={selectedFreteOptionInfo}
-                        availableFreteOptions={availableFreteOptions}
-                        onSelectFreteOption={setSelectedFreteOptionId}
-                        isLoading={freteIsLoading}
-                        error={freteError}
-                        cep={
-                           enderecos.find(
-                              (end) => end.id === selectedEnderecoId
-                           )?.cep || ""
-                        }
-                     />
-                                      {" "}
+      <div className="mt-8  flex flex-col mx-28">
+         <h1 className="text-4xl font-bold mb-6 text-start   w-full">
+            Confirmar Pedido
+         </h1>
+         <div className="flex flex-row space-x-12 ">
+            <div className="w-3/5">
+               {enderecosLoading ? (
+                  <p className="text-center">Carregando endereços...</p>
+               ) : enderecos.length === 0 ? (
+                  <div className="my-8 p-6 bg-amber-50 border border-amber-300 text-amber-900 rounded-lg shadow-sm text-center">
+                     <p className="font-semibold text-lg mb-2">
+                        ⚠️ Atenção: É necessário cadastrar um endereço para
+                        calcular o frete e finalizar a compra.
+                     </p>
+                     <Link
+                        to="/minha-conta"
+                        className="text-amber-700 hover:underline font-medium"
+                     >
+                        👉 Clique aqui para adicionar um endereço.
+                     </Link>
                   </div>
-                                   {" "}
-                  {selectedFreteOptionId ? (
-                     <div className="my-8 w-full flex justify-center gap-6 items-center">
-                                               {" "}
-                        <CheckoutMP
-                           cartItems={cartItems}
-                           selectedEndereco={enderecos.find(
-                              (end) => end.id === selectedEnderecoId
+               ) : (
+                  <>
+                     <h2 className="text-xl font-semibold  mb-4 ">
+                        Selecione o método de entrega
+                     </h2>
+                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
+                        <div
+                           onClick={
+                              isRetiradaSelected
+                                 ? handleSelectDefaultDelivery
+                                 : undefined
+                           }
+                           className={`
+                                            p-4 border rounded-lg cursor-pointer transition-colors duration-200
+                                            ${
+                                               !isRetiradaSelected
+                                                  ? "border-amber-500 bg-amber-50 shadow-md"
+                                                  : "border-gray-300 hover:bg-gray-50"
+                                            }
+                                        `}
+                        >
+                           <div className="flex justify-between items-center">
+                              <div className="flex items-center space-x-2">
+                                 <span
+                                    className={`h-4 w-4 rounded-full border border-gray-400 flex items-center justify-center ${
+                                       !isRetiradaSelected ? "bg-amber-500" : ""
+                                    }`}
+                                 >
+                                    {!isRetiradaSelected && (
+                                       <span className="h-2 w-2 rounded-full bg-white"></span>
+                                    )}
+                                 </span>
+                                 <p className="font-semibold text-base">
+                                    Entregar neste endereço
+                                 </p>
+                              </div>
+                           </div>
+                           {enderecoParaExibir && (
+                              <div className="mt-2 text-sm text-gray-700">
+                                 <p>
+                                    {enderecoParaExibir.rua}{" "}
+                                    {enderecoParaExibir.numero}
+                                    {enderecoParaExibir.bairro}
+                                 </p>
+                                 <p>
+                                    {enderecoParaExibir.cidade}{" "}
+                                    {enderecoParaExibir.estado},{" "}
+                                    {enderecoParaExibir.cep}
+                                 </p>
+                              </div>
                            )}
-                           selectedFreteOption={selectedFreteOptionInfo}
-                           isPaymentProcessing={isPaymentProcessing}
-                           setIsPaymentProcessing={setIsPaymentProcessing}
-                           onPaymentRedirect={clearCart} // <-- A nova prop adicionada aqui!
-                        />
-                                               {" "}
-                        <div className="flex items-center justify-center gap-4 w-auto">
-                                                      <AcoesCarrinhoContinue /> 
-                                                  {" "}
+                           <Separator className={"my-2"} />
+
+                           <Button
+                              onClick={(e) => {
+                                 e.stopPropagation();
+                                 setIsModalOpen(true);
+                              }}
+                              className={
+                                 " text-black hover:underline cursor-pointer bg-transparent hover:bg-transparent shadow-none border-none  "
+                              }
+                              size="sm"
+                           >
+                              Mudar
+                           </Button>
                         </div>
-                                             
+
+                        <div
+                           onClick={handleRetiradaSelection}
+                           className={`
+                                            p-4 border rounded-lg cursor-pointer transition-colors duration-200 flex items-start flex-col justify-center
+                                            ${
+                                               isRetiradaSelected
+                                                  ? "border-amber-500 bg-amber-50 shadow-md"
+                                                  : "border-gray-300 hover:bg-gray-50"
+                                            }
+                                        `}
+                        >
+                           <div className="flex items-center space-x-2">
+                              <span
+                                 className={`h-4 w-4 rounded-full border border-gray-400 flex items-center justify-center ${
+                                    isRetiradaSelected ? "bg-amber-500" : ""
+                                 }`}
+                              >
+                                 {isRetiradaSelected && (
+                                    <span className="h-2 w-2 rounded-full bg-white"></span>
+                                 )}
+                              </span>
+                              <p className="font-semibold text-base">
+                                 Retirar na loja
+                              </p>
+                           </div>
+
+                           <div className="mt-2 text-sm text-gray-700">
+                              <p>{retiradaNaLojaInfo.address}</p>
+                           </div>
+                        </div>
                      </div>
-                  ) : (
-                     <div className="flex flex-col items-center justify-center gap-4 w-full my-8">
-                                                <AcoesCarrinhoContinue />       
-                                             
-                     </div>
-                  )}
-                                 
+
+                     <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+                        <DialogContent>
+                           <DialogHeader>
+                              <DialogTitle>Selecione um Endereço</DialogTitle>
+                              <DialogDescription>
+                                 Escolha um dos endereços cadastrados para a
+                                 entrega.
+                              </DialogDescription>
+                           </DialogHeader>
+                           <div className="flex flex-col gap-4">
+                              {enderecos.map((endereco) => (
+                                 <div
+                                    key={endereco.id}
+                                    onClick={() =>
+                                       handleEnderecoSelection(endereco)
+                                    }
+                                    className={`
+                                                        p-4 border rounded-lg cursor-pointer transition-colors duration-200
+                                                        ${
+                                                           selectedEnderecoId ===
+                                                           endereco.id
+                                                              ? "border-amber-500 bg-amber-50 shadow-md"
+                                                              : "border-gray-300 hover:bg-gray-50"
+                                                        }
+                                                    `}
+                                 >
+                                    <p className="font-semibold">
+                                       {endereco.nome}
+                                    </p>
+                                    <p>
+                                       {endereco.rua}, {endereco.numero} -{" "}
+                                       {endereco.bairro}
+                                    </p>
+                                    <p>
+                                       {endereco.cidade}, {endereco.estado},{" "}
+                                       {endereco.cep}
+                                    </p>
+                                 </div>
+                              ))}
+                           </div>
+                        </DialogContent>
+                     </Dialog>
+
+                     {selectedEnderecoId && (
+                        <>
+                           {!isRetiradaSelected && (
+                              <div className="w-full mt-8">
+                                 <FreteResultado
+                                    selectedFreteOptionInfo={
+                                       selectedFreteOptionInfo
+                                    }
+                                    availableFreteOptions={
+                                       availableFreteOptions
+                                    }
+                                    onSelectFreteOption={
+                                       setSelectedFreteOptionId
+                                    }
+                                    isLoading={freteIsLoading}
+                                    error={freteError}
+                                    cep={selectedEndereco?.cep || ""}
+                                 />
+                              </div>
+                           )}
+                           {cartItems.length > 0 && (
+                              <>
+                                 <div className="flex items-center my-6 justify-between md:mb-14 flex-col md:flex-row">
+                                    <CupomDesconto
+                                       cupom={cupom}
+                                       setCupom={setCupom}
+                                       aplicarCupom={aplicarCupom}
+                                    />
+                                    <ResumoCarrinho totalFinal={totalFinal} />
+                                 </div>
+
+                                 <InfoCarrinho />
+                              </>
+                           )}
+                           <div className="my-8 w-full flex justify-center gap-6 items-center flex-wrap">
+                              <CheckoutMP
+                                 cartItems={cartItems}
+                                 selectedEndereco={selectedEndereco}
+                                 selectedFreteOption={selectedFreteOptionInfo}
+                                 isPaymentProcessing={isPaymentProcessing}
+                                 setIsPaymentProcessing={setIsPaymentProcessing}
+                                 onPaymentRedirect={clearCart}
+                              />
+                              <AcoesCarrinhoContinue />
+                           </div>
+                        </>
+                     )}
+                  </>
+               )}
+            </div>
+            {cartLoading ? (
+               <p className="text-gray-600 text-center">
+                  Carregando carrinho...
+               </p>
+            ) : cartItems.length === 0 ? (
+               <p className="text-gray-600 text-center">
+                  O carrinho está vazio.
+               </p>
+            ) : (
+               <div className="">
+                  <h2 className="text-xl font-semibold mb-4 ">Resumo</h2>
+                  <div className="max-h-[40rem] overflow-y-auto border rounded-sm">
+                     <TabelaItensCarrinho
+                        itens={cartItems}
+                        atualizarQuantidade={handleUpdateQuantity}
+                        removerDoCarrinho={(item) => {
+                           removeItemFromCart(item.id, item.cor, item.tamanho);
+                        }}
+                     />
+                  </div>
                </div>
-                          {" "}
-            </>
-         )}
-              {" "}
+            )}
+         </div>
       </div>
    );
 }
