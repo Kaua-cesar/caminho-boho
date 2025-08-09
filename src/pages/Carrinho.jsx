@@ -1,3 +1,4 @@
+// components/Carrinho.jsx
 import { useState, useMemo, useEffect } from "react";
 import { toast } from "sonner";
 import { useCart } from "../context/CartContext";
@@ -25,6 +26,9 @@ import {
 import FreteResultado from "../components/Carrinho/FreteResultado";
 import { Separator } from "../components/ui/separator";
 
+// Importe o componente AddressForm aqui
+import { AddressForm } from "../components/AddressForm";
+
 export default function Carrinho() {
    const { user } = useAuth();
    const {
@@ -40,6 +44,7 @@ export default function Carrinho() {
    const [enderecosError, setEnderecosError] = useState("");
    const [selectedEnderecoId, setSelectedEnderecoId] = useState(null);
    const [isModalOpen, setIsModalOpen] = useState(false);
+   const [isAddingNewAddress, setIsAddingNewAddress] = useState(false);
 
    const cuponsValidos = [
       { nomeDoCupom: "PRIMEIRA", descontoTotal: 0.1 },
@@ -167,7 +172,6 @@ export default function Carrinho() {
 
          const options = [];
 
-         // Lógica para frete padrão
          let fretePadraoValue = null;
          let fretePadraoPrazo = null;
          const maricaCEPRangePrefix = "249";
@@ -191,7 +195,6 @@ export default function Carrinho() {
             category: "frete",
          });
 
-         // Lógica para frete rápido
          let entregaRapidaValue = null;
          let entregaRapidaPrazo = null;
          if (cleanCep.startsWith(maricaCEPRangePrefix)) {
@@ -277,13 +280,6 @@ export default function Carrinho() {
       setFreteError("");
    };
 
-   const handleSelectDefaultDelivery = () => {
-      if (defaultEndereco) {
-         setSelectedEnderecoId(defaultEndereco.id);
-         calculateFreteOptions(defaultEndereco.cep);
-      }
-   };
-
    const selectedEndereco = useMemo(() => {
       if (selectedEnderecoId === "retirada") return null;
       return enderecos.find((end) => end.id === selectedEnderecoId);
@@ -303,9 +299,37 @@ export default function Carrinho() {
    };
 
    const isRetiradaSelected = selectedEnderecoId === "retirada";
-   const enderecoParaExibir = isRetiradaSelected
-      ? defaultEndereco
-      : selectedEndereco;
+
+   const enderecoDeEntregaExibido = useMemo(() => {
+      if (selectedEndereco) {
+         return selectedEndereco;
+      }
+      return defaultEndereco;
+   }, [selectedEndereco, defaultEndereco]);
+
+   if (cartItems.length === 0) {
+      return (
+         <div className="mx-auto my-8 max-w-8xl px-4 sm:px-6 lg:px-8 text-center">
+            <h1 className="text-4xl font-bold mb-6">
+               Seu carrinho está vazio 😔
+            </h1>
+            <p className="text-lg text-gray-600">
+               Parece que você ainda não adicionou nenhum item. Que tal dar uma
+               olhada nas nossas novidades?
+            </p>
+            <Link to="/produtos" className="mt-6 inline-block">
+               <Button className="bg-amber-600 text-white hover:bg-amber-700 cursor-pointer">
+                  Explorar produtos
+               </Button>
+            </Link>
+         </div>
+      );
+   }
+
+   const handleAddAddressClick = () => {
+      setIsModalOpen(true);
+      setIsAddingNewAddress(true);
+   };
 
    return (
       <div className="mx-auto my-8 max-w-8xl px-4 sm:px-6 lg:px-8 ">
@@ -314,7 +338,6 @@ export default function Carrinho() {
          </h1>
 
          <div className="flex flex-col lg:flex-row gap-8">
-            {/* Seção das opções de entrega e frete (order-2 em mobile, order-1 em pc) */}
             <div className="w-full lg:w-3/5 order-2 lg:order-1 ">
                {enderecosLoading ? (
                   <p className="text-center">Carregando endereços...</p>
@@ -324,12 +347,12 @@ export default function Carrinho() {
                         ⚠️ Atenção: É necessário cadastrar um endereço para
                         calcular o frete e finalizar a compra.
                      </p>
-                     <Link
-                        to="/minha-conta"
-                        className="text-amber-700 hover:underline font-medium"
+                     <Button
+                        onClick={handleAddAddressClick}
+                        className="mt-4 bg-amber-600 text-white hover:bg-amber-700 cursor-pointer"
                      >
-                        👉 Clique aqui para adicionar um endereço.
-                     </Link>
+                        Adicionar um Endereço
+                     </Button>
                   </div>
                ) : (
                   <>
@@ -337,13 +360,12 @@ export default function Carrinho() {
                         Selecione o método de entrega
                      </h2>
                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
-                        {/* Opção de Entrega em Endereço */}
                         <div
-                           onClick={
-                              !isRetiradaSelected
-                                 ? handleSelectDefaultDelivery
-                                 : undefined
-                           }
+                           onClick={() => {
+                              if (defaultEndereco) {
+                                 handleEnderecoSelection(defaultEndereco);
+                              }
+                           }}
                            className={`p-4 border rounded-lg cursor-pointer transition-colors duration-200 ${
                               !isRetiradaSelected
                                  ? "border-amber-500 bg-amber-50 shadow-md"
@@ -366,17 +388,17 @@ export default function Carrinho() {
                                  </p>
                               </div>
                            </div>
-                           {enderecoParaExibir && (
+                           {enderecoDeEntregaExibido && (
                               <div className="mt-2 text-sm text-gray-700">
                                  <p>
-                                    {enderecoParaExibir.rua}{" "}
-                                    {enderecoParaExibir.numero}
-                                    {enderecoParaExibir.bairro}
+                                    {enderecoDeEntregaExibido.rua}{" "}
+                                    {enderecoDeEntregaExibido.numero}
+                                    {enderecoDeEntregaExibido.bairro}
                                  </p>
                                  <p>
-                                    {enderecoParaExibir.cidade}{" "}
-                                    {enderecoParaExibir.estado},{" "}
-                                    {enderecoParaExibir.cep}
+                                    {enderecoDeEntregaExibido.cidade}{" "}
+                                    {enderecoDeEntregaExibido.estado},{" "}
+                                    {enderecoDeEntregaExibido.cep}
                                  </p>
                               </div>
                            )}
@@ -393,7 +415,6 @@ export default function Carrinho() {
                            </Button>
                         </div>
 
-                        {/* Opção de Retirada na Loja */}
                         <div
                            onClick={handleRetiradaSelection}
                            className={`p-4 border rounded-lg cursor-pointer transition-colors duration-200 flex items-start flex-col justify-center ${
@@ -422,47 +443,6 @@ export default function Carrinho() {
                         </div>
                      </div>
 
-                     {/* Diálogo do modal de endereços */}
-                     <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-                        <DialogContent>
-                           <DialogHeader>
-                              <DialogTitle>Selecione um Endereço</DialogTitle>
-                              <DialogDescription>
-                                 Escolha um dos endereços cadastrados para a
-                                 entrega.
-                              </DialogDescription>
-                           </DialogHeader>
-                           <div className="flex flex-col gap-4 max-h-[300px] overflow-y-auto">
-                              {enderecos.map((endereco) => (
-                                 <div
-                                    key={endereco.id}
-                                    onClick={() =>
-                                       handleEnderecoSelection(endereco)
-                                    }
-                                    className={`p-4 border rounded-lg cursor-pointer transition-colors duration-200 ${
-                                       selectedEnderecoId === endereco.id
-                                          ? "border-amber-500 bg-amber-50 shadow-md"
-                                          : "border-gray-300 hover:bg-gray-50"
-                                    }`}
-                                 >
-                                    <p className="font-semibold">
-                                       {endereco.nome}
-                                    </p>
-                                    <p>
-                                       {endereco.rua}, {endereco.numero} -{" "}
-                                       {endereco.bairro}
-                                    </p>
-                                    <p>
-                                       {endereco.cidade}, {endereco.estado},{" "}
-                                       {endereco.cep}
-                                    </p>
-                                 </div>
-                              ))}
-                           </div>
-                        </DialogContent>
-                     </Dialog>
-
-                     {/* Resultado do frete */}
                      {selectedEnderecoId && (
                         <>
                            {!isRetiradaSelected && (
@@ -484,7 +464,6 @@ export default function Carrinho() {
                               </div>
                            )}
 
-                           {/* Componentes de desconto e resumo do carrinho para telas menores */}
                            <div className="flex flex-col md:hidden items-center my-6 justify-between flex-wrap">
                               <CupomDesconto
                                  cupom={cupom}
@@ -494,7 +473,6 @@ export default function Carrinho() {
                               <ResumoCarrinho totalFinal={totalFinal} />
                            </div>
 
-                           {/* Componentes de desconto e resumo do carrinho para telas maiores */}
                            <div className="hidden md:flex items-center my-6 justify-between md:mb-14 flex-col xl:flex-row ">
                               <CupomDesconto
                                  cupom={cupom}
@@ -503,16 +481,26 @@ export default function Carrinho() {
                               />
                               <ResumoCarrinho totalFinal={totalFinal} />
                            </div>
-                           <div className="flex lg:justify-start justify-center">
-                              <InfoCarrinho />
-                           </div>
                         </>
                      )}
                   </>
                )}
+               <div className="flex-grow flex lg:justify-start justify-center items-center mb-6">
+                  <InfoCarrinho />
+               </div>
+               <div className=" w-full flex justify-center gap-6 items-center flex-wrap">
+                  <CheckoutMP
+                     cartItems={cartItems}
+                     selectedEndereco={selectedEndereco}
+                     selectedFreteOption={selectedFreteOptionInfo}
+                     isPaymentProcessing={isPaymentProcessing}
+                     setIsPaymentProcessing={setIsPaymentProcessing}
+                     onPaymentRedirect={clearCart}
+                  />
+                  <AcoesCarrinhoContinue />
+               </div>
             </div>
 
-            {/* Seção do Resumo e Tabela de Itens (order-1 em mobile, order-2 em pc) */}
             <div className="w-full lg:w-2/5 mt-8 lg:mt-0 order-1 lg:order-2">
                <h2 className="text-xl font-semibold mb-4 text-center lg:text-start">
                   Resumo
@@ -521,12 +509,8 @@ export default function Carrinho() {
                   <p className="text-gray-600 text-center">
                      Carregando carrinho...
                   </p>
-               ) : cartItems.length === 0 ? (
-                  <p className="text-gray-600 text-center">
-                     O carrinho está vazio.
-                  </p>
                ) : (
-                  <div className="max-h-[40rem] overflow-y-auto border rounded-sm">
+                  <div className="max-h-[41rem] overflow-y-auto border rounded-sm">
                      <TabelaItensCarrinho
                         itens={cartItems}
                         atualizarQuantidade={handleUpdateQuantity}
@@ -539,18 +523,77 @@ export default function Carrinho() {
             </div>
          </div>
 
-         {/* Ações do carrinho - movidas para o final */}
-         <div className="my-8 w-full flex justify-center gap-6 items-center flex-wrap">
-            <CheckoutMP
-               cartItems={cartItems}
-               selectedEndereco={selectedEndereco}
-               selectedFreteOption={selectedFreteOptionInfo}
-               isPaymentProcessing={isPaymentProcessing}
-               setIsPaymentProcessing={setIsPaymentProcessing}
-               onPaymentRedirect={clearCart}
-            />
-            <AcoesCarrinhoContinue />
-         </div>
+         {/* -------- INÍCIO DA ALTERAÇÃO -------- */}
+         {/* O modal de endereço foi movido para fora da condicional de endereços. */}
+         {/* Ele sempre será renderizado no DOM, mas sua visibilidade será controlada pelo estado `isModalOpen`. */}
+         <Dialog
+            open={isModalOpen}
+            onOpenChange={(open) => {
+               setIsModalOpen(open);
+               if (!open) {
+                  setIsAddingNewAddress(false);
+               }
+            }}
+         >
+            <DialogContent>
+               <DialogHeader>
+                  <DialogTitle>
+                     {isAddingNewAddress
+                        ? "Adicionar Novo Endereço"
+                        : "Selecione um Endereço"}
+                  </DialogTitle>
+                  <DialogDescription>
+                     {isAddingNewAddress
+                        ? "Preencha os campos abaixo para adicionar um novo endereço."
+                        : "Escolha um dos endereços cadastrados para a entrega."}
+                  </DialogDescription>
+               </DialogHeader>
+
+               {isAddingNewAddress ? (
+                  <AddressForm
+                     onAddressAdded={() => {
+                        fetchEnderecos();
+                        setIsAddingNewAddress(false);
+                     }}
+                     onClose={() => setIsAddingNewAddress(false)}
+                     userId={user?.uid}
+                     enderecoParaEditar={null}
+                  />
+               ) : (
+                  <>
+                     <div className="flex flex-col gap-4 max-h-[300px] overflow-y-auto">
+                        {enderecos.map((endereco) => (
+                           <div
+                              key={endereco.id}
+                              onClick={() => handleEnderecoSelection(endereco)}
+                              className={`p-4 border rounded-lg cursor-pointer transition-colors duration-200 ${
+                                 selectedEnderecoId === endereco.id
+                                    ? "border-amber-500 bg-amber-50 shadow-md"
+                                    : "border-gray-300 hover:bg-gray-50"
+                              }`}
+                           >
+                              <p className="font-semibold">{endereco.nome}</p>
+                              <p>
+                                 {endereco.rua}, {endereco.numero} -{" "}
+                                 {endereco.bairro}
+                              </p>
+                              <p>
+                                 {endereco.cidade}, {endereco.estado},{" "}
+                                 {endereco.cep}
+                              </p>
+                           </div>
+                        ))}
+                     </div>
+                     <div className="mt-4 flex justify-end">
+                        <Button onClick={() => setIsAddingNewAddress(true)}>
+                           Adicionar novo endereço
+                        </Button>
+                     </div>
+                  </>
+               )}
+            </DialogContent>
+         </Dialog>
+         {/* -------- FIM DA ALTERAÇÃO -------- */}
       </div>
    );
 }

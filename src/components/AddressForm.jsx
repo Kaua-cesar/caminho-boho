@@ -1,8 +1,8 @@
 // components/AddressForm.jsx
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
-// Agora, o componente aceita uma prop opcional `enderecoParaEditar`
 export function AddressForm({
    onAddressAdded,
    onClose,
@@ -17,17 +17,14 @@ export function AddressForm({
       cidade: "",
       uf: "",
       cep: "",
-      ...enderecoParaEditar, // Usa o operador spread para preencher os campos se a prop existir
+      ...enderecoParaEditar,
    });
    const [error, setError] = useState(null);
 
-   // Use useEffect para atualizar o estado interno se a prop `enderecoParaEditar` mudar.
-   // Isso é importante para que o formulário seja redefinido corretamente ao iniciar a edição de um novo endereço.
    useEffect(() => {
       if (enderecoParaEditar) {
          setNovoEndereco(enderecoParaEditar);
       } else {
-         // Limpa o formulário quando não há endereço para editar (modo de adição)
          setNovoEndereco({
             nomeCompleto: "",
             sobrenome: "",
@@ -48,9 +45,16 @@ export function AddressForm({
          name === "nomeCompleto" ||
          name === "sobrenome" ||
          name === "cidade" ||
-         name === "uf"
+         name === "nome"
       ) {
          formattedValue = value.replace(/[^a-zA-Z\u00C0-\u00FF\s]/g, "");
+      }
+
+      if (name === "uf") {
+         formattedValue = value.replace(/[^a-zA-Z]/g, "").toUpperCase();
+         if (formattedValue.length > 2) {
+            formattedValue = formattedValue.slice(0, 2);
+         }
       }
 
       if (name === "cep") {
@@ -74,7 +78,6 @@ export function AddressForm({
    const salvarEndereco = async () => {
       if (
          !novoEndereco.nomeCompleto ||
-         !novoEndereco.sobrenome ||
          !novoEndereco.nome ||
          !novoEndereco.rua ||
          !novoEndereco.cidade ||
@@ -82,6 +85,20 @@ export function AddressForm({
          !novoEndereco.cep
       ) {
          setError("Por favor, preencha todos os campos.");
+         toast.error("Por favor, preencha todos os campos.");
+         return;
+      }
+
+      const cleanedCep = novoEndereco.cep.replace(/\D/g, "");
+      if (cleanedCep.length !== 8) {
+         setError("Por favor, digite um CEP válido com 8 dígitos.");
+         toast.error("Por favor, digite um CEP válido com 8 dígitos.");
+         return;
+      }
+
+      if (novoEndereco.uf.length !== 2) {
+         setError("Por favor, digite um UF válido com 2 letras.");
+         toast.error("Por favor, digite um UF válido com 2 letras.");
          return;
       }
 
@@ -107,14 +124,21 @@ export function AddressForm({
 
          onAddressAdded();
          onClose();
+         toast.success(
+            `Endereço ${
+               enderecoParaEditar ? "alterado" : "adicionado"
+            } com sucesso!`
+         );
       } catch (err) {
          setError(err.message);
+         toast.error(err.message);
       }
    };
 
    return (
       <div className="flex flex-col gap-2">
-         <div className="flex gap-2">
+         {/* Campos de Nome e Sobrenome - Alterado para flex-col em telas pequenas */}
+         <div className="flex flex-col sm:flex-row gap-2">
             <input
                type="text"
                name="nomeCompleto"
@@ -134,6 +158,7 @@ export function AddressForm({
                required
             />
          </div>
+         {/* ...outros campos que já estão em colunas, então não precisam de alteração... */}
          <input
             type="text"
             name="rua"
@@ -141,7 +166,7 @@ export function AddressForm({
             onChange={handleChange}
             placeholder="Rua, número e bairro"
             className="border rounded px-2 py-1"
-         />{" "}
+         />
          <input
             type="text"
             name="nome"
@@ -150,7 +175,9 @@ export function AddressForm({
             placeholder="Nome do endereço (Ex: Casa, Trabalho)"
             className="border rounded px-2 py-1"
          />
-         <div className="flex gap-2">
+
+         {/* Campos de Cidade, UF e CEP - Alterado para flex-col em telas pequenas */}
+         <div className="flex flex-col sm:flex-row gap-2">
             <input
                type="text"
                name="cidade"
@@ -165,7 +192,7 @@ export function AddressForm({
                value={novoEndereco.uf}
                onChange={handleChange}
                placeholder="UF"
-               className="border rounded px-2 py-1 w-16 uppercase"
+               className="border rounded px-2 py-1 sm:w-16 uppercase"
                maxLength={2}
             />
             <input
@@ -174,11 +201,11 @@ export function AddressForm({
                value={novoEndereco.cep}
                onChange={handleChange}
                placeholder="CEP"
-               className="border rounded px-2 py-1 w-28"
+               className="border rounded px-2 py-1 sm:w-28"
                maxLength={9}
             />
          </div>
-         {error && <p className="text-red-600">{error}</p>}
+         {error && <p className="text-red-600 text-sm">{error}</p>}
          <Button
             onClick={salvarEndereco}
             className="bg-amber-600 text-white hover:bg-amber-700 mt-2 cursor-pointer"

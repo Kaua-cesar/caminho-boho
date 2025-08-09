@@ -4,14 +4,25 @@ import { BiSolidCategory } from "react-icons/bi";
 import { FaBagShopping } from "react-icons/fa6";
 import { HiSparkles } from "react-icons/hi2";
 import Logo from "../../assets/logo.png";
-import { FaHome } from "react-icons/fa";
+import {
+   FaHome,
+   FaSignOutAlt,
+   FaTruck,
+   FaMapMarkerAlt,
+   FaLock,
+   FaCreditCard,
+   FaHeart,
+} from "react-icons/fa";
 import { MdSupportAgent } from "react-icons/md";
+import { MdOutlineMail } from "react-icons/md"; // Importado o ícone de e-mail para Contato
 import React, { useState } from "react";
 import { FiUser, FiMenu } from "react-icons/fi";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { useFavorites } from "../../context/FavoritesContext";
 import { useCart } from "../../context/CartContext";
+import { Separator } from "@/components/ui/separator";
+
 import {
    DropdownMenu,
    DropdownMenuContent,
@@ -38,16 +49,18 @@ export function Nav() {
    const { user, logout } = useAuth();
    const { totalFavorites } = useFavorites();
    const { totalItems: totalCartItems } = useCart();
-
    const navigate = useNavigate();
    const location = useLocation();
-
    const naRotaLoginOuRegister = estaNaRota(
       ["/login", "/register"],
       location.pathname
    );
-
    const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+   const handleLogout = () => {
+      logout();
+      navigate("/");
+   };
 
    return (
       <>
@@ -63,7 +76,6 @@ export function Nav() {
                   </Link>
                </div>
 
-               {/* Links de Navegação Principal (visíveis apenas em telas maiores) */}
                <ul className="hidden md:flex gap-4 md:gap-8 items-center text-base md:text-lg">
                   <Link to="/" className="cursor-pointer hover:text-amber-500">
                      Inicio
@@ -94,9 +106,7 @@ export function Nav() {
                   </Link>
                </ul>
 
-               {/* Ícone de Menu Hambúrguer (visível apenas em telas pequenas) */}
                <div className="md:hidden flex items-center gap-4">
-                  {/* Ícones de Usuário, Favoritos e Carrinho para mobile */}
                   <DropdownMenu>
                      <DropdownMenuTrigger>
                         <FiUser className="cursor-pointer text-2xl" />
@@ -113,13 +123,7 @@ export function Nav() {
                               >
                                  Minha conta
                               </DropdownMenuItem>
-
-                              <DropdownMenuItem
-                                 onClick={() => {
-                                    logout();
-                                    navigate("/");
-                                 }}
-                              >
+                              <DropdownMenuItem onClick={handleLogout}>
                                  Sair
                               </DropdownMenuItem>
                            </>
@@ -159,6 +163,7 @@ export function Nav() {
                         </span>
                      )}
                   </Link>
+
                   <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
                      <SheetTrigger asChild>
                         <button aria-label="Abrir menu de navegação">
@@ -179,7 +184,7 @@ export function Nav() {
                                  className="flex flex-row items-center font-medium ml-6 gap-3 text-xl"
                               >
                                  <FaHome />
-                                 <span>Inicio</span> {/* ✨ Corrigido aqui */}
+                                 <span>Inicio</span>
                               </Link>
                            </SheetClose>
                            <SheetClose asChild>
@@ -188,7 +193,7 @@ export function Nav() {
                                  className="flex flex-row items-center font-medium ml-6 gap-3 text-xl"
                               >
                                  <FaBagShopping />
-                                 <span>Produtos</span> {/* ✨ Corrigido aqui */}
+                                 <span>Produtos</span>
                               </Link>
                            </SheetClose>
                            <SheetClose asChild>
@@ -197,8 +202,7 @@ export function Nav() {
                                  className="flex flex-row items-center font-medium ml-6 gap-3 text-xl"
                               >
                                  <BiSolidCategory />
-                                 <span>Categorias</span>{" "}
-                                 {/* ✨ Corrigido aqui */}
+                                 <span>Categorias</span>
                               </Link>
                            </SheetClose>
                            <SheetClose asChild>
@@ -207,18 +211,83 @@ export function Nav() {
                                  className="flex flex-row items-center font-medium ml-6 gap-3 text-xl"
                               >
                                  <HiSparkles />
-                                 <span>Sobre</span> {/* ✨ Corrigido aqui */}
+                                 <span>Sobre</span>
                               </Link>
                            </SheetClose>
+                           {/* ✨✨✨ CORRIGIDO AQUI: ADICIONADO CONTATO E SUPORTE SEPARADOS ✨✨✨ */}
                            <SheetClose asChild>
                               <Link
                                  to="/contato"
                                  className="flex flex-row items-center font-medium ml-6 gap-3 text-xl"
                               >
-                                 <MdSupportAgent /> <span>Contato</span>{" "}
-                                 {/* ✨ Corrigido aqui */}
+                                 <MdOutlineMail />
+                                 <span>Contato</span>
                               </Link>
                            </SheetClose>
+
+                           {user && (
+                              <>
+                                 <Separator className="my-4" />
+                                 <div className="font-bold text-gray-700 ml-6">
+                                    Minha Conta
+                                 </div>
+                                 <SheetClose asChild>
+                                    <Link
+                                       to="/minha-conta?tab=pedidos"
+                                       className="flex flex-row items-center font-medium ml-6 gap-3 text-xl"
+                                    >
+                                       <FaTruck />
+                                       <span>Meus pedidos</span>
+                                    </Link>
+                                 </SheetClose>
+                                 <SheetClose asChild>
+                                    <Link
+                                       to="/minha-conta?tab=enderecos"
+                                       className="flex flex-row items-center font-medium ml-6 gap-3 text-xl"
+                                    >
+                                       <FaMapMarkerAlt />
+                                       <span>Meus endereços</span>
+                                    </Link>
+                                 </SheetClose>
+                                 <SheetClose asChild>
+                                    <Link
+                                       to="/minha-conta?tab=seguranca"
+                                       className="flex flex-row items-center font-medium ml-6 gap-3 text-xl"
+                                    >
+                                       <FaLock />
+                                       <span>Login e segurança</span>
+                                    </Link>
+                                 </SheetClose>
+                                 <SheetClose asChild>
+                                    <Link
+                                       to="/minha-conta?tab=pagamentos"
+                                       className="flex flex-row items-center font-medium ml-6 gap-3 text-xl"
+                                    >
+                                       <FaCreditCard />
+                                       <span>Pagamentos</span>
+                                    </Link>
+                                 </SheetClose>
+                                 <Separator className="my-4" />{" "}
+                                 <SheetClose asChild>
+                                    <Link
+                                       to="/suporte"
+                                       className="flex flex-row items-center font-medium ml-6 gap-3 text-xl"
+                                    >
+                                       <MdSupportAgent />
+                                       <span>Suporte</span>
+                                    </Link>
+                                 </SheetClose>
+                                 <SheetClose asChild>
+                                    <button
+                                       onClick={handleLogout}
+                                       className="flex flex-row items-center font-medium ml-6 gap-3 text-xl w-full text-left"
+                                    >
+                                       <FaSignOutAlt />
+                                       <span>Sair</span>
+                                    </button>
+                                 </SheetClose>
+                              </>
+                           )}
                         </nav>
                      </SheetContent>
                   </Sheet>
@@ -241,13 +310,7 @@ export function Nav() {
                               >
                                  Minha conta
                               </DropdownMenuItem>
-
-                              <DropdownMenuItem
-                                 onClick={() => {
-                                    logout();
-                                    navigate("/");
-                                 }}
-                              >
+                              <DropdownMenuItem onClick={handleLogout}>
                                  Sair
                               </DropdownMenuItem>
                            </>
@@ -269,7 +332,6 @@ export function Nav() {
                         )}
                      </DropdownMenuContent>
                   </DropdownMenu>
-
                   <Link to="/favoritos" className="relative">
                      <IoHeartOutline className="cursor-pointer" />
                      {totalFavorites > 0 && (
@@ -278,7 +340,6 @@ export function Nav() {
                         </span>
                      )}
                   </Link>
-
                   <Link to="/carrinho" className="relative">
                      <RiShoppingCartFill className="cursor-pointer" />
                      {totalCartItems > 0 && (
