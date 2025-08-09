@@ -13,7 +13,6 @@ import {
    DialogDescription,
 } from "../components/ui/dialog";
 import { Button } from "../components/ui/button";
-
 import { InfoCarrinho } from "../components/Carrinho/InfoCarrinho";
 import TabelaItensCarrinho from "../components/Carrinho/TabelaItensCarrinho";
 import CupomDesconto from "../components/Carrinho/CupomDesconto";
@@ -270,7 +269,6 @@ export default function Carrinho() {
             value: 0,
             prazo: "Imediato",
             carrier: "Loja Física",
-            category: "retirada",
             address: "Rua Prates, 194, São Paulo, São Paulo, 12345-678, Brasil",
          },
       ]);
@@ -310,12 +308,14 @@ export default function Carrinho() {
       : selectedEndereco;
 
    return (
-      <div className="mt-8  flex flex-col mx-28">
-         <h1 className="text-4xl font-bold mb-6 text-start   w-full">
+      <div className="mx-auto my-8 max-w-8xl px-4 sm:px-6 lg:px-8 ">
+         <h1 className="text-4xl font-bold mb-6 text-center lg:text-start w-full">
             Confirmar Pedido
          </h1>
-         <div className="flex flex-row space-x-12 ">
-            <div className="w-3/5">
+
+         <div className="flex flex-col lg:flex-row gap-8">
+            {/* Seção das opções de entrega e frete (order-2 em mobile, order-1 em pc) */}
+            <div className="w-full lg:w-3/5 order-2 lg:order-1 ">
                {enderecosLoading ? (
                   <p className="text-center">Carregando endereços...</p>
                ) : enderecos.length === 0 ? (
@@ -333,24 +333,22 @@ export default function Carrinho() {
                   </div>
                ) : (
                   <>
-                     <h2 className="text-xl font-semibold  mb-4 ">
+                     <h2 className="text-xl font-semibold mb-4 text-center lg:text-start ">
                         Selecione o método de entrega
                      </h2>
                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
+                        {/* Opção de Entrega em Endereço */}
                         <div
                            onClick={
-                              isRetiradaSelected
+                              !isRetiradaSelected
                                  ? handleSelectDefaultDelivery
                                  : undefined
                            }
-                           className={`
-                                            p-4 border rounded-lg cursor-pointer transition-colors duration-200
-                                            ${
-                                               !isRetiradaSelected
-                                                  ? "border-amber-500 bg-amber-50 shadow-md"
-                                                  : "border-gray-300 hover:bg-gray-50"
-                                            }
-                                        `}
+                           className={`p-4 border rounded-lg cursor-pointer transition-colors duration-200 ${
+                              !isRetiradaSelected
+                                 ? "border-amber-500 bg-amber-50 shadow-md"
+                                 : "border-gray-300 hover:bg-gray-50"
+                           }`}
                         >
                            <div className="flex justify-between items-center">
                               <div className="flex items-center space-x-2">
@@ -382,32 +380,27 @@ export default function Carrinho() {
                                  </p>
                               </div>
                            )}
-                           <Separator className={"my-2"} />
-
+                           <Separator className="my-2" />
                            <Button
                               onClick={(e) => {
                                  e.stopPropagation();
                                  setIsModalOpen(true);
                               }}
-                              className={
-                                 " text-black hover:underline cursor-pointer bg-transparent hover:bg-transparent shadow-none border-none  "
-                              }
+                              className="text-black hover:underline cursor-pointer bg-transparent hover:bg-transparent shadow-none border-none"
                               size="sm"
                            >
                               Mudar
                            </Button>
                         </div>
 
+                        {/* Opção de Retirada na Loja */}
                         <div
                            onClick={handleRetiradaSelection}
-                           className={`
-                                            p-4 border rounded-lg cursor-pointer transition-colors duration-200 flex items-start flex-col justify-center
-                                            ${
-                                               isRetiradaSelected
-                                                  ? "border-amber-500 bg-amber-50 shadow-md"
-                                                  : "border-gray-300 hover:bg-gray-50"
-                                            }
-                                        `}
+                           className={`p-4 border rounded-lg cursor-pointer transition-colors duration-200 flex items-start flex-col justify-center ${
+                              isRetiradaSelected
+                                 ? "border-amber-500 bg-amber-50 shadow-md"
+                                 : "border-gray-300 hover:bg-gray-50"
+                           }`}
                         >
                            <div className="flex items-center space-x-2">
                               <span
@@ -423,13 +416,13 @@ export default function Carrinho() {
                                  Retirar na loja
                               </p>
                            </div>
-
                            <div className="mt-2 text-sm text-gray-700">
                               <p>{retiradaNaLojaInfo.address}</p>
                            </div>
                         </div>
                      </div>
 
+                     {/* Diálogo do modal de endereços */}
                      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
                         <DialogContent>
                            <DialogHeader>
@@ -439,22 +432,18 @@ export default function Carrinho() {
                                  entrega.
                               </DialogDescription>
                            </DialogHeader>
-                           <div className="flex flex-col gap-4">
+                           <div className="flex flex-col gap-4 max-h-[300px] overflow-y-auto">
                               {enderecos.map((endereco) => (
                                  <div
                                     key={endereco.id}
                                     onClick={() =>
                                        handleEnderecoSelection(endereco)
                                     }
-                                    className={`
-                                                        p-4 border rounded-lg cursor-pointer transition-colors duration-200
-                                                        ${
-                                                           selectedEnderecoId ===
-                                                           endereco.id
-                                                              ? "border-amber-500 bg-amber-50 shadow-md"
-                                                              : "border-gray-300 hover:bg-gray-50"
-                                                        }
-                                                    `}
+                                    className={`p-4 border rounded-lg cursor-pointer transition-colors duration-200 ${
+                                       selectedEnderecoId === endereco.id
+                                          ? "border-amber-500 bg-amber-50 shadow-md"
+                                          : "border-gray-300 hover:bg-gray-50"
+                                    }`}
                                  >
                                     <p className="font-semibold">
                                        {endereco.nome}
@@ -473,6 +462,7 @@ export default function Carrinho() {
                         </DialogContent>
                      </Dialog>
 
+                     {/* Resultado do frete */}
                      {selectedEnderecoId && (
                         <>
                            {!isRetiradaSelected && (
@@ -493,47 +483,49 @@ export default function Carrinho() {
                                  />
                               </div>
                            )}
-                           {cartItems.length > 0 && (
-                              <>
-                                 <div className="flex items-center my-6 justify-between md:mb-14 flex-col md:flex-row">
-                                    <CupomDesconto
-                                       cupom={cupom}
-                                       setCupom={setCupom}
-                                       aplicarCupom={aplicarCupom}
-                                    />
-                                    <ResumoCarrinho totalFinal={totalFinal} />
-                                 </div>
 
-                                 <InfoCarrinho />
-                              </>
-                           )}
-                           <div className="my-8 w-full flex justify-center gap-6 items-center flex-wrap">
-                              <CheckoutMP
-                                 cartItems={cartItems}
-                                 selectedEndereco={selectedEndereco}
-                                 selectedFreteOption={selectedFreteOptionInfo}
-                                 isPaymentProcessing={isPaymentProcessing}
-                                 setIsPaymentProcessing={setIsPaymentProcessing}
-                                 onPaymentRedirect={clearCart}
+                           {/* Componentes de desconto e resumo do carrinho para telas menores */}
+                           <div className="flex flex-col md:hidden items-center my-6 justify-between flex-wrap">
+                              <CupomDesconto
+                                 cupom={cupom}
+                                 setCupom={setCupom}
+                                 aplicarCupom={aplicarCupom}
                               />
-                              <AcoesCarrinhoContinue />
+                              <ResumoCarrinho totalFinal={totalFinal} />
+                           </div>
+
+                           {/* Componentes de desconto e resumo do carrinho para telas maiores */}
+                           <div className="hidden md:flex items-center my-6 justify-between md:mb-14 flex-col xl:flex-row ">
+                              <CupomDesconto
+                                 cupom={cupom}
+                                 setCupom={setCupom}
+                                 aplicarCupom={aplicarCupom}
+                              />
+                              <ResumoCarrinho totalFinal={totalFinal} />
+                           </div>
+                           <div className="flex lg:justify-start justify-center">
+                              <InfoCarrinho />
                            </div>
                         </>
                      )}
                   </>
                )}
             </div>
-            {cartLoading ? (
-               <p className="text-gray-600 text-center">
-                  Carregando carrinho...
-               </p>
-            ) : cartItems.length === 0 ? (
-               <p className="text-gray-600 text-center">
-                  O carrinho está vazio.
-               </p>
-            ) : (
-               <div className="">
-                  <h2 className="text-xl font-semibold mb-4 ">Resumo</h2>
+
+            {/* Seção do Resumo e Tabela de Itens (order-1 em mobile, order-2 em pc) */}
+            <div className="w-full lg:w-2/5 mt-8 lg:mt-0 order-1 lg:order-2">
+               <h2 className="text-xl font-semibold mb-4 text-center lg:text-start">
+                  Resumo
+               </h2>
+               {cartLoading ? (
+                  <p className="text-gray-600 text-center">
+                     Carregando carrinho...
+                  </p>
+               ) : cartItems.length === 0 ? (
+                  <p className="text-gray-600 text-center">
+                     O carrinho está vazio.
+                  </p>
+               ) : (
                   <div className="max-h-[40rem] overflow-y-auto border rounded-sm">
                      <TabelaItensCarrinho
                         itens={cartItems}
@@ -543,8 +535,21 @@ export default function Carrinho() {
                         }}
                      />
                   </div>
-               </div>
-            )}
+               )}
+            </div>
+         </div>
+
+         {/* Ações do carrinho - movidas para o final */}
+         <div className="my-8 w-full flex justify-center gap-6 items-center flex-wrap">
+            <CheckoutMP
+               cartItems={cartItems}
+               selectedEndereco={selectedEndereco}
+               selectedFreteOption={selectedFreteOptionInfo}
+               isPaymentProcessing={isPaymentProcessing}
+               setIsPaymentProcessing={setIsPaymentProcessing}
+               onPaymentRedirect={clearCart}
+            />
+            <AcoesCarrinhoContinue />
          </div>
       </div>
    );

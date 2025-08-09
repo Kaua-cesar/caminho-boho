@@ -284,7 +284,7 @@ export function Pedidos() {
                   key={pedido.id}
                   className="bg-white p-6 rounded-lg shadow-md"
                >
-                  <div className="flex justify-between items-center border-b pb-4 mb-4">
+                  <div className="flex justify-between items-center border-b pb-4 mb-4 gap-2 flex-col md:flex-row">
                      <div>
                         <p className="font-semibold text-gray-900">
                            Pedido #{pedido.id}
@@ -321,7 +321,7 @@ export function Pedidos() {
                         pedido.items.map((item, index) => (
                            <div
                               key={index}
-                              className="flex items-center space-x-4"
+                              className="flex items-center space-x-4 "
                            >
                               <img
                                  src={item.image}
@@ -329,11 +329,14 @@ export function Pedidos() {
                                  className="w-16 h-16 object-cover rounded-md"
                               />
                               <div className="flex-1">
-                                 <p className="font-medium text-gray-900">
+                                 <p className="font-medium text-gray-900 ">
                                     {item.title}
                                  </p>
-                                 <p className="text-sm text-gray-600">
-                                    Quantidade: {item.quantity}
+                                 <p className="text-sm text-gray-600 flex gap-1">
+                                    <span className="">Quantidade:</span>
+                                    <span className="font-semibold">
+                                       {item.quantity}
+                                    </span>
                                  </p>
                               </div>
                               <p className="font-semibold text-gray-900">
@@ -345,9 +348,9 @@ export function Pedidos() {
                   </div>
 
                   <Separator className="my-4" />
-                  <div className="flex justify-between items-center flex-wrap gap-2">
+                  <div className="flex justify-between items-center flex-wrap gap-2 flex-col sm:flex-row">
                      {pedido.shipping && pedido.shipping.option && (
-                        <div className="text-sm text-gray-700">
+                        <div className="text-sm text-gray-700 flex flex-col">
                            <span className="font-semibold">
                               Método de Envio:
                            </span>{" "}
@@ -366,7 +369,7 @@ export function Pedidos() {
                   {/* ⭐ BOTÃO "PAGAR AGORA" CONDICIONAL AJUSTADO */}
                   {(pedido.status === "pendente" ||
                      pedido.status === "pending") && (
-                     <div className="mt-4 w-full flex justify-end">
+                     <div className="mt-4 w-full flex sm:justify-end justify-center">
                         <button
                            onClick={() => handleRePagamento(pedido.id)}
                            className="w-auto p-2 bg-amber-600 text-white font-semibold rounded-lg cursor-pointer hover:bg-amber-700 transition duration-300"
@@ -541,91 +544,75 @@ export default function MinhaConta() {
    }
 
    return (
-      <div className="w-full flex p-6 bg-white h-210 ">
-                  {/* Menu lateral */}         
-         <div className="w-1/5 pr-5 flex flex-col">
-                        <h1 className="text-2xl font-bold mb-4">Minha Conta</h1>
-                       {" "}
+      // Div principal: Ocupa a altura da tela menos o cabeçalho (se houver).
+      // O flex-col é removido daqui, pois o layout será horizontal.
+      <div className="w-full flex p-6 bg-white h-[calc(100vh-6rem)]">
+         {/* Menu lateral: Sem rolagem, altura fixa. */}
+         <div className="w-1/5 pr-5 flex flex-col h-full overflow-y-hidden">
+            <h1 className="text-2xl font-bold mb-4">Minha Conta</h1>
             <p className="text-sm">
-                              {user?.displayName}, Email: {user?.email}         
-                {" "}
+               {user?.displayName}, Email: {user?.email}
             </p>
-                       {" "}
-            <div className="space-y-4 mt-8  flex flex-col">
-                              
-               <div className="flex flex-col space-y-2 ">
-                                   {" "}
+            <div className="space-y-4 mt-8 flex flex-col flex-grow overflow-y-auto">
+               <div className="flex flex-col space-y-2">
                   {opcoes.map((item, index) => (
                      <div
                         key={index}
                         onClick={() => setSelecionado(index)}
                         className={`flex items-center gap-3 cursor-pointer px-3 py-2 rounded transition select-none
-                           ${
-                           selecionado === index
-                              ? "bg-gray-100 font-semibold"
-                              : "hover:bg-gray-50 text-gray-800 font-medium"
-                        }`}
+                  ${
+                     selecionado === index
+                        ? "bg-gray-100 font-semibold"
+                        : "hover:bg-gray-50 text-gray-800 font-medium"
+                  }`}
                         role="button"
                         aria-pressed={selecionado === index}
                      >
-                                               {" "}
                         <span className="shadow bg-white rounded p-1 text-amber-600">
-                                                      {item.icon}               
-                                  {" "}
+                           {item.icon}
                         </span>
-                                                <span>{item.label}</span>       
-                                     
+                        <span>{item.label}</span>
                      </div>
                   ))}
-                                 
                </div>
-                              <Separator />               
+               <Separator />
                <div className="flex flex-col space-y-2">
-                                   {" "}
                   <button
                      type="button"
                      onClick={() => alert("Abrindo suporte...")}
                      className="flex items-center gap-2 text-start rounded transition px-3 py-2 cursor-pointer hover:bg-gray-100 font-medium"
                      aria-label="Suporte"
                   >
-                                          
                      <FaHeadset className="shadow bg-white rounded p-1 text-amber-600 text-2xl" />
-                                          <span>Suporte</span>                 {" "}
+                     <span>Suporte</span>
                   </button>
-                                   {" "}
                   <button
                      type="button"
                      onClick={logout}
                      className="flex items-center gap-2 text-start rounded transition px-3 py-2 cursor-pointer hover:bg-gray-100 font-medium"
                      aria-label="Sair"
                   >
-                                          
                      <FaSignOutAlt className="shadow bg-white rounded p-1 text-amber-600 text-2xl" />
-                                          <span>Sair</span>                 {" "}
+                     <span>Sair</span>
                   </button>
-                                 
                </div>
-                          {" "}
             </div>
-                     
          </div>
-                  {/* Conteúdo dinâmico com o cabeçalho fixo */}         
-         <div className=" pl-6 flex flex-col w-full">
-                       {" "}
-            {/* Título e informações do usuário como cabeçalho fixo */}         
-             {" "}
+
+         {/* Conteúdo principal: Ocupa o restante do espaço horizontal e tem rolagem isolada. */}
+         <div className="pl-6 flex flex-col w-4/5 h-full">
+            {/* Este é o cabeçalho do conteúdo, que permanece fixo */}
             <div className="pb-4">
                <h1 className="text-2xl font-bold mb-2">
                   {opcoes[selecionado].label}
                </h1>
             </div>
-                        {/* Conteúdo com rolagem */}
-            <div className="w-4/5 pl-6 flex flex-col flex-1 overflow-y-auto h-200">
+
+            {/* Este é o contêiner de rolagem. Ele usa flex-grow para ocupar o espaço restante na coluna. */}
+            <div className="w-full flex-grow overflow-y-auto">
                {renderConteudo()}
             </div>
-                     
          </div>
-              {" "}
       </div>
    );
 }
