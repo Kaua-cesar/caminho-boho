@@ -7,7 +7,7 @@ export const produtos = [
    {
       id: "prod1",
       nome: "Vestido Costa Nua Longo",
-      precoOriginal: 0.99,
+      precoOriginal: 0.09,
       categoria: "costanua",
       cores: [
          { nome: "Verde", classe: "bg-green-500" },

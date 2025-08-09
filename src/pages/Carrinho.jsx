@@ -14,77 +14,17 @@ import {
    AcoesCarrinhoFinish,
 } from "../components/Carrinho/AcoesCarrinho";
 import FreteResultado from "../components/Carrinho/FreteResultado";
-
-// Componente para selecionar o endereço
-function FreteEndereco({
-   enderecos,
-   selectedEnderecoId,
-   onSelectEndereco,
-   isLoading,
-   error,
-}) {
-   if (isLoading) {
-      return <p className="text-gray-600">Carregando endereços...</p>;
-   }
-   if (error) {
-      return (
-         <p className="text-red-600">Erro ao carregar endereços: {error}</p>
-      );
-   }
-   if (!enderecos || enderecos.length === 0) {
-      return (
-         <p className="text-gray-600">
-                        Você não tem endereços salvos. Adicione em{" "}
-            <a href="/minha-conta" className="text-blue-600 hover:underline">
-                              Minha Conta        
-            </a>
-            .          
-         </p>
-      );
-   }
-
-   return (
-      <div className="flex flex-col gap-2 w-full max-w-sm">
-                  
-         <p className="font-bold">
-                        Selecione o endereço para o cálculo do frete:          
-         </p>
-                  
-         {enderecos.map((endereco) => (
-            <label
-               key={endereco.id}
-               className={`flex items-center gap-2 p-3 border rounded-md cursor-pointer ${
-                  selectedEnderecoId === endereco.id
-                     ? "border-amber-600 bg-amber-50"
-                     : "border-gray-300"
-               }`}
-            >
-                              
-               <input
-                  type="radio"
-                  name="endereco"
-                  value={endereco.id}
-                  checked={selectedEnderecoId === endereco.id}
-                  onChange={() => onSelectEndereco(endereco)}
-                  className="form-radio text-amber-600"
-               />
-                              
-               <span>
-                                    {endereco.nome} ({endereco.cep})            
-                     
-               </span>
-                          {" "}
-            </label>
-         ))}
-              {" "}
-      </div>
-   );
-}
+// A linha abaixo foi removida:
 
 export default function Carrinho() {
    const { user } = useAuth();
-   const { cartItems, cartLoading, removeItemFromCart, updateItemQuantity } =
-      useCart();
+   const {
+      cartItems,
+      cartLoading,
+      removeItemFromCart,
+      updateItemQuantity,
+      clearCart, // <-- A função de limpar o carrinho já está aqui
+   } = useCart();
 
    const [enderecos, setEnderecos] = useState([]);
    const [enderecosLoading, setEnderecosLoading] = useState(true);
@@ -103,7 +43,7 @@ export default function Carrinho() {
    const [freteIsLoading, setFreteIsLoading] = useState(false);
    const [freteError, setFreteError] = useState("");
    const [availableFreteOptions, setAvailableFreteOptions] = useState([]);
-   const [selectedFreteOptionId, setSelectedFreteOptionId] = useState(null); // ⭐ NOVO ESTADO: Para controlar o botão do Mercado Pago ⭐
+   const [selectedFreteOptionId, setSelectedFreteOptionId] = useState(null);
 
    const [isPaymentProcessing, setIsPaymentProcessing] = useState(false);
 
@@ -116,9 +56,9 @@ export default function Carrinho() {
          );
          if (!response.ok) throw new Error("Erro ao carregar endereços.");
          const data = await response.json();
-         setEnderecos(data); // ⭐ NOVO: Define o primeiro endereço como o selecionado por padrão ⭐
+         setEnderecos(data);
          if (data && data.length > 0) {
-            setSelectedEnderecoId(data[0].id); // ⭐ Bônus: Chama o cálculo de frete para o CEP deste endereço ⭐
+            setSelectedEnderecoId(data[0].id);
             calculateFreteOptions(data[0].cep);
          } else {
             setSelectedEnderecoId(null);
@@ -284,7 +224,6 @@ export default function Carrinho() {
             );
             setSelectedFreteOptionId(cheapestOption.id);
          }
-         toast.success("Opções de frete carregadas!");
       } catch (err) {
          console.error("Erro ao buscar fretes:", err);
          const message =
@@ -321,7 +260,7 @@ export default function Carrinho() {
       <div className="px-6 mx-auto md:mt-8 mt-8 max-w-6xl">
                   
          <h1 className="text-2xl font-bold mb-6 text-center">Seu Carrinho</h1> 
-                
+                  
          {cartLoading ? (
             <p className="text-gray-600 text-center">Carregando carrinho...</p>
          ) : cartItems.length === 0 ? (
@@ -347,19 +286,13 @@ export default function Carrinho() {
                      aplicarCupom={aplicarCupom}
                   />
                                     <ResumoCarrinho totalFinal={totalFinal} /> 
-                               
+                                 
                </div>
-                              <InfoCarrinho />               
+                              <InfoCarrinho />                               
                <div className="flex flex-col md:flex-row md:items-start justify-start md:justify-between md:mt-0 mt-8 gap-8">
                                    {" "}
-                  <FreteEndereco
-                     enderecos={enderecos}
-                     selectedEnderecoId={selectedEnderecoId}
-                     onSelectEndereco={handleEnderecoSelection}
-                     isLoading={enderecosLoading}
-                     error={enderecosError}
-                  />
-                                 
+                  {/* A chamada para o FreteEndereco foi removida daqui */}     
+                           
                </div>
                               
                <div className="w-full md:w-auto flex flex-col items-center">
@@ -383,7 +316,7 @@ export default function Carrinho() {
                                    {" "}
                   {selectedFreteOptionId ? (
                      <div className="my-8 w-full flex justify-center gap-6 items-center">
-                        {/* ⭐ NOVO: Passe as props necessárias para o CheckoutMP ⭐ */}
+                                               {" "}
                         <CheckoutMP
                            cartItems={cartItems}
                            selectedEndereco={enderecos.find(
@@ -392,16 +325,19 @@ export default function Carrinho() {
                            selectedFreteOption={selectedFreteOptionInfo}
                            isPaymentProcessing={isPaymentProcessing}
                            setIsPaymentProcessing={setIsPaymentProcessing}
+                           onPaymentRedirect={clearCart} // <-- A nova prop adicionada aqui!
                         />
+                                               {" "}
                         <div className="flex items-center justify-center gap-4 w-auto">
-                           <AcoesCarrinhoContinue />
+                                                      <AcoesCarrinhoContinue /> 
+                                                  {" "}
                         </div>
-                                       
+                                             
                      </div>
                   ) : (
                      <div className="flex flex-col items-center justify-center gap-4 w-full my-8">
-                                                 <AcoesCarrinhoContinue />     
-                                       
+                                                <AcoesCarrinhoContinue />       
+                                             
                      </div>
                   )}
                                  

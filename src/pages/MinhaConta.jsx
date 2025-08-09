@@ -28,6 +28,7 @@ import {
 import { AddressForm } from "@/components/AddressForm"; // Importe o novo componente
 import moment from "moment";
 import "moment/locale/pt-br";
+
 import { toast } from "sonner"; // Adicionei o toast para mensagens de erro
 
 // Exemplo de dados mockados para Pedidos e Cartões, mantidos por enquanto
@@ -39,143 +40,6 @@ const pedidosMock = [
 const cartoesMock = [
    { id: 1, bandeira: "Visa", final: "1234", validade: "12/28" },
 ];
-
-export function Pedidos() {
-   const { user } = useAuth();
-   const [pedidos, setPedidos] = useState([]);
-   const [loading, setLoading] = useState(true);
-
-   useEffect(() => {
-      const fetchPedidos = async () => {
-         if (!user) {
-            setLoading(false);
-            return;
-         }
-
-         try {
-            const response = await fetch(
-               `${import.meta.env.VITE_API_URL}/api/pedidos?userId=${user.uid}`
-            );
-
-            if (!response.ok) {
-               throw new Error("Falha ao buscar pedidos.");
-            }
-
-            const data = await response.json();
-            setPedidos(data);
-         } catch (error) {
-            console.error("Erro ao buscar pedidos:", error);
-            toast.error("Não foi possível carregar o histórico de pedidos.");
-         } finally {
-            setLoading(false);
-         }
-      };
-
-      fetchPedidos();
-   }, [user]);
-
-   if (loading) {
-      return <div className="text-center mt-8">Carregando seus pedidos...</div>;
-   }
-
-   return (
-      <div className="container mx-auto p-4">
-         <h2 className="text-2xl font-bold mb-6 text-gray-800">Meus Pedidos</h2>
-
-         {pedidos.length === 0 ? (
-            <div className="bg-white p-6 rounded-lg shadow-md text-center">
-                              
-               <p className="text-gray-600">Você ainda não tem pedidos.</p>     
-                        
-               <Link
-                  to="/"
-                  className="text-blue-600 hover:underline mt-2 inline-block"
-               >
-                                    Voltar para a loja                
-               </Link>
-                          {" "}
-            </div>
-         ) : (
-            <div className="space-y-6">
-               {pedidos.map((pedido) => (
-                  <div
-                     key={pedido.id}
-                     className="bg-white p-6 rounded-lg shadow-md"
-                  >
-                     <div className="flex justify-between items-center border-b pb-4 mb-4">
-                        <div>
-                           <p className="font-semibold text-gray-900">
-                              Pedido #{pedido.id}
-                           </p>
-                           <p className="text-sm text-gray-500">
-                              Data do pedido:{" "}
-                              {moment(pedido.dataCriacao)
-                                 .locale("pt-br")
-                                 .format("LL")}
-                           </p>
-                        </div>
-                        <div className="text-right">
-                           <span
-                              className={`px-3 py-1 rounded-full text-xs font-bold ${
-                                 pedido.status === "aprovado"
-                                    ? "bg-green-100 text-green-800"
-                                    : pedido.status === "rejeitado"
-                                    ? "bg-red-100 text-red-800"
-                                    : "bg-yellow-100 text-yellow-800"
-                              }`}
-                           >
-                              {pedido.status
-                                 ? pedido.status.toUpperCase()
-                                 : "DESCONHECIDO"}
-                           </span>
-                        </div>
-                     </div>
-
-                     <div className="space-y-4">
-                        {pedido.items &&
-                           pedido.items.map((item, index) => (
-                              <div
-                                 key={index}
-                                 className="flex items-center space-x-4"
-                              >
-                                 <img
-                                    src={item.image}
-                                    alt={item.title}
-                                    className="w-16 h-16 object-cover rounded-md"
-                                 />
-                                 <div className="flex-1">
-                                    <p className="font-medium text-gray-900">
-                                       {item.title}
-                                    </p>
-                                    <p className="text-sm text-gray-600">
-                                       Quantidade: {item.quantity}
-                                    </p>
-                                 </div>
-                                 <p className="font-semibold text-gray-900">
-                                    R${" "}
-                                    {(item.unit_price * item.quantity).toFixed(
-                                       2
-                                    )}
-                                 </p>
-                              </div>
-                           ))}
-                     </div>
-
-                     <Separator className="my-4" />
-
-                     <div className="text-right">
-                        <p className="text-lg font-bold text-gray-900">
-                           Total: R${" "}
-                           {pedido.total ? pedido.total.toFixed(2) : "0.00"}
-                        </p>
-                     </div>
-                  </div>
-               ))}
-            </div>
-         )}
-      </div>
-   );
-}
 
 function Enderecos() {
    const { user } = useAuth();
@@ -326,6 +190,194 @@ function Enderecos() {
                </div>
             </DialogContent>
          </Dialog>
+      </div>
+   );
+}
+export function Pedidos() {
+   const { user } = useAuth();
+   const [pedidos, setPedidos] = useState([]);
+   const [loading, setLoading] = useState(true);
+
+   const handleRePagamento = async (pedidoId) => {
+      try {
+         const response = await fetch(
+            `${import.meta.env.VITE_API_URL}/api/pedidos/${pedidoId}/re-pagar`
+         );
+         const data = await response.json();
+
+         if (!response.ok) {
+            toast.error(data.error);
+            return;
+         }
+
+         if (data.preferenceId) {
+            const redirectUrl = `https://www.mercadopago.com.br/checkout/v1/redirect?preference-id=${data.preferenceId}`;
+            window.location.href = redirectUrl;
+         } else {
+            toast.error("Não foi possível obter os dados de pagamento.");
+         }
+      } catch (error) {
+         console.error("Erro ao re-pagar pedido:", error);
+         toast.error("Ocorreu um erro. Tente novamente.");
+      }
+   };
+
+   useEffect(() => {
+      const fetchPedidos = async () => {
+         if (!user) {
+            setPedidos([]);
+            setLoading(false);
+            return;
+         }
+
+         try {
+            const response = await fetch(
+               `${import.meta.env.VITE_API_URL}/api/pedidos?userId=${user.uid}`
+            );
+
+            if (!response.ok) {
+               throw new Error("Falha ao buscar pedidos.");
+            }
+
+            const data = await response.json();
+            setPedidos(data);
+         } catch (error) {
+            console.error("Erro ao buscar pedidos:", error);
+            toast.error("Não foi possível carregar o histórico de pedidos.");
+         } finally {
+            setLoading(false);
+         }
+      };
+
+      fetchPedidos();
+   }, [user]);
+
+   if (loading) {
+      return <div className="text-center mt-8">Carregando seus pedidos...</div>;
+   }
+
+   if (!loading && pedidos.length === 0) {
+      return (
+         <div className="flex  p-4">
+            <h2 className="text-2xl font-bold mb-6 text-gray-800">
+               Meus Pedidos
+            </h2>
+            <div className="bg-white p-6 rounded-lg shadow-md text-center">
+               <p className="text-gray-600">Você ainda não tem pedidos.</p>
+               <Link
+                  to="/"
+                  className="text-blue-600 hover:underline mt-2 inline-block"
+               >
+                  Voltar para a loja
+               </Link>
+            </div>
+         </div>
+      );
+   }
+
+   return (
+      <div className="container mx-auto p-4">
+         <h2 className="text-2xl font-bold mb-6 text-gray-800">Meus Pedidos</h2>
+         <div className="space-y-6">
+            {pedidos.map((pedido) => (
+               <div
+                  key={pedido.id}
+                  className="bg-white p-6 rounded-lg shadow-md"
+               >
+                  <div className="flex justify-between items-center border-b pb-4 mb-4">
+                     <div>
+                        <p className="font-semibold text-gray-900">
+                           Pedido #{pedido.id}
+                        </p>
+                        <p className="text-sm text-gray-500">
+                           Data do pedido:{" "}
+                           {moment(pedido.dataCriacao).format(
+                              "DD[/]MM [de] YYYY [às] HH:mm"
+                           )}
+                        </p>
+                     </div>
+                     <div className="text-right">
+                        <span
+                           className={`px-3 py-1 rounded-full text-xs font-bold ${
+                              pedido.status === "aprovado"
+                                 ? "bg-green-100 text-green-800"
+                                 : pedido.status === "rejeitado"
+                                 ? "bg-red-100 text-red-800"
+                                 : "bg-yellow-100 text-yellow-800"
+                           }`}
+                        >
+                           {pedido.status === "pending" ||
+                           pedido.status === "pendente"
+                              ? "PENDENTE"
+                              : pedido.status
+                              ? pedido.status.toUpperCase()
+                              : "DESCONHECIDO"}
+                        </span>
+                     </div>
+                  </div>
+
+                  <div className="space-y-4">
+                     {pedido.items &&
+                        pedido.items.map((item, index) => (
+                           <div
+                              key={index}
+                              className="flex items-center space-x-4"
+                           >
+                              <img
+                                 src={item.image}
+                                 alt={item.title}
+                                 className="w-16 h-16 object-cover rounded-md"
+                              />
+                              <div className="flex-1">
+                                 <p className="font-medium text-gray-900">
+                                    {item.title}
+                                 </p>
+                                 <p className="text-sm text-gray-600">
+                                    Quantidade: {item.quantity}
+                                 </p>
+                              </div>
+                              <p className="font-semibold text-gray-900">
+                                 R$
+                                 {(item.unit_price * item.quantity).toFixed(2)}
+                              </p>
+                           </div>
+                        ))}
+                  </div>
+
+                  <Separator className="my-4" />
+                  <div className="flex justify-between items-center flex-wrap gap-2">
+                     {pedido.shipping && pedido.shipping.option && (
+                        <div className="text-sm text-gray-700">
+                           <span className="font-semibold">
+                              Método de Envio:
+                           </span>{" "}
+                           {pedido.shipping.option.name} (
+                           {pedido.shipping.option.carrier})
+                        </div>
+                     )}
+                     <div className="text-right flex-1">
+                        <p className="text-lg font-bold text-gray-900">
+                           Total: R${" "}
+                           {pedido.total ? pedido.total.toFixed(2) : "0.00"}
+                        </p>
+                     </div>
+                  </div>
+
+                  {/* ⭐ BOTÃO "PAGAR AGORA" CONDICIONAL AJUSTADO */}
+                  {(pedido.status === "pendente" ||
+                     pedido.status === "pending") && (
+                     <div className="mt-4 w-full flex justify-end">
+                        <button
+                           onClick={() => handleRePagamento(pedido.id)}
+                           className="w-auto p-2 bg-amber-600 text-white font-semibold rounded-lg cursor-pointer hover:bg-amber-700 transition duration-300"
+                        >
+                           Pagar Agora
+                        </button>
+                     </div>
+                  )}
+               </div>
+            ))}
+         </div>
       </div>
    );
 }
@@ -489,62 +541,91 @@ export default function MinhaConta() {
    }
 
    return (
-      <div className="w-full flex flex-row flex-1 p-6 bg-white rounded shadow min-h-[calc(100vh-68px)]">
-         {/* Menu lateral */}
+      <div className="w-full flex p-6 bg-white h-210 ">
+                  {/* Menu lateral */}         
          <div className="w-1/5 pr-5 flex flex-col">
-            <h1 className="text-2xl font-bold mb-4">Minha Conta</h1>
+                        <h1 className="text-2xl font-bold mb-4">Minha Conta</h1>
+                       {" "}
             <p className="text-sm">
-               {user?.displayName}, Email: {user?.email}
+                              {user?.displayName}, Email: {user?.email}         
+                {" "}
             </p>
-            <div className="space-y-4 mt-8 flex-1 flex flex-col">
-               <div className="flex flex-col space-y-2 flex-1">
+                       {" "}
+            <div className="space-y-4 mt-8  flex flex-col">
+                              
+               <div className="flex flex-col space-y-2 ">
+                                   {" "}
                   {opcoes.map((item, index) => (
                      <div
                         key={index}
                         onClick={() => setSelecionado(index)}
                         className={`flex items-center gap-3 cursor-pointer px-3 py-2 rounded transition select-none
-                ${
-                   selecionado === index
-                      ? "bg-gray-100 font-semibold"
-                      : "hover:bg-gray-50 text-gray-800 font-medium"
-                }`}
+                           ${
+                           selecionado === index
+                              ? "bg-gray-100 font-semibold"
+                              : "hover:bg-gray-50 text-gray-800 font-medium"
+                        }`}
                         role="button"
                         aria-pressed={selecionado === index}
                      >
+                                               {" "}
                         <span className="shadow bg-white rounded p-1 text-amber-600">
-                           {item.icon}
+                                                      {item.icon}               
+                                  {" "}
                         </span>
-                        <span>{item.label}</span>
+                                                <span>{item.label}</span>       
+                                     
                      </div>
                   ))}
+                                 
                </div>
-               <Separator />
+                              <Separator />               
                <div className="flex flex-col space-y-2">
+                                   {" "}
                   <button
                      type="button"
                      onClick={() => alert("Abrindo suporte...")}
                      className="flex items-center gap-2 text-start rounded transition px-3 py-2 cursor-pointer hover:bg-gray-100 font-medium"
                      aria-label="Suporte"
                   >
+                                          
                      <FaHeadset className="shadow bg-white rounded p-1 text-amber-600 text-2xl" />
-                     <span>Suporte</span>
+                                          <span>Suporte</span>                 {" "}
                   </button>
+                                   {" "}
                   <button
                      type="button"
                      onClick={logout}
                      className="flex items-center gap-2 text-start rounded transition px-3 py-2 cursor-pointer hover:bg-gray-100 font-medium"
                      aria-label="Sair"
                   >
+                                          
                      <FaSignOutAlt className="shadow bg-white rounded p-1 text-amber-600 text-2xl" />
-                     <span>Sair</span>
+                                          <span>Sair</span>                 {" "}
                   </button>
+                                 
                </div>
+                          {" "}
             </div>
+                     
          </div>
-         {/* Conteúdo dinâmico */}
-         <div className="w-4/5 pl-6 flex flex-col flex-1 min-h-full">
-            {renderConteudo()}
+                  {/* Conteúdo dinâmico com o cabeçalho fixo */}         
+         <div className=" pl-6 flex flex-col w-full">
+                       {" "}
+            {/* Título e informações do usuário como cabeçalho fixo */}         
+             {" "}
+            <div className="pb-4">
+               <h1 className="text-2xl font-bold mb-2">
+                  {opcoes[selecionado].label}
+               </h1>
+            </div>
+                        {/* Conteúdo com rolagem */}
+            <div className="w-4/5 pl-6 flex flex-col flex-1 overflow-y-auto h-200">
+               {renderConteudo()}
+            </div>
+                     
          </div>
+              {" "}
       </div>
    );
 }

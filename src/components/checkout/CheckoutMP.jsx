@@ -1,9 +1,7 @@
 // src/components/checkout/CheckoutMP.jsx
-
 import React, { useState, useEffect } from "react";
-import { initMercadoPago, Wallet } from "@mercadopago/sdk-react";
+import { initMercadoPago } from "@mercadopago/sdk-react";
 import { useAuth } from "../../context/AuthContext";
-import { useCart } from "../../context/CartContext";
 import { toast } from "sonner";
 import { v4 as uuidv4 } from "uuid";
 
@@ -13,11 +11,14 @@ export function CheckoutMP({
    selectedFreteOption,
    isPaymentProcessing,
    setIsPaymentProcessing,
+   onPaymentRedirect,
 }) {
-   const [preferenceId, setPreferenceId] = useState(null);
    const { user } = useAuth();
-   const { clearCart } = useCart();
    const publicKey = import.meta.env.VITE_MERCADOPAGO_PUBLIC_KEY;
+   const backendUrl = import.meta.env.VITE_API_URL;
+   // ⭐ NOVO: A URL do seu webhook ngrok.
+   // Lembre-se de substituir esta URL a cada nova sessão do ngrok.
+   const ngrokWebhookUrl = "https://a4d945f7c508.ngrok-free.app/webhook";
 
    useEffect(() => {
       if (publicKey) {
@@ -33,6 +34,10 @@ export function CheckoutMP({
       }
       if (!selectedEndereco) {
          toast.error("Por favor, selecione um endereço de entrega.");
+         return;
+      }
+      if (!selectedFreteOption) {
+         toast.error("Por favor, selecione uma opção de frete.");
          return;
       }
 
@@ -56,21 +61,18 @@ export function CheckoutMP({
             },
             selectedEnderecoId: selectedEndereco.id,
             external_reference: orderId,
+            // ⭐ CORRIGIDO: Adiciona a URL do webhook do ngrok aqui
+            notification_url: ngrokWebhookUrl,
          };
 
-         const response = await fetch(
-            `${import.meta.env.VITE_API_URL}/create_preference`,
-            {
-               method: "POST",
-               headers: { "Content-Type": "application/json" },
-               body: JSON.stringify(requestBody),
-            }
-         );
+         const response = await fetch(`${backendUrl}/create_preference`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(requestBody),
+         });
 
          const result = await response.json();
 
-         // A MUDANÇA CRÍTICA ESTÁ AQUI:
-         // SÓ PROSSEGUIMOS SE A API RETORNAR SUCESSO E O ID DA PREFERÊNCIA
          if (response.ok && result.id) {
             console.log("✅ Pedido criado com sucesso! ID:", orderId);
             console.log(
@@ -78,48 +80,36 @@ export function CheckoutMP({
                result.id
             );
 
-            setPreferenceId(result.id);
-            clearCart();
+            if (onPaymentRedirect) {
+               onPaymentRedirect();
+            }
 
-            toast.success(
-               "Pedido criado com sucesso! Redirecionando para o pagamento."
-            );
+            window.location.href = `https://www.mercadopago.com.br/checkout/v1/redirect?preference-id=${result.id}`;
          } else {
             console.error("❌ Erro ao criar o pedido ou preferência:", result);
             toast.error(
                `Erro ao criar o pedido: ${result.error || "Tente novamente."}`
             );
+            setIsPaymentProcessing(false);
          }
       } catch (error) {
          console.error("❌ Erro de conexão com o servidor:", error);
          toast.error("Não foi possível conectar ao servidor de pagamento.");
-      } finally {
          setIsPaymentProcessing(false);
       }
    };
 
    return (
       <div>
-         {!preferenceId && (
-            <button
-               onClick={handleFinalizarCompra}
-               disabled={isPaymentProcessing || !selectedFreteOption}
-               className="w-full py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition duration-300 disabled:opacity-50 disabled:cursor-not-allowed p-3 cursor-pointer"
-            >
-               {isPaymentProcessing
-                  ? "Processando..."
-                  : "Finalizar Compra com Mercado Pago"}
-            </button>
-         )}
-
-         {preferenceId && (
-            <div className="p-4 bg-white rounded-lg shadow-md text-center">
-               <p className="text-gray-700 mb-4">
-                  Finalize sua compra no ambiente seguro do Mercado Pago:
-               </p>
-               <Wallet initialization={{ preferenceId }} />
-            </div>
-         )}
+         <button
+            onClick={handleFinalizarCompra}
+            disabled={isPaymentProcessing || !selectedFreteOption}
+            className="w-full py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition duration-300 disabled:opacity-50 disabled:cursor-not-allowed p-3 cursor-pointer"
+         >
+            {isPaymentProcessing
+               ? "Processando..."
+               : "Finalizar Compra com Mercado Pago"}
+         </button>
       </div>
    );
 }
