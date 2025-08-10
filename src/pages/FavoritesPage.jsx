@@ -35,7 +35,7 @@ export function FavoritesPage() {
    }
 
    return (
-      <div className="flex items-center justify-center flex-col ">
+      <div className="flex items-center justify-center flex-col pt-[4.25rem]">
          <h1 className="text-3xl font-bold my-8 text-center text-gray-800">
             Meus Favoritos ({totalFavorites})
          </h1>

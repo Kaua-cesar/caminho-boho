@@ -58,7 +58,7 @@ function Layout() {
          <div className="fixed top-0 left-0 w-full z-50 bg-white shadow-xs shadow-amber-600/50 h-17">
             <Nav />
          </div>
-         <div style={{ paddingTop: "4.25rem" }}>
+         <div>
             {mostrarCarrosel && <Carrosel />}
             <Routes>
                <Route path="/" element={<Home />} />

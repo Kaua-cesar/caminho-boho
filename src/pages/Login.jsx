@@ -143,7 +143,12 @@ export default function Login() {
                            Boho.
                         </span>
                      </div>
-                     <button className="w-full border-1 md:border-2 md:py-2 py-4 rounded-md transition cursor-pointer md:hidden">
+                     <button
+                        className="w-full border-1 md:border-2 md:py-2 py-4 rounded-md transition cursor-pointer md:hidden"
+                        onClick={() => navigate("/register")}
+                        type="button"
+                        disabled={loading}
+                     >
                         Criar Conta
                      </button>
                   </div>

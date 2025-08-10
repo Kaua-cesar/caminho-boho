@@ -184,8 +184,6 @@ export default function Register() {
       }
 
       try {
-         // ⭐ AQUI O CÓDIGO FOI SIMPLIFICADO: NÃO HÁ MAIS A CONSULTA DO CPF NO FIRESTORE ⭐
-         // Se as validações locais passarem, o registro é executado
          await register(email, password, {
             nomeCompleto: `${name.trim()} ${sobrenome.trim()}`,
             telefone: unformattedTelefone,
@@ -196,7 +194,6 @@ export default function Register() {
          navigate("/login");
       } catch (err) {
          console.error("Erro no registro:", err);
-         // Agora a mensagem de erro vem diretamente do AuthContext
          toast.error(err.message);
       } finally {
          setIsLoading(false);
@@ -204,14 +201,18 @@ export default function Register() {
    };
 
    return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-100">
-         <div className="p-8 bg-white rounded-lg shadow-md w-full max-w-lg">
-            <h2 className="text-3xl font-bold text-center mb-6">Cadastre-se</h2>
+      <div className="flex items-center justify-center h-screen bg-gray-100 ">
+         <div className="p-8 bg-white rounded-lg shadow-md w-full max-w-lg ">
+            {/* Título com tamanho de fonte responsivo */}
+            <h2 className="text-xl md:text-3xl font-bold text-center mb-6">
+               Cadastre-se
+            </h2>
             <form onSubmit={handleSubmit} className="space-y-4">
-               <div className="flex space-x-4">
-                  <div className="w-1/2">
+               <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0">
+                  <div className="w-full sm:w-1/2">
+                     {/* Rótulo com tamanho de fonte responsivo */}
                      <label
-                        className="block text-sm font-bold mb-2"
+                        className="block text-xs md:text-sm font-bold mb-2"
                         htmlFor="name"
                      >
                         Nome
@@ -225,9 +226,10 @@ export default function Register() {
                         required
                      />
                   </div>
-                  <div className="w-1/2">
+                  <div className="w-full sm:w-1/2">
+                     {/* Rótulo com tamanho de fonte responsivo */}
                      <label
-                        className="block text-sm font-bold mb-2"
+                        className="block text-xs md:text-sm font-bold mb-2"
                         htmlFor="sobrenome"
                      >
                         Sobrenome
@@ -244,7 +246,7 @@ export default function Register() {
                </div>
                <div>
                   <label
-                     className="block text-sm font-bold mb-2"
+                     className="block text-xs md:text-sm font-bold mb-2"
                      htmlFor="telefone"
                   >
                      Telefone
@@ -260,7 +262,10 @@ export default function Register() {
                   />
                </div>
                <div>
-                  <label className="block text-sm font-bold mb-2" htmlFor="cpf">
+                  <label
+                     className="block text-xs md:text-sm font-bold mb-2"
+                     htmlFor="cpf"
+                  >
                      CPF
                   </label>
                   <input
@@ -275,7 +280,7 @@ export default function Register() {
                </div>
                <div>
                   <label
-                     className="block text-sm font-bold mb-2"
+                     className="block text-xs md:text-sm font-bold mb-2"
                      htmlFor="email"
                   >
                      Email
@@ -291,7 +296,7 @@ export default function Register() {
                </div>
                <div>
                   <label
-                     className="block text-sm font-bold mb-2"
+                     className="block text-xs md:text-sm font-bold mb-2"
                      htmlFor="password"
                   >
                      Senha
@@ -307,7 +312,7 @@ export default function Register() {
                </div>
                <div>
                   <label
-                     className="block text-sm font-bold mb-2"
+                     className="block text-xs md:text-sm font-bold mb-2"
                      htmlFor="passwordConfirmation"
                   >
                      Confirmar Senha

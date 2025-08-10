@@ -74,7 +74,7 @@ export function ContactPage() {
 
    return (
       // Contêiner principal da página: padding responsivo, largura máxima e centralização
-      <div className=" px-4 md:px-6 lg:px-8 flex flex-col items-center justify-center min-h-[calc(100vh-100px)]">
+      <div className="pt-[4.25rem] px-4 md:px-6 lg:px-8 flex flex-col items-center justify-center min-h-[calc(100vh-100px)]">
          {/* Título da página */}
          <h1 className="text-3xl sm:text-4xl font-bold my-8 text-center text-gray-800">
             Fale Conosco

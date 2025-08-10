@@ -643,7 +643,7 @@ export default function MinhaConta() {
    }
 
    return (
-      <div className="flex flex-col md:flex-row h-[calc(100vh-6rem)] bg-white">
+      <div className="flex flex-col md:flex-row h-[calc(100vh-4.3rem)] bg-white mt-[4.25rem]">
                   
          {/* Removido o botão de menu hambúrguer e o overlay para mobile */}   
               {/* NAV LATERAL - Visível apenas no desktop */}         
@@ -718,24 +718,8 @@ export default function MinhaConta() {
          </nav>
                   {/* CONTAINER DO CONTEÚDO PRINCIPAL */}         
          <div className="flex-1 overflow-y-auto w-full p-4 md:p-6">
-                       {" "}
-            <div className="md:block hidden">
-                              
-               <div className="flex flex-col mb-4">
-                                   {" "}
-                  <h1 className="text-2xl font-bold mb-1">Minha Conta</h1>     
-                             {" "}
-                  <p className="text-sm text-gray-600">
-                                          Olá, {user?.displayName}!            
-                          {" "}
-                  </p>
-                                 
-               </div>
-                          {" "}
-            </div>
-                        {renderConteudo()}         
+                                  {renderConteudo()}         
          </div>
-              {" "}
       </div>
    );
 }

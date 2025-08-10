@@ -330,7 +330,7 @@ export default function Carrinho() {
    };
 
    return (
-      <div className="mx-auto my-8 max-w-8xl px-4 sm:px-6 lg:px-8 ">
+      <div className="mx-auto my-8 max-w-8xl px-4 sm:px-6 lg:px-8 pt-[4.25rem]">
          <h1 className="text-4xl font-bold mb-6 text-center lg:text-start w-full">
             Confirmar Pedido
          </h1>
