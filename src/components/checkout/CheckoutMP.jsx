@@ -36,8 +36,10 @@ export function CheckoutMP({
          toast.error("Por favor, selecione um endereço de entrega.");
          return;
       }
-      if (!selectedFreteOption) {
-         toast.error("Por favor, selecione uma opção de frete.");
+      if (!selectedFreteOption || selectedFreteOption.value === undefined) {
+         toast.error(
+            "Por favor, selecione uma opção de frete ou retirada local."
+         );
          return;
       }
 
@@ -106,9 +108,7 @@ export function CheckoutMP({
             disabled={isPaymentProcessing || !selectedFreteOption}
             className="w-full py-3 bg-amber-600 text-white rounded-lg font-semibold hover:bg-amber-700 transition duration-300 disabled:opacity-50 disabled:cursor-not-allowed p-3 cursor-pointer"
          >
-            {isPaymentProcessing
-               ? "Processando..."
-               : "Finalizar Compra com Mercado Pago"}
+            {isPaymentProcessing ? "Processando..." : "Finalizar Compra"}
          </button>
       </div>
    );

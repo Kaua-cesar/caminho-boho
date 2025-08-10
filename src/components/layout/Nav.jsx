@@ -258,15 +258,6 @@ export function Nav() {
                                        <span>Login e segurança</span>
                                     </Link>
                                  </SheetClose>
-                                 <SheetClose asChild>
-                                    <Link
-                                       to="/minha-conta?tab=pagamentos"
-                                       className="flex flex-row items-center font-medium ml-6 gap-3 text-xl"
-                                    >
-                                       <FaCreditCard />
-                                       <span>Pagamentos</span>
-                                    </Link>
-                                 </SheetClose>
                                  <Separator className="my-4" />{" "}
                                  <SheetClose asChild>
                                     <Link

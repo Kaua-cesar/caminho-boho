@@ -123,7 +123,7 @@ export function Enderecos() {
       <div className="p-4">
          <h2 className="text-xl font-bold mb-4">Meus endereços</h2>
          {enderecos.length === 0 ? (
-            <p>Você ainda não tem endereços cadastrados.</p>
+            <p className="mb-4">Você ainda não tem endereços cadastrados.</p>
          ) : (
             <ul className="space-y-2 mb-4">
                {enderecos.map((end) => (
@@ -463,45 +463,6 @@ function Seguranca() {
    );
 }
 
-function Pagamentos() {
-   const [cartoes, setCartoes] = useState([
-      { id: 1, bandeira: "Visa", final: "1234", validade: "12/28" },
-   ]);
-
-   function removerCartao(id) {
-      setCartoes(cartoes.filter((c) => c.id !== id));
-   }
-
-   return (
-      <div className="p-4">
-         <h2 className="text-xl font-bold mb-4">Meus cartões</h2>
-         {cartoes.length === 0 ? (
-            <p>Nenhum cartão salvo.</p>
-         ) : (
-            <ul className="space-y-2">
-               {cartoes.map((cartao) => (
-                  <li
-                     key={cartao.id}
-                     className="border rounded p-3 flex justify-between items-center"
-                  >
-                     <span>
-                        {cartao.bandeira} final {cartao.final} - validade{" "}
-                        {cartao.validade}
-                     </span>
-                     <button
-                        className="text-red-600 hover:underline"
-                        onClick={() => removerCartao(cartao.id)}
-                     >
-                        Remover
-                     </button>
-                  </li>
-               ))}
-            </ul>
-         )}
-      </div>
-   );
-}
-
 // =======================================================
 // ⭐ COMPONENTE PRINCIPAL (MinhaConta) com NAV LATERAL ⭐
 // =======================================================
@@ -532,11 +493,6 @@ export default function MinhaConta() {
          icon: <FaLock className="text-lg" />,
          label: "Login e segurança",
       },
-      {
-         path: "pagamentos",
-         icon: <FaCreditCard className="text-lg" />,
-         label: "Pagamentos",
-      },
    ];
 
    function renderConteudo() {
@@ -547,9 +503,6 @@ export default function MinhaConta() {
             return <Enderecos />;
          case "seguranca":
             return <Seguranca />;
-         case "pagamentos":
-            return <Pagamentos />;
-
          default:
             return <Pedidos />;
       }
