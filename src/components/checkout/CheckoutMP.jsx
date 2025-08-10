@@ -27,27 +27,23 @@ export function CheckoutMP({
    }, [publicKey]);
 
    const handleFinalizarCompra = async () => {
+      // Sai da função se o pagamento já estiver em processo
       if (isPaymentProcessing) return;
+
+      // Validação principal: verifica o carrinho, frete e endereço
       if (cartItems.length === 0) {
          toast.error("Seu carrinho está vazio.");
          return;
       }
 
-      // --- LÓGICA CORRIGIDA ---
-      // Apenas verifique se a opção de frete é uma 'entrega' E se não há um endereço selecionado.
-      // Isso impede o erro ao selecionar 'retirada', já que 'selectedEndereco' será nulo.
-      const isEntrega = selectedFreteOption?.id !== "retirada";
-      if (isEntrega && !selectedEndereco) {
+      // Validação central corrigida e combinada para evitar erros.
+      // Se a opção de frete não existe, ou se não é "retirada" e o endereço não está selecionado.
+      if (
+         !selectedFreteOption ||
+         (selectedFreteOption.id !== "retirada" && !selectedEndereco)
+      ) {
          toast.error(
             "Por favor, selecione um endereço de entrega ou a opção de retirada local."
-         );
-         return;
-      }
-      // --- FIM DA LÓGICA CORRIGIDA ---
-
-      if (!selectedFreteOption || selectedFreteOption.value === undefined) {
-         toast.error(
-            "Por favor, selecione uma opção de frete ou retirada local."
          );
          return;
       }
@@ -115,6 +111,8 @@ export function CheckoutMP({
       <div>
          <button
             onClick={handleFinalizarCompra}
+            // Esta lógica já é eficiente para desabilitar o botão até que
+            // a opção de frete seja selecionada.
             disabled={isPaymentProcessing || !selectedFreteOption}
             className="w-full py-3 bg-amber-600 text-white rounded-lg font-semibold hover:bg-amber-700 transition duration-300 disabled:opacity-50 disabled:cursor-not-allowed p-3 cursor-pointer"
          >
