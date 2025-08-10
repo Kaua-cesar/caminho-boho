@@ -32,12 +32,19 @@ export function CheckoutMP({
          toast.error("Seu carrinho está vazio.");
          return;
       }
-      if (!selectedEndereco && selectedFreteOption?.id !== "retirada") {
+
+      // --- LÓGICA CORRIGIDA ---
+      // Apenas verifique se a opção de frete é uma 'entrega' E se não há um endereço selecionado.
+      // Isso impede o erro ao selecionar 'retirada', já que 'selectedEndereco' será nulo.
+      const isEntrega = selectedFreteOption?.id !== "retirada";
+      if (isEntrega && !selectedEndereco) {
          toast.error(
             "Por favor, selecione um endereço de entrega ou a opção de retirada local."
          );
          return;
       }
+      // --- FIM DA LÓGICA CORRIGIDA ---
+
       if (!selectedFreteOption || selectedFreteOption.value === undefined) {
          toast.error(
             "Por favor, selecione uma opção de frete ou retirada local."
@@ -65,9 +72,8 @@ export function CheckoutMP({
                cost: selectedFreteOption.value,
                option: selectedFreteOption,
             },
-            selectedEnderecoId: selectedEndereco.id || selectedFreteOption?.id,
+            selectedEnderecoId: selectedEndereco?.id || selectedFreteOption?.id,
             external_reference: orderId,
-            // ⭐ CORRIGIDO: Adiciona a URL do webhook do ngrok aqui
             notification_url: ngrokWebhookUrl,
          };
 
