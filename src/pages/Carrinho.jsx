@@ -60,13 +60,13 @@ export default function Carrinho() {
    const [selectedFreteOptionId, setSelectedFreteOptionId] = useState(null);
 
    const [isPaymentProcessing, setIsPaymentProcessing] = useState(false);
-
+   const backendUrl = import.meta.env.VITE_API_URL;
    const fetchEnderecos = async () => {
       setEnderecosLoading(true);
       setEnderecosError("");
       try {
          const response = await fetch(
-            `http://localhost:3001/api/enderecos?userId=${user.uid}`
+            `${backendUrl}/api/enderecos?userId=${user.uid}`
          );
          if (!response.ok) throw new Error("Erro ao carregar endereços.");
          const data = await response.json();

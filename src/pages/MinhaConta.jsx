@@ -38,6 +38,7 @@ import { toast } from "sonner";
 // (Mantenha o código original desses componentes)
 // =======================================================
 export function Enderecos() {
+   const backendUrl = import.meta.env.VITE_API_URL;
    const { user } = useAuth();
    const [enderecos, setEnderecos] = useState([]);
    const [loading, setLoading] = useState(true);
@@ -52,7 +53,7 @@ export function Enderecos() {
       setLoading(true);
       try {
          const response = await fetch(
-            `http://localhost:3001/api/enderecos?userId=${user.uid}`
+            `${backendUrl}/api/enderecos?userId=${user.uid}`
          );
          if (!response.ok) {
             throw new Error("Erro ao buscar endereços");
@@ -75,7 +76,7 @@ export function Enderecos() {
       if (!enderecoIdToDelete) return;
       try {
          const response = await fetch(
-            `http://localhost:3001/api/enderecos/${enderecoIdToDelete}`,
+            `${backendUrl}/api/enderecos/${enderecoIdToDelete}`,
             {
                method: "DELETE",
             }
