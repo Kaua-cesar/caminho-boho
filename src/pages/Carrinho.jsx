@@ -1,4 +1,3 @@
-// components/Carrinho.jsx
 import { useState, useMemo, useEffect } from "react";
 import { toast } from "sonner";
 import { useCart } from "../context/CartContext";
@@ -103,22 +102,21 @@ export default function Carrinho() {
       0
    );
 
+   const subtotalComDesconto = useMemo(() => {
+      return totalItens - totalItens * descontoPercentual;
+   }, [totalItens, descontoPercentual]);
+
    const selectedFreteOptionInfo = useMemo(() => {
       return availableFreteOptions.find(
          (option) => option.id === selectedFreteOptionId
       );
    }, [availableFreteOptions, selectedFreteOptionId]);
 
+   const valorFrete = selectedFreteOptionInfo?.value || 0;
+
    const totalFinal = useMemo(() => {
-      let currentTotal = totalItens - totalItens * descontoPercentual;
-      if (
-         selectedFreteOptionInfo &&
-         selectedFreteOptionInfo.value !== undefined
-      ) {
-         currentTotal += selectedFreteOptionInfo.value;
-      }
-      return currentTotal;
-   }, [totalItens, descontoPercentual, selectedFreteOptionInfo]);
+      return subtotalComDesconto + valorFrete;
+   }, [subtotalComDesconto, valorFrete]);
 
    const aplicarCupom = () => {
       const cupomFormatado = cupom.trim().toUpperCase();
@@ -384,7 +382,7 @@ export default function Carrinho() {
                                     )}
                                  </span>
                                  <p className="font-semibold text-base">
-                                    Entregar neste endereço
+                                    Entrega
                                  </p>
                               </div>
                            </div>
@@ -470,16 +468,28 @@ export default function Carrinho() {
                                  setCupom={setCupom}
                                  aplicarCupom={aplicarCupom}
                               />
-                              <ResumoCarrinho totalFinal={totalFinal} />
+                              <ResumoCarrinho
+                                 totalItens={totalItens}
+                                 valorFrete={valorFrete}
+                                 totalFinal={totalFinal}
+                                 descontoPercentual={descontoPercentual}
+                                 cuponsAplicados={cuponsAplicados}
+                              />
                            </div>
 
-                           <div className="hidden md:flex items-center my-6 justify-between md:mb-14 flex-col xl:flex-row ">
+                           <div className="hidden md:flex items-center my-6 justify-between md:mb-12 flex-col xl:flex-row ">
                               <CupomDesconto
                                  cupom={cupom}
                                  setCupom={setCupom}
                                  aplicarCupom={aplicarCupom}
                               />
-                              <ResumoCarrinho totalFinal={totalFinal} />
+                              <ResumoCarrinho
+                                 totalItens={totalItens}
+                                 valorFrete={valorFrete}
+                                 totalFinal={totalFinal}
+                                 descontoPercentual={descontoPercentual}
+                                 cuponsAplicados={cuponsAplicados}
+                              />
                            </div>
                         </>
                      )}
@@ -584,8 +594,13 @@ export default function Carrinho() {
                            </div>
                         ))}
                      </div>
-                     <div className="mt-4 flex justify-end">
-                        <Button onClick={() => setIsAddingNewAddress(true)}>
+                     <div className="mt-4 flex justify-end ">
+                        <Button
+                           onClick={() => setIsAddingNewAddress(true)}
+                           className={
+                              "bg-amber-600 text-white hover:bg-amber-700 cursor-pointer"
+                           }
+                        >
                            Adicionar novo endereço
                         </Button>
                      </div>
