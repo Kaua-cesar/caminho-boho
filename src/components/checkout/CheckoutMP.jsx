@@ -32,8 +32,10 @@ export function CheckoutMP({
          toast.error("Seu carrinho está vazio.");
          return;
       }
-      if (!selectedEndereco) {
-         toast.error("Por favor, selecione um endereço de entrega.");
+      if (!selectedEndereco && selectedFreteOption?.id !== "retirada") {
+         toast.error(
+            "Por favor, selecione um endereço de entrega ou a opção de retirada local."
+         );
          return;
       }
       if (!selectedFreteOption || selectedFreteOption.value === undefined) {
