@@ -65,7 +65,7 @@ export function CheckoutMP({
                cost: selectedFreteOption.value,
                option: selectedFreteOption,
             },
-            selectedEnderecoId: selectedEndereco.id,
+            selectedEnderecoId: selectedEndereco.id || selectedFreteOption?.id,
             external_reference: orderId,
             // ⭐ CORRIGIDO: Adiciona a URL do webhook do ngrok aqui
             notification_url: ngrokWebhookUrl,
