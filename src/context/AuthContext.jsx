@@ -1,7 +1,6 @@
 // src/context/AuthContext.jsx
-
 import { createContext, useContext, useState, useEffect } from "react";
-import { auth } from "../lib/firebase";
+import { auth, db } from "../lib/firebase";
 import {
    onAuthStateChanged,
    signOut,
@@ -10,6 +9,7 @@ import {
    updateProfile,
    sendEmailVerification,
 } from "firebase/auth";
+import { doc, setDoc } from "firebase/firestore";
 import {
    googleProvider,
    signInWithProviderPopup,
@@ -23,19 +23,15 @@ export function AuthProvider({ children }) {
    const [loading, setLoading] = useState(true);
 
    useEffect(() => {
-      const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-         // Lógica de verificação de e-mail simplificada e mais robusta.
-         // A regra agora é clara: um usuário só é considerado "logado" em nosso app se seu e-mail for verificado.
-         if (currentUser && !currentUser.emailVerified) {
-            // Esta condição afeta principalmente novos usuários de email/senha.
-            // Ao se registrar, `currentUser` existe, mas `emailVerified` é `false`.
-            // Ao definir o usuário do contexto como `null`, evitamos o redirecionamento
-            // automático para páginas protegidas antes da verificação (corrige a "race condition").
-            // Usuários de login social (Google) geralmente já vêm com e-mail verificado.
-            setUser(null);
+      const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+         if (currentUser) {
+            if (!currentUser.emailVerified) {
+               setUser(null);
+            } else {
+               setUser(currentUser);
+            }
          } else {
-            // Define o usuário se ele estiver verificado ou se for `null` (caso de logout).
-            setUser(currentUser);
+            setUser(null);
          }
          setLoading(false);
       });
@@ -59,6 +55,15 @@ export function AuthProvider({ children }) {
          const loggedInUser = await signInWithProviderPopup(providerToUse);
          if (loggedInUser) {
             setUser(loggedInUser);
+            // Cria o documento do usuário no Firestore após o login via provedor
+            await setDoc(
+               doc(db, "users", loggedInUser.uid),
+               {
+                  email: loggedInUser.email,
+                  nomeCompleto: loggedInUser.displayName,
+               },
+               { merge: true }
+            );
          }
          return !!loggedInUser;
       } catch (error) {
@@ -74,11 +79,10 @@ export function AuthProvider({ children }) {
          await signOut(auth);
          setUser(null);
       } catch (error) {
-         // Trate o erro se necessário
+         // Handle error if needed
       }
    };
 
-   // Função de login com e-mail e senha
    const loginWithEmailPassword = async (email, password) => {
       setLoading(true);
       const start = Date.now();
@@ -90,16 +94,15 @@ export function AuthProvider({ children }) {
          );
 
          if (!userCredential.user.emailVerified) {
-            await signOut(auth); // Garante que o usuário não fique logado
+            await signOut(auth);
             setUser(null);
             const error = new Error("E-mail não verificado.");
             error.code = "auth/email-not-verified";
-            // Anexamos o usuário ao erro para poder reenviar o e-mail se necessário
             error.user = userCredential.user;
             throw error;
          }
 
-         setUser(userCredential.user); // Define o usuário no contexto apenas se verificado
+         setUser(userCredential.user);
          return true;
       } catch (error) {
          setUser(null);
@@ -111,7 +114,7 @@ export function AuthProvider({ children }) {
       }
    };
 
-   const register = async (email, password, nome) => {
+   const register = async (email, password, additionalData) => {
       setLoading(true);
       const start = Date.now();
       try {
@@ -121,25 +124,49 @@ export function AuthProvider({ children }) {
             password
          );
          const user = userCredential.user;
-         if (nome) {
-            await updateProfile(user, { displayName: nome });
+
+         await setDoc(doc(db, "users", user.uid), {
+            email: user.email,
+            ...additionalData,
+         });
+
+         if (additionalData.nomeCompleto) {
+            await updateProfile(user, {
+               displayName: additionalData.nomeCompleto,
+            });
          }
-         console.log(
-            "Usuário criado. Tentando enviar e-mail de verificação para:",
-            user.email
-         );
+
          await sendEmailVerification(user);
-         console.log(
-            "Comando para enviar e-mail de verificação executado com sucesso."
-         );
          await signOut(auth);
-         console.log("Usuário deslogado para forçar a verificação.");
-         return true; // Sucesso no registro
+
+         return true;
       } catch (error) {
-         // Este log é crucial. Se houver um erro ao enviar o e-mail, ele aparecerá aqui.
          console.error("Erro durante o processo de registro:", error);
          setUser(null);
-         throw error;
+
+         let errorMessage =
+            "Ocorreu um erro no registro. Por favor, tente novamente.";
+
+         switch (error.code) {
+            case "auth/email-already-in-use":
+               errorMessage = "Este e-mail já está em uso.";
+               break;
+            case "auth/invalid-email":
+               errorMessage = "O e-mail fornecido é inválido.";
+               break;
+            case "auth/operation-not-allowed":
+               errorMessage = "O método de autenticação não está habilitado.";
+               break;
+            case "auth/weak-password":
+               errorMessage = "A senha é muito fraca.";
+               break;
+            default:
+               errorMessage =
+                  "Ocorreu um erro no registro. Por favor, tente novamente.";
+               break;
+         }
+
+         throw new Error(errorMessage);
       } finally {
          const elapsed = Date.now() - start;
          const delay = Math.max(0, 2000 - elapsed);
