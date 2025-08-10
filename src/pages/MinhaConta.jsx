@@ -37,8 +37,7 @@ import { toast } from "sonner";
 // ⭐ COMPONENTES INDIVIDUAIS PARA CADA SEÇÃO DA CONTA ⭐
 // (Mantenha o código original desses componentes)
 // =======================================================
-
-function Enderecos() {
+export function Enderecos() {
    const { user } = useAuth();
    const [enderecos, setEnderecos] = useState([]);
    const [loading, setLoading] = useState(true);
@@ -130,17 +129,28 @@ function Enderecos() {
                {enderecos.map((end) => (
                   <li
                      key={end.id}
-                     className="border rounded p-3 flex flex-col justify-between items-start"
+                     className="border rounded-md p-3 flex flex-col justify-between items-start"
                   >
                      <div className="flex justify-between items-center w-full">
                         <div className="flex flex-col">
-                           <span className="font-semibold">
-                              {end.nomeCompleto} {end.sobrenome}
+                           <div className="flex items-center gap-16 ">
+                              <span className="font-semibold">
+                                 {end.nomeCompleto} {end.sobrenome}
+                              </span>{" "}
+                              <span className="text-sm text-gray-600">
+                                 Celular: {end.celular}
+                              </span>
+                           </div>
+                           <span>
+                              {end.rua}, {end.numero} - {end.bairro}
                            </span>
                            <span>
-                              {end.nome}: {end.rua} - {end.cidade}/{end.uf} -{" "}
-                              {end.cep}
+                              {end.cidade}/{end.uf} - {end.cep}
                            </span>
+                           <span className="font-semibold text-sm border px-2 py-1 rounded-md my-2 w-fit">
+                              {end.localizacao}
+                           </span>
+                           {/* Adiciona a exibição do complemento, se existir */}
                         </div>
                         <div className="flex gap-3 items-center">
                            <button
