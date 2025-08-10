@@ -55,8 +55,10 @@ export function CheckoutMP({
             items: cartItems,
             payer: {
                id: user.uid,
-               name: selectedEndereco.nomeCompleto,
-               lastname: selectedEndereco.sobrenome,
+               name: selectedEndereco
+                  ? selectedEndereco.nomeCompleto
+                  : user?.displayName || user?.email,
+               lastname: selectedEndereco ? selectedEndereco.sobrenome : "",
                email: user?.email,
             },
             shipping: {
