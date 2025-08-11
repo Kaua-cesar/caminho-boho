@@ -49,7 +49,7 @@ export const produtos = [
    {
       id: "prod3",
       nome: "Vestido Boho Longo 2023",
-      precoOriginal: 249.99,
+      precoOriginal: 2.99,
       desconto: -25,
       categoria: "boholongo",
       cores: [
