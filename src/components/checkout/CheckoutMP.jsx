@@ -23,25 +23,25 @@ export function CheckoutMP({
 
    useEffect(() => {
       if (publicKey) {
-         // ⭐ MODIFICAÇÃO: A função initMercadoPago agora retorna uma Promise.
-         // Usamos .then() para saber quando a inicialização foi concluída.
+         // ⭐ CORREÇÃO: Chamamos initMercadoPago sem .then(), pois ele não retorna uma Promise.
+         // Ele simplesmente inicia o processo de carregamento do script.
          initMercadoPago(publicKey, {
             locale: "pt-BR",
             advancedFraudPrevention: true,
-         })
-            .then(() => {
+         });
+
+         // Verificamos a cada 100ms se a função de checkout está disponível.
+         // Isso é uma forma robusta de lidar com o carregamento assíncrono do script.
+         const checkInterval = setInterval(() => {
+            if (window.MercadoPago && window.MercadoPago.checkout) {
                console.log("SDK do Mercado Pago inicializado com sucesso.");
                setMercadoPagoReady(true);
-            })
-            .catch((error) => {
-               console.error(
-                  "Erro ao inicializar o SDK do Mercado Pago:",
-                  error
-               );
-               toast.error(
-                  "Não foi possível carregar a biblioteca de pagamento."
-               );
-            });
+               clearInterval(checkInterval); // Paramos de verificar quando estiver pronto.
+            }
+         }, 100);
+
+         // Limpeza do intervalo quando o componente for desmontado
+         return () => clearInterval(checkInterval);
       }
    }, [publicKey]);
 
@@ -49,6 +49,7 @@ export function CheckoutMP({
       // Sai da função se o pagamento já estiver em processo ou se o SDK não estiver pronto.
       if (isPaymentProcessing || !mercadoPagoReady) {
          console.log("Mercado Pago não está pronto. Abortando a compra.");
+         toast.info("Aguarde, a biblioteca de pagamento está carregando...");
          return;
       }
 
@@ -111,9 +112,7 @@ export function CheckoutMP({
                onPaymentRedirect();
             }
 
-            // ⭐ CORREÇÃO MAIS IMPORTANTE AQUI:
-            // A chamada foi movida para dentro de um bloco condicional.
-            // O código só tentará abrir o checkout se o SDK estiver pronto.
+            // A chamada só ocorrerá se o estado 'mercadoPagoReady' for true.
             window.MercadoPago.checkout({
                preference: {
                   id: result.id,
@@ -135,7 +134,6 @@ export function CheckoutMP({
       }
    };
 
-   // ⭐ NOVO: O botão agora depende do estado `mercadoPagoReady`.
    const isButtonDisabled =
       isPaymentProcessing ||
       !selectedFreteOption ||
