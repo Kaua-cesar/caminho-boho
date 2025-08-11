@@ -18,28 +18,45 @@ export function CheckoutMP({
    const backendUrl = import.meta.env.VITE_API_URL;
    const ngrokWebhookUrl = "https://a4d945f7c508.ngrok-free.app/webhook";
 
+   // ⭐ NOVO ESTADO: Adicionamos um estado para verificar se o Mercado Pago está pronto.
+   const [mercadoPagoReady, setMercadoPagoReady] = useState(false);
+
    useEffect(() => {
       if (publicKey) {
-         // ⭐ MODIFICAÇÃO: Usamos o `advancedFraudPrevention` para uma melhor integração
+         // ⭐ MODIFICAÇÃO: A função initMercadoPago agora retorna uma Promise.
+         // Usamos .then() para saber quando a inicialização foi concluída.
          initMercadoPago(publicKey, {
             locale: "pt-BR",
             advancedFraudPrevention: true,
-         });
+         })
+            .then(() => {
+               console.log("SDK do Mercado Pago inicializado com sucesso.");
+               setMercadoPagoReady(true);
+            })
+            .catch((error) => {
+               console.error(
+                  "Erro ao inicializar o SDK do Mercado Pago:",
+                  error
+               );
+               toast.error(
+                  "Não foi possível carregar a biblioteca de pagamento."
+               );
+            });
       }
    }, [publicKey]);
 
    const handleFinalizarCompra = async () => {
-      // Sai da função se o pagamento já estiver em processo
-      if (isPaymentProcessing) return;
+      // Sai da função se o pagamento já estiver em processo ou se o SDK não estiver pronto.
+      if (isPaymentProcessing || !mercadoPagoReady) {
+         console.log("Mercado Pago não está pronto. Abortando a compra.");
+         return;
+      }
 
-      // Validação principal: verifica o carrinho, frete e endereço
       if (cartItems.length === 0) {
          toast.error("Seu carrinho está vazio.");
          return;
       }
 
-      // ⭐ CORREÇÃO AQUI
-      // Validação corrigida para exigir endereço, a menos que seja retirada
       if (
          !selectedFreteOption ||
          (selectedFreteOption.id !== "retirada" && !selectedEndereco)
@@ -70,7 +87,6 @@ export function CheckoutMP({
                cost: selectedFreteOption.value,
                option: selectedFreteOption,
             },
-            // Correção: Envia o ID do endereço selecionado ou o ID do frete (se for retirada)
             selectedEnderecoId: selectedEndereco?.id || selectedFreteOption?.id,
             external_reference: orderId,
             notification_url: ngrokWebhookUrl,
@@ -96,17 +112,14 @@ export function CheckoutMP({
             }
 
             // ⭐ CORREÇÃO MAIS IMPORTANTE AQUI:
-            // Substituímos o redirecionamento manual por uma função do SDK do Mercado Pago.
-            // Isso garante que o redirecionamento seja tratado corretamente pelo navegador.
+            // A chamada foi movida para dentro de um bloco condicional.
+            // O código só tentará abrir o checkout se o SDK estiver pronto.
             window.MercadoPago.checkout({
                preference: {
                   id: result.id,
                },
             }).open();
 
-            // O 'isPaymentProcessing(false)' deve ser chamado em um evento de retorno
-            // ou quando o usuário fechar a janela, mas por agora, para evitar que o
-            // botão fique travado, vamos liberá-lo.
             setIsPaymentProcessing(false);
          } else {
             console.error("❌ Erro ao criar o pedido ou preferência:", result);
@@ -122,17 +135,17 @@ export function CheckoutMP({
       }
    };
 
-   // ⭐ A LÓGICA DE VALIDAÇÃO FOI ATUALIZADA AQUI
+   // ⭐ NOVO: O botão agora depende do estado `mercadoPagoReady`.
    const isButtonDisabled =
       isPaymentProcessing ||
       !selectedFreteOption ||
+      !mercadoPagoReady || // ⭐ VERIFICA SE O SDK ESTÁ PRONTO
       (selectedFreteOption.id !== "retirada" && !selectedEndereco);
 
    return (
       <div>
          <button
             onClick={handleFinalizarCompra}
-            // Usamos a nova variável de validação `isButtonDisabled`
             disabled={isButtonDisabled}
             className="w-full py-3 bg-amber-600 text-white rounded-lg font-semibold hover:bg-amber-700 transition duration-300 disabled:opacity-50 disabled:cursor-not-allowed p-3 cursor-pointer"
          >
