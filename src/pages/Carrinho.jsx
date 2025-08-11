@@ -308,7 +308,7 @@ export default function Carrinho() {
 
    if (cartItems.length === 0) {
       return (
-         <div className="mx-auto my-8 max-w-8xl px-4 sm:px-6 lg:px-8 text-center">
+         <div className="mx-auto my-8 max-w-8xl px-4 sm:px-6 lg:px-8 text-center pt-[4.25rem]">
             <h1 className="text-4xl font-bold mb-6">
                Seu carrinho está vazio 😔
             </h1>
@@ -392,8 +392,8 @@ export default function Carrinho() {
                            {enderecoDeEntregaExibido && (
                               <div className="mt-2 text-sm text-gray-700">
                                  <p>
-                                    {enderecoDeEntregaExibido.rua}{" "}
-                                    {enderecoDeEntregaExibido.numero}
+                                    {enderecoDeEntregaExibido.rua},{" "}
+                                    {enderecoDeEntregaExibido.numero} -{" "}
                                     {enderecoDeEntregaExibido.bairro}
                                  </p>
                                  <p>
@@ -465,7 +465,7 @@ export default function Carrinho() {
                               </div>
                            )}
 
-                           <div className="flex flex-col md:hidden items-center my-6 justify-between flex-wrap">
+                           <div className="flex flex-col md:hidden items-center my-6 justify-between flex-wrap ">
                               <CupomDesconto
                                  cupom={cupom}
                                  setCupom={setCupom}
@@ -480,7 +480,7 @@ export default function Carrinho() {
                               />
                            </div>
 
-                           <div className="hidden md:flex items-center my-6 justify-between md:mb-12 flex-col xl:flex-row ">
+                           <div className="hidden md:flex items-center my-6 justify-between md:mb-12 flex-col xl:flex-row gap-4">
                               <CupomDesconto
                                  cupom={cupom}
                                  setCupom={setCupom}
