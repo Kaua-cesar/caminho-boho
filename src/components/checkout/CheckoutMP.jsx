@@ -36,8 +36,8 @@ export function CheckoutMP({
          return;
       }
 
-      // Validação central corrigida e combinada para evitar erros.
-      // Se a opção de frete não existe, ou se não é "retirada" e o endereço não está selecionado.
+      // ⭐ CORREÇÃO AQUI
+      // Validação corrigida para exigir endereço, a menos que seja retirada
       if (
          !selectedFreteOption ||
          (selectedFreteOption.id !== "retirada" && !selectedEndereco)
@@ -68,6 +68,7 @@ export function CheckoutMP({
                cost: selectedFreteOption.value,
                option: selectedFreteOption,
             },
+            // Correção: Envia o ID do endereço selecionado ou o ID do frete (se for retirada)
             selectedEnderecoId: selectedEndereco?.id || selectedFreteOption?.id,
             external_reference: orderId,
             notification_url: ngrokWebhookUrl,
@@ -107,13 +108,18 @@ export function CheckoutMP({
       }
    };
 
+   // ⭐ A LÓGICA DE VALIDAÇÃO FOI ATUALIZADA AQUI
+   const isButtonDisabled =
+      isPaymentProcessing ||
+      !selectedFreteOption ||
+      (selectedFreteOption.id !== "retirada" && !selectedEndereco);
+
    return (
       <div>
          <button
             onClick={handleFinalizarCompra}
-            // Esta lógica já é eficiente para desabilitar o botão até que
-            // a opção de frete seja selecionada.
-            disabled={isPaymentProcessing || !selectedFreteOption}
+            // Usamos a nova variável de validação `isButtonDisabled`
+            disabled={isButtonDisabled}
             className="w-full py-3 bg-amber-600 text-white rounded-lg font-semibold hover:bg-amber-700 transition duration-300 disabled:opacity-50 disabled:cursor-not-allowed p-3 cursor-pointer"
          >
             {isPaymentProcessing ? "Processando..." : "Finalizar Compra"}

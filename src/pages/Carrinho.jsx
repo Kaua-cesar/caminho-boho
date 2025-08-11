@@ -76,7 +76,8 @@ export default function Carrinho() {
             calculateFreteOptions(data[0].cep);
          } else {
             setSelectedEnderecoId(null);
-            handleRetiradaSelection();
+            setAvailableFreteOptions([]);
+            setSelectedFreteOptionId(null);
          }
       } catch (err) {
          setEnderecosError(err.message);
@@ -351,6 +352,8 @@ export default function Carrinho() {
                      >
                         Adicionar um Endereço
                      </Button>
+                     {/* ⭐ REMOVIDO: O botão para a opção de retirada foi removido daqui. */}
+                     {/* O usuário deve adicionar um endereço para prosseguir. */}
                   </div>
                ) : (
                   <>
@@ -495,9 +498,6 @@ export default function Carrinho() {
                      )}
                   </>
                )}
-               <div className="flex-grow flex lg:justify-start justify-center items-center mb-6">
-                  <InfoCarrinho />
-               </div>
                <div className=" w-full flex justify-center gap-6 items-center flex-wrap">
                   <CheckoutMP
                      cartItems={cartItems}
@@ -533,9 +533,6 @@ export default function Carrinho() {
             </div>
          </div>
 
-         {/* -------- INÍCIO DA ALTERAÇÃO -------- */}
-         {/* O modal de endereço foi movido para fora da condicional de endereços. */}
-         {/* Ele sempre será renderizado no DOM, mas sua visibilidade será controlada pelo estado `isModalOpen`. */}
          <Dialog
             open={isModalOpen}
             onOpenChange={(open) => {
@@ -608,7 +605,6 @@ export default function Carrinho() {
                )}
             </DialogContent>
          </Dialog>
-         {/* -------- FIM DA ALTERAÇÃO -------- */}
       </div>
    );
 }
