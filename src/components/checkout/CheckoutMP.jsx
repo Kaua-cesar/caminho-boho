@@ -16,13 +16,15 @@ export function CheckoutMP({
    const { user } = useAuth();
    const publicKey = import.meta.env.VITE_MERCADOPAGO_PUBLIC_KEY;
    const backendUrl = import.meta.env.VITE_API_URL;
-   // ⭐ NOVO: A URL do seu webhook ngrok.
-   // Lembre-se de substituir esta URL a cada nova sessão do ngrok.
    const ngrokWebhookUrl = "https://a4d945f7c508.ngrok-free.app/webhook";
 
    useEffect(() => {
       if (publicKey) {
-         initMercadoPago(publicKey, { locale: "pt-BR" });
+         // ⭐ MODIFICAÇÃO: Usamos o `advancedFraudPrevention` para uma melhor integração
+         initMercadoPago(publicKey, {
+            locale: "pt-BR",
+            advancedFraudPrevention: true,
+         });
       }
    }, [publicKey]);
 
@@ -93,7 +95,19 @@ export function CheckoutMP({
                onPaymentRedirect();
             }
 
-            window.location.href = `https://www.mercadopago.com.br/checkout/v1/redirect?preference-id=${result.id}`;
+            // ⭐ CORREÇÃO MAIS IMPORTANTE AQUI:
+            // Substituímos o redirecionamento manual por uma função do SDK do Mercado Pago.
+            // Isso garante que o redirecionamento seja tratado corretamente pelo navegador.
+            window.MercadoPago.checkout({
+               preference: {
+                  id: result.id,
+               },
+            }).open();
+
+            // O 'isPaymentProcessing(false)' deve ser chamado em um evento de retorno
+            // ou quando o usuário fechar a janela, mas por agora, para evitar que o
+            // botão fique travado, vamos liberá-lo.
+            setIsPaymentProcessing(false);
          } else {
             console.error("❌ Erro ao criar o pedido ou preferência:", result);
             toast.error(
