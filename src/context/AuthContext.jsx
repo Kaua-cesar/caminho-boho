@@ -1,4 +1,3 @@
-// src/context/AuthContext.jsx
 import { createContext, useContext, useState, useEffect } from "react";
 import { auth, db } from "../lib/firebase";
 import {
@@ -21,17 +20,32 @@ const AuthContext = createContext();
 export function AuthProvider({ children }) {
    const [user, setUser] = useState(null);
    const [loading, setLoading] = useState(true);
+   const [isAdmin, setIsAdmin] = useState(false);
+
+   // ⭐ MUDANÇA PRINCIPAL: Transformamos a constante em um array.
+   const ADMIN_EMAILS = [
+      "kauacz04coc@gmail.com",
+      "outro.email@example.com",
+      "mais.um.email@exemplo.com",
+   ];
 
    useEffect(() => {
       const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+         setLoading(true);
+
          if (currentUser) {
             if (!currentUser.emailVerified) {
                setUser(null);
+               setIsAdmin(false);
             } else {
                setUser(currentUser);
+               // ⭐ LÓGICA ATUALIZADA: Usamos .includes() para verificar se o email do usuário
+               // está na lista de ADMIN_EMAILS.
+               setIsAdmin(ADMIN_EMAILS.includes(currentUser.email));
             }
          } else {
             setUser(null);
+            setIsAdmin(false);
          }
          setLoading(false);
       });
@@ -52,10 +66,11 @@ export function AuthProvider({ children }) {
                return false;
          }
 
-         const loggedInUser = await signInWithProviderPopup(providerToUse);
+         const result = await signInWithProviderPopup(providerToUse);
+         const loggedInUser = result.user;
+
          if (loggedInUser) {
             setUser(loggedInUser);
-            // Cria o documento do usuário no Firestore após o login via provedor
             await setDoc(
                doc(db, "users", loggedInUser.uid),
                {
@@ -68,6 +83,7 @@ export function AuthProvider({ children }) {
          return !!loggedInUser;
       } catch (error) {
          setUser(null);
+         console.error("Erro no login com provedor:", error);
          return false;
       } finally {
          setLoading(false);
@@ -78,8 +94,9 @@ export function AuthProvider({ children }) {
       try {
          await signOut(auth);
          setUser(null);
+         setIsAdmin(false);
       } catch (error) {
-         // Handle error if needed
+         console.error("Erro ao fazer logout:", error);
       }
    };
 
@@ -165,7 +182,6 @@ export function AuthProvider({ children }) {
                   "Ocorreu um erro no registro. Por favor, tente novamente.";
                break;
          }
-
          throw new Error(errorMessage);
       } finally {
          const elapsed = Date.now() - start;
@@ -192,6 +208,7 @@ export function AuthProvider({ children }) {
    const value = {
       user,
       loading,
+      isAdmin,
       loginWithEmailPassword,
       loginWithProvider,
       logout,

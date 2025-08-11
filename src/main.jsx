@@ -28,6 +28,9 @@ import { ContactPage } from "./pages/ContactPage";
 
 import RotaPrivada from "./components/auth/RotaPrivada";
 import RotaPublica from "./components/auth/RotaPublica";
+// Importa o componente de rota privada de admin
+import AdminPrivateRoute from "./components/auth/AdminPrivateRoute";
+import AdminPage from "./pages/AdminPage";
 
 function Layout() {
    const location = useLocation();
@@ -44,6 +47,7 @@ function Layout() {
       "/produtos",
       "/sobre",
       "/contato",
+      "/admin", // Adicionado para desativar o carrosel na área de administração
    ];
 
    const isCategoryProductRoute = location.pathname.startsWith(
@@ -110,6 +114,15 @@ function Layout() {
                   element={<ProductsByCategoryPage />}
                />
                <Route path="/produtos" element={<ProductsPage />} />
+
+               {/* ⭐ MUDANÇA PRINCIPAL AQUI:
+                        A rota para a AdminPage agora está ANINHADA
+                        dentro da rota de AdminPrivateRoute.
+                        O caminho '/admin/*' foi alterado para apenas '/admin' para que a rota aninhada funcione corretamente.
+                    */}
+               <Route element={<AdminPrivateRoute />}>
+                  <Route path="/admin" element={<AdminPage />} />
+               </Route>
             </Routes>
          </div>
       </>
