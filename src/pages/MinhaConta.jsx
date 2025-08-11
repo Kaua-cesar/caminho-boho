@@ -123,180 +123,118 @@ export function Enderecos() {
 
    return (
       <div className="p-4">
-                  <h2 className="text-xl font-bold mb-4">Meus endereços</h2>   
-              
+         <h2 className="text-xl font-bold mb-4">Meus endereços</h2>
+
          {enderecos.length === 0 ? (
             <p className="mb-4">Você ainda não tem endereços cadastrados.</p>
          ) : (
             <ul className="space-y-2 mb-4">
-                              
                {enderecos.map((end) => (
                   <li
                      key={end.id}
                      className="border rounded-md p-3 flex flex-col justify-between items-start"
                   >
-                                          
                      <div className="flex justify-between items-center w-full">
-                                               {" "}
                         <div className="flex flex-col">
-                                                      
-                           <div className="flex items-center gap-16 ">
-                                                           {" "}
+                           <div className="flex items-center gap-16">
                               <span className="font-semibold">
-                                                                  
-                                 {end.nomeCompleto} {end.sobrenome}             
-                                                {" "}
-                              </span>{" "}
-                                                           {" "}
-                              <span className="text-sm text-gray-600">
-                                                                  Celular:{" "}
-                                 {end.celular}                             {" "}
+                                 {end.nomeCompleto} {end.sobrenome}
                               </span>
-                                                         
+                              <span className="text-sm text-gray-600">
+                                 Celular: {end.celular}
+                              </span>
                            </div>
-                                                      
                            <span>
-                                                            {end.rua},{" "}
-                              {end.numero} - {end.bairro}                       
-                                 
+                              {end.rua}, {end.numero} - {end.bairro}
                            </span>
-                                                      
                            <span>
-                                                            {end.cidade}/
-                              {end.uf} - {end.cep}                           
+                              {end.cidade}/{end.uf} - {end.cep}
                            </span>
-                                                      
                            <span className="font-semibold text-sm border px-2 py-1 rounded-md my-2 w-fit">
-                                                            {end.localizacao}   
-                                                     
+                              {end.localizacao}
                            </span>
-                                                  {" "}
                         </div>
-                                               {" "}
                         <div className="flex gap-3 items-center">
-                                                      
                            <button
                               className="text-gray-500 hover:text-amber-600 transition cursor-pointer text-xl"
                               onClick={() => handleEdit(end)}
                            >
-                                                            <FaEdit />         
-                                               
+                              <FaEdit />
                            </button>
-                                                      
                            <button
                               className="text-gray-500 hover:text-red-600 transition cursor-pointer text-xl"
                               onClick={() => handleRemoveClick(end.id)}
                            >
-                                                            <FaXmark />         
-                                               
+                              <FaXmark />
                            </button>
-                                                  {" "}
                         </div>
-                                             
                      </div>
-                                      {" "}
                   </li>
                ))}
-                          {" "}
             </ul>
          )}
-                  
+
          <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-                       {" "}
             <DialogTrigger asChild>
-                              
                <Button
                   onClick={handleAdd}
                   className="bg-amber-600 text-white hover:bg-amber-700 cursor-pointer"
                >
-                                    Adicionar novo endereço                
+                  Adicionar novo endereço
                </Button>
-                          {" "}
             </DialogTrigger>
-                       {" "}
             <DialogContent className="">
-                              
                <DialogHeader>
-                                   {" "}
                   <DialogTitle>
-                                          
                      {enderecoParaEditar
                         ? "Editar endereço"
                         : "Adicionar novo endereço"}
-                                      {" "}
                   </DialogTitle>
-                                   {" "}
                   <DialogDescription>
-                                          
                      {enderecoParaEditar
                         ? "Edite os campos abaixo para atualizar seu endereço."
                         : "Preencha os campos abaixo para salvar um novo endereço de entrega."}
-                                      {" "}
                   </DialogDescription>
-                                 
                </DialogHeader>
-                              
                <div className="py-4">
-                                   {" "}
                   <AddressForm
                      onAddressAdded={fetchEnderecos}
                      onClose={() => setIsModalOpen(false)}
                      userId={user?.uid}
                      enderecoParaEditar={enderecoParaEditar}
                   />
-                                 
                </div>
-                          {" "}
             </DialogContent>
-                     
          </Dialog>
-                  
+
          <Dialog open={isDeleteModalOpen} onOpenChange={setIsDeleteModalOpen}>
-                       {" "}
             <DialogContent className="sm:max-w-[425px]">
-                              
                <DialogHeader>
-                                   {" "}
-                  <DialogTitle>Confirmar Exclusão</DialogTitle>                 {" "}
+                  <DialogTitle>Confirmar Exclusão</DialogTitle>
                   <DialogDescription>
-                                          Tem certeza que deseja remover este
-                     endereço? Esta ação não                      pode ser
-                     desfeita.                  {" "}
+                     Tem certeza que deseja remover este endereço? Esta ação não
+                     pode ser desfeita.
                   </DialogDescription>
-                                 
                </DialogHeader>
-                              
                <div className="grid gap-4 py-4">
-                                   {" "}
                   <p className="text-sm text-gray-500">
-                                          A exclusão do endereço é permanente.  
-                                    {" "}
+                     A exclusão do endereço é permanente.
                   </p>
-                                 
                </div>
-                              
                <DialogFooter>
-                                   {" "}
                   <DialogClose asChild>
-                                          
-                     <Button variant="secondary">Cancelar</Button>             
-                        {" "}
+                     <Button variant="secondary">Cancelar</Button>
                   </DialogClose>
-                                   {" "}
                   <Button
                      onClick={confirmRemove}
                      variant="destructive"
                      className="bg-red-600 hover:bg-red-700"
                   >
-                                          Confirmar Exclusão                  {" "}
+                     Confirmar Exclusão
                   </Button>
-                                 
                </DialogFooter>
-                          {" "}
             </DialogContent>
-                     
          </Dialog>
-              {" "}
       </div>
    );
 }
