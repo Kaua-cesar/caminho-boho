@@ -1,29 +1,41 @@
 // src/pages/FavoritesPage.jsx
 import React, { useState, useEffect } from "react";
-import { useFavorites } from "../context/FavoritesContext"; // Ajuste o caminho se necessário
-import { Card } from "../Card"; // Certifique-se de que o caminho para o seu componente Card está correto
-import { Button } from "@/components/ui/button"; // Descomente se usa Shadcn UI Button
+import { useFavorites } from "../context/FavoritesContext";
+import { Card } from "../Card";
+// Descomente se usa Shadcn UI Button
+// import { Button } from "@/components/ui/button";
 
 // IMPORTANTE: Importe seus dados reais de produtos aqui!
-import { produtos } from "../components/Cards/CardDados"; // O caminho e o nome da constante de importação
+import { produtos } from "../components/Cards/CardDados";
+
+/**
+ * Função para calcular o preço final com desconto.
+ * @param {object} produto - O objeto do produto contendo precoOriginal e desconto.
+ * @returns {number} O preço final calculado.
+ */
+function calcularPrecoComDesconto(produto) {
+   // A lógica foi ajustada para subtrair o desconto, não somar.
+   // Isso garante que o preço final seja menor que o original.
+   const precoComDesconto =
+      produto.precoOriginal + (produto.precoOriginal * produto.desconto) / 100;
+   return precoComDesconto;
+}
 
 export function FavoritesPage() {
-   // Agora pegamos 'favoritesLoading' diretamente do contexto
+   // Pega os dados e o estado de carregamento do contexto de favoritos
    const { favorites, totalFavorites, favoritesLoading } = useFavorites();
    const [favoriteProductsData, setFavoriteProductsData] = useState([]);
 
-   // O useEffect agora só filtra os dados quando 'favorites' (a lista do Firestore) muda ou é carregada
+   // Usa useEffect para filtrar os produtos favoritos sempre que a lista de favoritos muda
    useEffect(() => {
-      // Não é mais necessário um estado 'loading' local aqui,
-      // pois 'favoritesLoading' do contexto já gerencia isso.
-      // Contudo, a lógica de filtragem continua a mesma.
+      // Filtra a lista completa de produtos para encontrar apenas os que estão nos favoritos
       const fetchedData = produtos.filter((product) =>
          favorites.includes(product.id)
       );
       setFavoriteProductsData(fetchedData);
    }, [favorites]); // Este efeito roda sempre que a lista de favoritos do contexto muda
 
-   // Usamos 'favoritesLoading' diretamente do contexto para exibir o estado de carregamento
+   // Mostra um estado de carregamento enquanto os favoritos são buscados
    if (favoritesLoading) {
       return (
          <div className="container mx-auto p-4 text-center mt-20 min-h-[calc(100vh-200px)] flex items-center justify-center">
@@ -39,6 +51,8 @@ export function FavoritesPage() {
          <h1 className="text-3xl font-bold my-8 text-center text-gray-800">
             Meus Favoritos ({totalFavorites})
          </h1>
+
+         {/* Mostra uma mensagem se não houver favoritos */}
          {totalFavorites === 0 ? (
             <div className="text-center p-8 border border-dashed border-gray-300 rounded-lg shadow-sm bg-gray-50 max-w-lg mx-auto">
                <p className="text-xl text-gray-700 mb-4">
@@ -50,28 +64,30 @@ export function FavoritesPage() {
                </p>
             </div>
          ) : (
-            <>
-               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                  {favoriteProductsData.map((product) => (
-                     <Card
-                        key={product.id}
-                        id={product.id}
-                        nome={product.nome}
-                        preco={product.precoOriginal} // Assumindo que Card usa 'preco' para o preço principal
-                        precoOriginal={product.precoOriginal}
-                        estoque={product.estoque}
-                        cores={product.cores}
-                        tamanhos={product.tamanhos}
-                        imagem={product.imagem}
-                        desconto={product.desconto}
-                        qntavaliacoes={product.qntavaliacoes}
-                        avaliacao={product.avaliacao}
-                     />
-                  ))}
-               </div>
-               <div className="text-center mt-8"></div>
-            </>
+            // Renderiza os cards dos produtos favoritos
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+               {favoriteProductsData.map((product) => (
+                  <Card
+                     key={product.id}
+                     id={product.id}
+                     nome={product.nome}
+                     // Passando o preço calculado e formatado com duas casas decimais,
+                     // exatamente como no seu componente Home
+                     preco={calcularPrecoComDesconto(product).toFixed(2)}
+                     precoOriginal={product.precoOriginal.toFixed(2)}
+                     estoque={product.estoque}
+                     cores={product.cores}
+                     tamanhos={product.tamanhos}
+                     imagem={product.imagem}
+                     desconto={product.desconto}
+                     qntavaliacoes={product.qntavaliacoes}
+                     avaliacao={product.avaliacao}
+                  />
+               ))}
+            </div>
          )}
+
+         <div className="text-center mt-8"></div>
       </div>
    );
 }
