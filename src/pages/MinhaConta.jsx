@@ -52,7 +52,7 @@ export function Enderecos() {
       setLoading(true);
       try {
          const response = await fetch(
-            `http://localhost:3001/api/enderecos?userId=${user.uid}`
+            `${import.meta.env.VITE_API_URL}/api/enderecos?userId=${user.uid}`
          );
          if (!response.ok) {
             throw new Error("Erro ao buscar endereços");
@@ -75,7 +75,9 @@ export function Enderecos() {
       if (!enderecoIdToDelete) return;
       try {
          const response = await fetch(
-            `http://localhost:3001/api/enderecos/${enderecoIdToDelete}`,
+            `${
+               import.meta.env.VITE_API_URL
+            }/api/enderecos/${enderecoIdToDelete}`,
             {
                method: "DELETE",
             }

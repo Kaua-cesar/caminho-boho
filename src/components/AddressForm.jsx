@@ -150,8 +150,10 @@ export function AddressForm({
 
       const method = enderecoParaEditar ? "PUT" : "POST";
       const url = enderecoParaEditar
-         ? `http://localhost:3001/api/enderecos/${enderecoParaEditar.id}`
-         : `http://localhost:3001/api/enderecos`;
+         ? `${import.meta.env.VITE_API_URL}/api/enderecos/${
+              enderecoParaEditar.id
+           }`
+         : `${import.meta.env.VITE_API_URL}/api/enderecos`;
 
       try {
          const response = await fetch(url, {
