@@ -25,7 +25,7 @@ export function AuthProvider({ children }) {
    // ⭐ MUDANÇA PRINCIPAL: Transformamos a constante em um array.
    const ADMIN_EMAILS = [
       "kauacz04coc@gmail.com",
-      "outro.email@example.com",
+      "campanariolais@gmail.com",
       "mais.um.email@exemplo.com",
    ];
 

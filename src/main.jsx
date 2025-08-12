@@ -1,4 +1,3 @@
-// src/main.jsx
 import React, { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
@@ -28,12 +27,14 @@ import { ContactPage } from "./pages/ContactPage";
 
 import RotaPrivada from "./components/auth/RotaPrivada";
 import RotaPublica from "./components/auth/RotaPublica";
-// Importa o componente de rota privada de admin
 import AdminPrivateRoute from "./components/auth/AdminPrivateRoute";
 import AdminPage from "./pages/AdminPage";
 
 function Layout() {
    const location = useLocation();
+
+   // ⭐ NOVO: Variável para controlar se a Nav deve ser exibida.
+   const mostrarNav = location.pathname !== "/admin";
 
    // Rotas onde o carrosel não deve aparecer
    const rotasSemCarrosel = [
@@ -47,7 +48,7 @@ function Layout() {
       "/produtos",
       "/sobre",
       "/contato",
-      "/admin", // Adicionado para desativar o carrosel na área de administração
+      "/admin",
    ];
 
    const isCategoryProductRoute = location.pathname.startsWith(
@@ -59,9 +60,12 @@ function Layout() {
 
    return (
       <>
-         <div className="fixed top-0 left-0 w-full z-50 bg-white shadow-xs shadow-amber-600/50 h-17">
-            <Nav />
-         </div>
+         {/* ⭐ MUDANÇA: Renderiza a Nav apenas se mostrarNav for verdadeiro */}
+         {mostrarNav && (
+            <div className="fixed top-0 left-0 w-full z-50 bg-white shadow-xs shadow-amber-600/50 h-17">
+               <Nav />
+            </div>
+         )}
          <div>
             {mostrarCarrosel && <Carrosel />}
             <Routes>
@@ -114,12 +118,6 @@ function Layout() {
                   element={<ProductsByCategoryPage />}
                />
                <Route path="/produtos" element={<ProductsPage />} />
-
-               {/* ⭐ MUDANÇA PRINCIPAL AQUI:
-                        A rota para a AdminPage agora está ANINHADA
-                        dentro da rota de AdminPrivateRoute.
-                        O caminho '/admin/*' foi alterado para apenas '/admin' para que a rota aninhada funcione corretamente.
-                    */}
                <Route element={<AdminPrivateRoute />}>
                   <Route path="/admin" element={<AdminPage />} />
                </Route>
