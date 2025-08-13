@@ -24,13 +24,6 @@ const validateCpf = (cpf) => {
    return true;
 };
 
-// Máscaras
-const applyMask = (value, pattern) => {
-   let i = 0;
-   const v = value.replace(/\D/g, "");
-   return pattern.replace(/#/g, () => v[i++] || "");
-};
-
 export default function Register() {
    const [name, setName] = useState("");
    const [sobrenome, setSobrenome] = useState("");
@@ -144,6 +137,12 @@ export default function Register() {
       const unformattedTelefone = telefone.replace(/\D/g, "");
       const unformattedCpf = cpf.replace(/\D/g, "");
 
+      if (!validateCpf(unformattedCpf)) {
+         toast.error("CPF inválido.");
+         setIsLoading(false);
+         return;
+      }
+
       if (
          !name ||
          !sobrenome ||
@@ -186,7 +185,9 @@ export default function Register() {
          }
 
          await response.json();
-         toast.success("Registro realizado com sucesso! Verifique seu email.");
+         toast.success(
+            "Registro realizado com sucesso! Verifique seu email (caixa principal ou spam)."
+         );
 
          // Resetar campos
          setName("");
