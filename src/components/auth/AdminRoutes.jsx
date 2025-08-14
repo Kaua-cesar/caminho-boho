@@ -2,7 +2,7 @@
 import React, { useContext } from "react";
 import { Navigate, Outlet } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
-import AdminPage from "../../pages/AdminPage";
+import AdminPage from "../../pages/Admin/AdminPage";
 
 /**
  * @description Componente de rota privada para administradores.

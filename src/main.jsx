@@ -28,8 +28,8 @@ import { ContactPage } from "./pages/ContactPage";
 import RotaPrivada from "./components/auth/RotaPrivada";
 import RotaPublica from "./components/auth/RotaPublica";
 import AdminPrivateRoute from "./components/auth/AdminPrivateRoute";
-import AdminPage from "./pages/AdminPage";
-import AdminUpload from "./pages/AdminUpload";
+import AdminPage from "./pages/Admin/AdminPage";
+import AdminUpload from "./pages/Admin/AdminUpload";
 
 function Layout() {
    const location = useLocation();

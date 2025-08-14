@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../../context/AuthContext";
 import { CiFileOn, CiSearch } from "react-icons/ci";
 import { IoIosGitBranch } from "react-icons/io";
-import { FaPlus, FaChevronDown, FaArrowUp } from "react-icons/fa6";
+import { FaPlus, FaChevronDown } from "react-icons/fa6";
 import { LuFolderOpen, LuUsers } from "react-icons/lu";
 import { FaRegChartBar } from "react-icons/fa";
 import { SiHackthebox } from "react-icons/si";

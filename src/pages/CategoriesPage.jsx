@@ -21,10 +21,10 @@ export function CategoriesPage() {
             ];
 
             const categoryDisplayNames = {
-               costanua: "Vestidos Costa Nua",
-               vestlenco: "Vestidos Lenço",
-               boholongo: "Vestidos Boho Longo",
-               bohochic: "Vestidos Boho Chic",
+               costanua: "Costa Nua",
+               vestlenco: "Lenço",
+               boholongo: "Boho Longo",
+               bohochic: "Boho Chic",
             };
 
             const finalCategories = uniqueCategories.map((cat) => ({
@@ -81,11 +81,11 @@ export function CategoriesPage() {
                      to={`/produtos/categoria/${category.name}`}
                      className="p-6 bg-white border border-gray-200 rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 text-center cursor-pointer flex flex-col justify-between h-full"
                   >
-                     <h2 className="text-xl sm:text-2xl font-semibold text-amber-600 mb-2">
+                     <h2 className="text-xl sm:text-2xl font-semibold text-amber-600 mb-2 ">
                         {category.displayName}
                      </h2>
                      <p className="text-gray-600 text-sm sm:text-base">
-                        Ver {category.displayName.toLowerCase()}
+                        Ver vestidos {category.displayName.toLowerCase()}
                      </p>
                   </Link>
                ))}

@@ -332,14 +332,15 @@ export default function AdminUpload() {
                   <X className="h-4 w-4" />
                </Button>
             </div>
-            <div className="grid grid-cols-5 gap-2">
+            <div className="flex sm:flex-row gap-2 sm:gap-3 flex-col">
                {["PP", "P", "M", "G", "GG"].map((tamanho) => (
                   <div key={tamanho}>
-                     <label className="block text-xs font-medium text-gray-500">
+                     <label className="flex ml-1 text-xs font-medium text-gray-500">
                         {tamanho}
                      </label>
                      <Input
                         type="number"
+                        className={"text-center"}
                         min="0"
                         value={cores[cor][tamanho]}
                         onChange={(e) =>
@@ -359,7 +360,7 @@ export default function AdminUpload() {
    };
 
    return (
-      <div className="h-screen flex flex-col items-center justify-center gap-6">
+      <div className="h-screen flex flex-col items-center justify-center gap-6 w-full ">
          <Dialog open={openAdd} onOpenChange={setOpenAdd}>
             <DialogTrigger asChild>
                <Button>Adicionar Produto</Button>
@@ -482,39 +483,7 @@ export default function AdminUpload() {
                </form>
             </DialogContent>
          </Dialog>
-         <Dialog open={openRemove} onOpenChange={setOpenRemove}>
-            <DialogTrigger asChild>
-               <Button variant="destructive">Remover Produto</Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-md">
-               <DialogHeader>
-                  <DialogTitle>Remover Produto</DialogTitle>
-               </DialogHeader>
-               <form
-                  onSubmit={async (e) => {
-                     e.preventDefault();
-                     await removerProduto();
-                  }}
-                  className="space-y-3"
-               >
-                  <Input
-                     placeholder="ID do Produto (ex: produto-1)"
-                     value={produtoIdRemover}
-                     onChange={(e) => setProdutoIdRemover(e.target.value)}
-                  />
-                  <DialogFooter>
-                     <Button
-                        type="submit"
-                        variant="destructive"
-                        className="w-full"
-                        disabled={isSubmitting}
-                     >
-                        {isSubmitting ? "Removendo..." : "Remover"}
-                     </Button>
-                  </DialogFooter>
-               </form>
-            </DialogContent>
-         </Dialog>
+
          <Dialog
             open={openEdit}
             onOpenChange={(isOpen) => {
@@ -528,7 +497,7 @@ export default function AdminUpload() {
             <DialogTrigger asChild>
                <Button variant="secondary">Editar Produto</Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-lg">
+            <DialogContent className="sm:max-w-lg max-h-[calc(100dvh-2rem)] overflow-auto">
                <DialogHeader>
                   <DialogTitle>Editar Produto</DialogTitle>
                </DialogHeader>
@@ -653,7 +622,7 @@ export default function AdminUpload() {
                         <label className="block text-sm font-bold mb-2">
                            Gerenciar Cores e Tamanhos
                         </label>
-                        <div className="flex mb-2">
+                        <div className="flex mb-4 flex-col sm:flex-row sm:gap-0 gap-2 ">
                            <Input
                               type="text"
                               placeholder="Nome da cor (ex: Rosa)"
@@ -674,7 +643,7 @@ export default function AdminUpload() {
                            true
                         )}
                      </div>
-                     <DialogFooter className="mt-4">
+                     <DialogFooter>
                         <Button
                            type="submit"
                            className="w-full"
@@ -685,6 +654,39 @@ export default function AdminUpload() {
                      </DialogFooter>
                   </form>
                )}
+            </DialogContent>
+         </Dialog>
+         <Dialog open={openRemove} onOpenChange={setOpenRemove}>
+            <DialogTrigger asChild>
+               <Button variant="destructive">Remover Produto</Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-md">
+               <DialogHeader>
+                  <DialogTitle>Remover Produto</DialogTitle>
+               </DialogHeader>
+               <form
+                  onSubmit={async (e) => {
+                     e.preventDefault();
+                     await removerProduto();
+                  }}
+                  className="space-y-3"
+               >
+                  <Input
+                     placeholder="ID do Produto (ex: produto-1)"
+                     value={produtoIdRemover}
+                     onChange={(e) => setProdutoIdRemover(e.target.value)}
+                  />
+                  <DialogFooter>
+                     <Button
+                        type="submit"
+                        variant="destructive"
+                        className="w-full"
+                        disabled={isSubmitting}
+                     >
+                        {isSubmitting ? "Removendo..." : "Remover"}
+                     </Button>
+                  </DialogFooter>
+               </form>
             </DialogContent>
          </Dialog>
       </div>
