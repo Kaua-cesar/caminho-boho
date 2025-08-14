@@ -1,47 +1,12 @@
-import React, { useState, useEffect } from "react";
-
+import React, { useState } from "react";
 import { useAuth } from "../context/AuthContext";
-
 import { CiFileOn, CiSearch } from "react-icons/ci";
-
 import { IoIosGitBranch } from "react-icons/io";
-
 import { FaPlus, FaChevronDown, FaArrowUp } from "react-icons/fa6";
-
 import { LuFolderOpen, LuUsers } from "react-icons/lu";
-
 import { FaRegChartBar } from "react-icons/fa";
-
 import { SiHackthebox } from "react-icons/si";
-
 import { FiShoppingCart, FiFileText } from "react-icons/fi";
-
-import { TbCurrencyReal } from "react-icons/tb";
-
-// =======================================================
-
-// ⭐ NOVOS COMPONENTES PARA A VISÃO GERAL ⭐
-
-// =======================================================
-
-// Card reutilizável para exibir estatísticas
-
-const StatCard = ({ title, value, icon: Icon, change, changeColor }) => (
-   <div className="bg-[#282a36] p-4 rounded-lg border border-[#44475a] flex flex-col gap-2">
-      <div className="flex items-center justify-between text-[#6272a4]">
-         <span className="text-sm font-medium">{title}</span>
-         <Icon className="text-xl" /> 
-      </div>
-      <div>
-         <h3 className="text-3xl font-bold text-[#f8f8f2]">{value}</h3> 
-         <p
-            className={`text-xs font-semibold flex items-center gap-1 ${changeColor}`}
-         >
-            <FaArrowUp size={10} />  {change} 
-         </p>
-      </div>
-   </div>
-);
 
 const navItems = [
    { key: "visao-geral", name: "visao-geral.jsx", icon: FaRegChartBar },

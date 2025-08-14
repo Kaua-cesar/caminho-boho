@@ -197,7 +197,7 @@ export default function Register() {
 
          await response.json();
          toast.success(
-            "Registro realizado com sucesso! Verifique seu email (caixa principal ou spam)."
+            "Registro realizado com sucesso! Verifique seu email ( caixa principal ou spam )."
          );
 
          // Resetar campos

@@ -1,5 +1,6 @@
-import React, { useState } from "react";
-import { getAuth } from "firebase/auth";
+import React, { useState, useEffect } from "react";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { useNavigate } from "react-router-dom";
 import {
    Dialog,
    DialogTrigger,
@@ -12,20 +13,54 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 
-const API_URL = import.meta.env.VITE_API_URL;
+const ADMIN_EMAILS = [
+   "kauacz04coc@gmail.com",
+   "campanariolais@gmail.com",
+   "mais.um.email@exemplo.com",
+];
 
 export default function AdminUpload() {
+   const navigate = useNavigate();
    const [open, setOpen] = useState(false);
+   const [isAdmin, setIsAdmin] = useState(false);
+   const [loading, setLoading] = useState(true);
    const [produto, setProduto] = useState({
       nome: "",
       descricao: "",
       precoOriginal: "",
-      desconto: 0,
+      desconto: "",
       categoria: "",
       imagem: "",
-      cores: {}, // Objeto para armazenar cores e seus tamanhos
+      cores: {},
+      avaliacoes: "",
+      quantidadeAvaliacoes: "",
    });
    const [novaCor, setNovaCor] = useState("");
+
+   useEffect(() => {
+      const auth = getAuth();
+
+      const unsubscribe = onAuthStateChanged(auth, async (user) => {
+         if (!user) {
+            navigate("/"); // não logado
+            return;
+         }
+
+         // Verifica se o email do usuário está na lista de admins
+         if (!ADMIN_EMAILS.includes(user.email)) {
+            navigate("/"); // não é admin
+            return;
+         }
+
+         setIsAdmin(true);
+         setLoading(false);
+      });
+
+      return () => unsubscribe();
+   }, [navigate]);
+
+   if (loading) return <div>Carregando...</div>;
+   if (!isAdmin) return null;
 
    async function criarProduto(e) {
       e.preventDefault();
@@ -36,27 +71,25 @@ export default function AdminUpload() {
 
          const token = await user.getIdToken();
 
-         // Mapeia o objeto `cores` para a nova estrutura de `estoque`
          const estoque = {};
          Object.keys(produto.cores).forEach((cor) => {
             const tamanhosComQuantidade = Object.fromEntries(
                Object.entries(produto.cores[cor]).filter(([_, qtd]) => qtd > 0)
             );
-            // Adiciona a cor apenas se ela tiver tamanhos com quantidade > 0
             if (Object.keys(tamanhosComQuantidade).length > 0) {
                estoque[cor] = tamanhosComQuantidade;
             }
          });
 
          const newProduct = {
-            id: crypto.randomUUID(),
             ...produto,
             precoOriginal: parseFloat(produto.precoOriginal) || 0,
             desconto: parseFloat(produto.desconto) || 0,
-            avaliacoes: 0,
-            quantidadeAvaliacoes: 0,
-            estoque: estoque, // Envia o novo objeto `estoque` para o back-end
-            cores: undefined, // Remove a propriedade `cores` original
+            avaliacoes: parseFloat(produto.avaliacoes) || 0,
+            quantidadeAvaliacoes: parseInt(produto.quantidadeAvaliacoes) || 0,
+            estoque,
+            cores: undefined,
+            imagem: produto.imagem,
          };
 
          const res = await fetch(`${API_URL}/admin-upload`, {
@@ -71,15 +104,16 @@ export default function AdminUpload() {
          const data = await res.json();
          if (res.ok) {
             alert("Produto criado com sucesso!");
-            // Reseta o formulário
             setProduto({
                nome: "",
                descricao: "",
                precoOriginal: "",
-               desconto: 0,
+               desconto: "",
                categoria: "",
                imagem: "",
                cores: {},
+               avaliacoes: "",
+               quantidadeAvaliacoes: "",
             });
             setNovaCor("");
             setOpen(false);
@@ -91,9 +125,6 @@ export default function AdminUpload() {
          alert("Erro ao criar produto");
       }
    }
-
-   // ... restante do código (adicionarCor, handleTamanhoChange, removerCor, renderização)
-   // Essas funções permanecem as mesmas
 
    const adicionarCor = () => {
       if (novaCor && !produto.cores[novaCor]) {
@@ -126,7 +157,6 @@ export default function AdminUpload() {
       delete copy[cor];
       setProduto((prev) => ({ ...prev, cores: copy }));
    };
-
    return (
       <div className="h-screen flex items-center justify-center">
          <Dialog open={open} onOpenChange={setOpen}>
@@ -176,9 +206,14 @@ export default function AdminUpload() {
                      type="number"
                      placeholder="Desconto (%)"
                      value={produto.desconto}
-                     onChange={(e) =>
-                        setProduto({ ...produto, desconto: e.target.value })
-                     }
+                     onChange={(e) => {
+                        let val = parseFloat(e.target.value) || 0;
+                        if (val > 100) val = 100;
+                        if (val < 0) val = 0;
+                        setProduto({ ...produto, desconto: val });
+                     }}
+                     min={0}
+                     max={100}
                   />
                   <Input
                      placeholder="Categoria"
@@ -195,6 +230,28 @@ export default function AdminUpload() {
                         setProduto({ ...produto, imagem: e.target.value })
                      }
                      required
+                  />
+                  <Input
+                     type="number"
+                     placeholder="Avaliações"
+                     value={produto.avaliacoes}
+                     onChange={(e) => {
+                        let val = parseInt(e.target.value) || 0;
+                        if (val > 5) val = 5;
+                        setProduto({ ...produto, avaliacoes: val });
+                     }}
+                     max={5}
+                  />
+                  <Input
+                     type="number"
+                     placeholder="Quantidade de Avaliações"
+                     value={produto.quantidadeAvaliacoes}
+                     onChange={(e) =>
+                        setProduto({
+                           ...produto,
+                           quantidadeAvaliacoes: e.target.value,
+                        })
+                     }
                   />
 
                   <div className="mt-4">
