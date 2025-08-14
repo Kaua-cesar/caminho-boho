@@ -3,21 +3,16 @@ import { Separator } from "@/components/ui/separator";
 import { useAuth } from "../context/AuthContext";
 import { useState, useEffect } from "react";
 import {
-   FaBars,
    FaTruck,
    FaMapMarkerAlt,
    FaLock,
-   FaCreditCard,
-   FaHeart,
    FaHeadset,
    FaSignOutAlt,
    FaEdit,
 } from "react-icons/fa";
 import { FaXmark } from "react-icons/fa6";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { useFavorites } from "../context/FavoritesContext";
-import { Card } from "../Card";
-import { produtos } from "../components/Cards/CardDados";
+
 import { Button } from "@/components/ui/button";
 import {
    Dialog,
@@ -304,11 +299,11 @@ function Pedidos() {
    if (!loading && pedidos.length === 0) {
       return (
          <div className="flex flex-col p-4 ">
-                       {" "}
+                       
             <h2 className="text-2xl font-bold mb-6 text-gray-800">
-                              Meus Pedidos            {" "}
+                              Meus Pedidos            
             </h2>
-                       {" "}
+                       
             <div className="bg-white p-6 rounded-lg shadow-md text-center w-auto">
                               
                <p className="text-gray-600">
@@ -322,7 +317,7 @@ function Pedidos() {
                >
                                     Ir as compras                
                </Link>
-                          {" "}
+                          
             </div>
                      
          </div>
@@ -335,35 +330,35 @@ function Pedidos() {
          <h2 className="text-2xl font-bold mb-6 text-gray-800">Meus Pedidos</h2>
                   
          <div className="space-y-6">
-                       {" "}
+                       
             {pedidos.map((pedido) => (
                <div
                   key={pedido.id}
                   className="bg-white p-6 rounded-lg shadow-md"
                >
-                                   {" "}
+                                   
                   <div className="flex justify-between items-center border-b pb-4 mb-4 gap-2 flex-col md:flex-row">
                                           
                      <div>
-                                               {" "}
+                                               
                         <p className="font-semibold text-gray-900">
                                                       Pedido #{pedido.id}       
-                                          {" "}
+                                          
                         </p>
-                                               {" "}
+                                               
                         <p className="text-sm text-gray-500">
                                                       Data do pedido:          
                                             
                            {moment(pedido.dataCriacao).format(
                               "DD[/]MM [de] YYYY [às] HH:mm"
                            )}
-                                                  {" "}
+                                                  
                         </p>
                                              
                      </div>
                                           
                      <div className="text-right">
-                                               {" "}
+                                               
                         <span
                            className={`px-3 py-1 rounded-full text-xs font-bold ${
                               pedido.status === "aprovado"
@@ -380,13 +375,13 @@ function Pedidos() {
                               : pedido.status
                               ? pedido.status.toUpperCase()
                               : "DESCONHECIDO"}
-                                                  {" "}
+                                                  
                         </span>
                                              
                      </div>
-                                      {" "}
+                                      
                   </div>
-                                   {" "}
+                                   
                   <div className="space-y-4">
                                           
                      {pedido.items &&
@@ -395,48 +390,48 @@ function Pedidos() {
                               key={index}
                               className="flex items-center space-x-4 "
                            >
-                                                           {" "}
+                                                           
                               <img
                                  src={item.image}
                                  alt={item.title}
                                  className="w-16 h-16 object-cover rounded-md"
                               />
-                                                           {" "}
+                                                           
                               <div className="flex-1">
                                                                   
                                  <p className="font-medium text-gray-900 ">
-                                                                       {" "}
+                                                                       
                                     {item.title}                               
                                      
                                  </p>
                                                                   
                                  <p className="text-sm text-gray-600 flex gap-1">
-                                                                       {" "}
+                                                                       
                                     <span className="">Quantidade:</span>       
-                                                               {" "}
+                                                               
                                     <span className="font-semibold">
                                                                               
                                        {item.quantity}                         
-                                                {" "}
+                                                
                                     </span>
                                                                      
                                  </p>
-                                                              {" "}
+                                                              
                               </div>
-                                                           {" "}
+                                                           
                               <p className="font-semibold text-gray-900">
                                                                   R$            
                                                       
                                  {(item.unit_price * item.quantity).toFixed(2)} 
-                                                            {" "}
+                                                            
                               </p>
                                                          
                            </div>
                         ))}
-                                      {" "}
+                                      
                   </div>
                                     <Separator className="my-4" />             
-                     {" "}
+                     
                   <div className="flex justify-between items-center flex-wrap gap-2 flex-col sm:flex-row">
                                           
                      {pedido.shipping && pedido.shipping.option && (
@@ -445,37 +440,37 @@ function Pedidos() {
                            <span className="font-semibold">
                                                             Método de Envio:    
                                                      
-                           </span>{" "}
+                           </span>
                                                       
                            {pedido.shipping.option.name} (                      
                                 {pedido.shipping.option.carrier})              
-                                    {" "}
+                                    
                         </div>
                      )}
                                           
                      <div className="text-right flex-1">
-                                               {" "}
+                                               
                         <p className="text-lg font-bold text-gray-900">
                                                       Total: R$                
                                       
                            {pedido.total ? pedido.total.toFixed(2) : "0.00"}   
-                                              {" "}
+                                              
                         </p>
                                              
                      </div>
-                                      {" "}
+                                      
                   </div>
-                                   {" "}
+                                   
                   {(pedido.status === "pendente" ||
                      pedido.status === "pending") && (
                      <div className="mt-4 w-full flex sm:justify-end justify-center">
-                                               {" "}
+                                               
                         <button
                            onClick={() => handleRePagamento(pedido.id)}
                            className="w-auto p-2 bg-amber-600 text-white font-semibold rounded-lg cursor-pointer hover:bg-amber-700 transition duration-300"
                         >
                                                       Pagar Agora              
-                                    {" "}
+                                    
                         </button>
                                              
                      </div>
@@ -485,7 +480,7 @@ function Pedidos() {
             ))}
                      
          </div>
-              {" "}
+              
       </div>
    );
 }
@@ -507,7 +502,7 @@ function Seguranca() {
                   <h2 className="text-xl font-bold mb-4">Login e segurança</h2> 
                 
          <form onSubmit={alterarSenha} className="space-y-3 max-w-sm">
-                       {" "}
+                       
             <input
                type="password"
                placeholder="Senha atual"
@@ -516,7 +511,7 @@ function Seguranca() {
                className="border rounded px-2 py-1 w-full"
                required
             />
-                       {" "}
+                       
             <input
                type="password"
                placeholder="Nova senha"
@@ -525,17 +520,17 @@ function Seguranca() {
                className="border rounded px-2 py-1 w-full"
                required
             />
-                       {" "}
+                       
             <button
                type="submit"
                className="bg-amber-600 text-white px-3 py-1 rounded hover:bg-amber-700 w-full"
             >
-                              Alterar senha            {" "}
+                              Alterar senha            
             </button>
-                       {" "}
+                       
             {mensagem && <p className="text-green-600">{mensagem}</p>}         
          </form>
-              {" "}
+              
       </div>
    );
 }
@@ -588,7 +583,7 @@ export default function MinhaConta() {
          {/* Removido o botão de menu hambúrguer e o overlay para mobile */}   
               {/* NAV LATERAL - Visível apenas no desktop */}         
          <nav className="hidden md:flex flex-col w-[20%] max-w-[300px] p-6 shadow-xl">
-                       {" "}
+                       
             <div className="mb-6 md:mb-4">
                               
                <h1 className="text-2xl font-bold mb-1">Minha Conta</h1>         
@@ -597,13 +592,13 @@ export default function MinhaConta() {
                                     {user?.displayName}, <br /> {user?.email}   
                              
                </p>
-                          {" "}
+                          
             </div>
-                        <Separator />           {" "}
+                        <Separator />           
             <div className="flex flex-col flex-grow overflow-y-auto mt-4">
                               
                <div className="flex flex-col space-y-2">
-                                   {" "}
+                                   
                   {opcoes.map((item) => (
                      <Link
                         key={item.path}
@@ -615,10 +610,10 @@ export default function MinhaConta() {
                               : "hover:bg-gray-50 text-gray-800 font-medium"
                         }`}
                      >
-                                               {" "}
+                                               
                         <span className="shadow bg-white rounded p-1 text-amber-600">
                                                       {item.icon}               
-                                  {" "}
+                                  
                         </span>
                                                 <span>{item.label}</span>       
                                      
@@ -628,7 +623,7 @@ export default function MinhaConta() {
                </div>
                               <Separator className="my-4" />               
                <div className="flex flex-col space-y-2">
-                                   {" "}
+                                   
                   <button
                      type="button"
                      onClick={() => alert("Abrindo suporte...")}
@@ -637,9 +632,9 @@ export default function MinhaConta() {
                   >
                                           
                      <FaHeadset className="shadow bg-white rounded p-1 text-amber-600 text-2xl" />
-                                          <span>Suporte</span>                 {" "}
+                                          <span>Suporte</span>                 
                   </button>
-                                   {" "}
+                                   
                   <button
                      type="button"
                      onClick={logout}
@@ -648,11 +643,11 @@ export default function MinhaConta() {
                   >
                                           
                      <FaSignOutAlt className="shadow bg-white rounded p-1 text-amber-600 text-2xl" />
-                                          <span>Sair</span>                 {" "}
+                                          <span>Sair</span>                 
                   </button>
                                  
                </div>
-                          {" "}
+                          
             </div>
                      
          </nav>

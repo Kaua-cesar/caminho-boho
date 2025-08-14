@@ -1,35 +1,59 @@
-// src/pages/ProductsByCategoryPage.jsx
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom"; // Para pegar o parâmetro da URL
-import { produtos } from "../../components/Cards/CardDados"; // Importa seus dados de produtos reais
-import { Card } from "../../Card"; // Importa seu componente Card
+import { useParams } from "react-router-dom";
+import { Card } from "../../Card";
+import {
+   getFirestore,
+   collection,
+   getDocs,
+   query,
+   where,
+} from "firebase/firestore";
+import { getApp } from "firebase/app";
 
 export function ProductsByCategoryPage() {
-   const { categoryName } = useParams(); // Pega o 'categoryName' da URL
+   const { categoryName } = useParams();
    const [filteredProducts, setFilteredProducts] = useState([]);
    const [loading, setLoading] = useState(true);
 
    useEffect(() => {
-      setLoading(true);
-      // Filtra os produtos com base no categoryName da URL
-      const productsInThisCategory = produtos.filter(
-         (product) => product.categoria === categoryName
-      );
-      setFilteredProducts(productsInThisCategory);
-      setLoading(false);
-   }, [categoryName]); // Re-executa sempre que a categoria na URL muda
+      async function fetchProducts() {
+         try {
+            setLoading(true);
+            const app = getApp();
+            const db = getFirestore(app);
 
-   // Função para formatar o nome da categoria para exibição
+            // Consulta filtrando apenas os produtos da categoria
+            const produtosRef = collection(db, "produtos");
+            const q = query(
+               produtosRef,
+               where("categoria", "==", categoryName)
+            );
+            const snapshot = await getDocs(q);
+
+            const productsInThisCategory = snapshot.docs.map((doc) => ({
+               id: doc.id,
+               ...doc.data(),
+            }));
+
+            setFilteredProducts(productsInThisCategory);
+         } catch (err) {
+            console.error("Erro ao buscar produtos por categoria:", err);
+            setFilteredProducts([]);
+         } finally {
+            setLoading(false);
+         }
+      }
+
+      fetchProducts();
+   }, [categoryName]);
+
    const formatCategoryName = (name) => {
-      // Mapeamento específico para seus nomes de categoria, se necessário
       const displayNames = {
          costanua: "Vestidos Costa Nua",
          vestlenco: "Vestidos Lenço",
          boholongo: "Vestidos Boho Longo",
          bohochic: "Vestidos Boho Chic",
-         // Adicione mais mapeamentos aqui conforme suas categorias
       };
-      // Se houver um nome mapeado, use-o; caso contrário, tente formatar automaticamente
       return (
          displayNames[name] ||
          name
@@ -49,7 +73,7 @@ export function ProductsByCategoryPage() {
    }
 
    return (
-      <div className="container mx-auto p-4 mt-20 ]">
+      <div className="container mx-auto p-4 mt-20">
          <h1 className="text-3xl font-bold mb-8 text-center text-gray-800">
             Produtos em {formatCategoryName(categoryName)}
          </h1>
@@ -70,7 +94,7 @@ export function ProductsByCategoryPage() {
                      key={product.id}
                      id={product.id}
                      nome={product.nome}
-                     preco={product.precoOriginal} // Assumindo que Card usa 'preco' para o preço principal
+                     preco={product.precoOriginal}
                      precoOriginal={product.precoOriginal}
                      estoque={product.estoque}
                      cores={product.cores}

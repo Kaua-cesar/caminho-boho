@@ -29,6 +29,7 @@ import RotaPrivada from "./components/auth/RotaPrivada";
 import RotaPublica from "./components/auth/RotaPublica";
 import AdminPrivateRoute from "./components/auth/AdminPrivateRoute";
 import AdminPage from "./pages/AdminPage";
+import AdminUpload from "./pages/AdminUpload";
 
 function Layout() {
    const location = useLocation();
@@ -121,6 +122,7 @@ function Layout() {
                <Route element={<AdminPrivateRoute />}>
                   <Route path="/admin" element={<AdminPage />} />
                </Route>
+               <Route path="/admin-upload" element={<AdminUpload />} />
             </Routes>
          </div>
       </>

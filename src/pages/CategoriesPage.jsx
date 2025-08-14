@@ -1,35 +1,51 @@
-// src/pages/CategoriesPage.jsx
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { produtos } from "../components/Cards/CardDados"; // Importa seus dados de produtos reais
+import { getFirestore, collection, getDocs } from "firebase/firestore";
+import { getApp } from "firebase/app";
 
 export function CategoriesPage() {
    const [categories, setCategories] = useState([]);
    const [loading, setLoading] = useState(true);
 
    useEffect(() => {
-      setLoading(true);
-      const uniqueCategories = [...new Set(produtos.map((p) => p.categoria))];
+      async function fetchCategories() {
+         setLoading(true);
+         try {
+            const app = getApp();
+            const db = getFirestore(app);
+            const snapshot = await getDocs(collection(db, "produtos"));
+            const produtos = snapshot.docs.map((doc) => doc.data());
 
-      const categoryDisplayNames = {
-         costanua: "Vestidos Costa Nua",
-         vestlenco: "Vestidos Lenço",
-         boholongo: "Vestidos Boho Longo",
-         bohochic: "Vestidos Boho Chic",
-         // Adicione mais mapeamentos conforme suas categorias
-      };
+            const uniqueCategories = [
+               ...new Set(produtos.map((p) => p.categoria)),
+            ];
 
-      const finalCategories = uniqueCategories.map((cat) => ({
-         name: cat,
-         displayName:
-            categoryDisplayNames[cat] ||
-            cat
-               .replace(/([A-Z])/g, " $1")
-               .replace(/^./, (str) => str.toUpperCase()),
-      }));
+            const categoryDisplayNames = {
+               costanua: "Vestidos Costa Nua",
+               vestlenco: "Vestidos Lenço",
+               boholongo: "Vestidos Boho Longo",
+               bohochic: "Vestidos Boho Chic",
+               // Adicione mais mapeamentos conforme suas categorias
+            };
 
-      setCategories(finalCategories);
-      setLoading(false);
+            const finalCategories = uniqueCategories.map((cat) => ({
+               name: cat,
+               displayName:
+                  categoryDisplayNames[cat] ||
+                  cat
+                     .replace(/([A-Z])/g, " $1")
+                     .replace(/^./, (str) => str.toUpperCase()),
+            }));
+
+            setCategories(finalCategories);
+         } catch (err) {
+            console.error("Erro ao buscar categorias:", err);
+         } finally {
+            setLoading(false);
+         }
+      }
+
+      fetchCategories();
    }, []);
 
    if (loading) {
@@ -43,7 +59,6 @@ export function CategoriesPage() {
    }
 
    return (
-      // Contêiner principal da página, com padding responsivo e centralização
       <div className="container mx-auto px-4 py-8 md:px-6 lg:px-8 flex flex-col items-center justify-center min-h-[calc(100vh-100px)]">
          <h1 className="text-3xl sm:text-4xl font-bold my-8 text-center text-gray-800">
             Explore Nossas Categorias
@@ -55,17 +70,17 @@ export function CategoriesPage() {
                   Nenhuma categoria encontrada.
                </p>
                <p className="text-md text-gray-600">
-                  Verifique seus dados de produtos ou adicione novas categorias.
+                  Verifique seus produtos no Firestore ou adicione novos
+                  produtos.
                </p>
             </div>
          ) : (
-            // Grid de categorias, mantendo a responsividade existente e adicionando max-w
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 w-full max-w-6xl">
                {categories.map((category, index) => (
                   <Link
                      key={index}
                      to={`/produtos/categoria/${category.name}`}
-                     className=" p-6 bg-white border border-gray-200 rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 text-center cursor-pointer flex flex-col justify-between h-full"
+                     className="p-6 bg-white border border-gray-200 rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 text-center cursor-pointer flex flex-col justify-between h-full"
                   >
                      <h2 className="text-xl sm:text-2xl font-semibold text-amber-600 mb-2">
                         {category.displayName}

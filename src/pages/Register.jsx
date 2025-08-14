@@ -94,6 +94,17 @@ export default function Register() {
       let newPos = selectionStart + (masked.length - value.length);
       if (newPos < 0) newPos = 0;
       e.target.setSelectionRange(newPos, newPos);
+
+      // Validação instantânea
+      if (rawValue.length === 11) {
+         if (!validateCpf(rawValue)) {
+            setErrors((prev) => ({ ...prev, cpf: "CPF inválido" }));
+         } else {
+            setErrors((prev) => ({ ...prev, cpf: null }));
+         }
+      } else {
+         setErrors((prev) => ({ ...prev, cpf: "CPF incompleto" }));
+      }
    };
 
    const handleEmailChange = (e) => {

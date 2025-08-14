@@ -1,15 +1,30 @@
 import React, { useState, useEffect } from "react";
-import { produtos } from "../../components/Cards/CardDados"; // Importa seus dados de produtos reais
-import { Card } from "../../Card"; // Importa seu componente Card
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "../../lib/firebase"; // seu Firestore inicializado
+import { Card } from "../../Card";
 
 export function ProductsPage() {
    const [allProducts, setAllProducts] = useState([]);
    const [loading, setLoading] = useState(true);
 
    useEffect(() => {
-      setLoading(true);
-      setAllProducts(produtos);
-      setLoading(false);
+      async function fetchProducts() {
+         setLoading(true);
+         try {
+            const querySnapshot = await getDocs(collection(db, "produtos"));
+            const productsData = querySnapshot.docs.map((doc) => ({
+               id: doc.id,
+               ...doc.data(),
+            }));
+            setAllProducts(productsData);
+         } catch (err) {
+            console.error("Erro ao buscar produtos:", err);
+            setAllProducts([]);
+         }
+         setLoading(false);
+      }
+
+      fetchProducts();
    }, []);
 
    if (loading) {
@@ -23,13 +38,7 @@ export function ProductsPage() {
    }
 
    return (
-      // Ajustes no container principal:
-      // - Removi 'container' e 'mx-auto' aqui para usar um padding mais flexível
-      // - Usei 'p-4' para padding geral em todas as telas
-      // - Adicionei 'md:p-8' para aumentar o padding em telas maiores
-      // - 'max-w-screen-xl' para um limite de largura generoso, mas não tão restritivo quanto '7xl'
-      // - Centralizado com 'mx-auto' dentro do layout geral
-      <div className=" min-h-screen p-4 md:p-8 mx-auto max-w-screen-xl ">
+      <div className="min-h-screen p-4 md:p-8 mx-auto max-w-screen-xl">
          <h1 className="text-3xl font-bold mb-8 text-center text-gray-800 md:text-4xl pt-[4.25rem]">
             Todos os Nossos Produtos
          </h1>
@@ -44,11 +53,7 @@ export function ProductsPage() {
                </p>
             </div>
          ) : (
-            // Ajustes no grid:
-            // - 'gap-4' para um espaçamento padrão entre os cards
-            // - 'sm:gap-6' para um pouco mais de espaçamento em telas maiores
-            // - Mantive 'place-items-center' para centralizar os cards
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 place-items-center ">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 place-items-center">
                {allProducts.map((product) => (
                   <Card
                      key={product.id}

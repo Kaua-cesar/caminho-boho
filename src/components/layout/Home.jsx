@@ -1,20 +1,30 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { Card } from "../../Card";
-import { produtos } from "../Cards/CardDados";
 import { CardsHome } from "../CardsHome";
 import { Footer } from "./Footer";
 import { Filters } from "../Filters";
+import { getProdutos } from "../../lib/firebaseProducts"; // função que criamos
 
 function calcularPrecoComDesconto(produto) {
    return produto.precoOriginal * (1 + produto.desconto / 100);
 }
 
 export function Home() {
+   const [produtos, setProdutos] = useState([]); // <- novos dados
    const [categoriaSelecionada, setCategoriaSelecionada] = useState("todas");
    const [precoSelecionado, setPrecoSelecionado] = useState("todos");
    const [ordenacao, setOrdenacao] = useState("sem-ordenacao");
    const [busca, setBusca] = useState("");
    const [quantidadeExibida, setQuantidadeExibida] = useState(8);
+
+   // ⭐ Busca os produtos do Firestore ao carregar a página
+   useEffect(() => {
+      async function fetchProdutos() {
+         const data = await getProdutos();
+         setProdutos(data);
+      }
+      fetchProdutos();
+   }, []);
 
    const produtosFiltrados = useMemo(() => {
       return produtos
@@ -44,7 +54,6 @@ export function Home() {
          });
    }, [produtos, categoriaSelecionada, precoSelecionado, ordenacao, busca]);
 
-   // Mostra apenas os primeiros N produtos
    const produtosParaExibir = produtosFiltrados.slice(0, quantidadeExibida);
 
    function handleVerMais() {
@@ -70,7 +79,6 @@ export function Home() {
             busca={busca}
             setBusca={setBusca}
          />
-         {/* Produtos */}
          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 md:gap-6 justify-center px-4 max-w-7xl mx-2 gap-4">
             {produtosParaExibir.length > 0 ? (
                produtosParaExibir.map((produto) => (
@@ -86,7 +94,6 @@ export function Home() {
                </p>
             )}
          </div>
-         {/* Botão Ver Mais */}
          {quantidadeExibida < produtosFiltrados.length && (
             <button
                onClick={handleVerMais}
