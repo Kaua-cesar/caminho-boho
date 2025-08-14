@@ -3,8 +3,6 @@ import { toast } from "sonner";
 import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
 import { Link } from "react-router-dom";
-
-// Importando componentes do Shadcn
 import {
    Dialog,
    DialogContent,
@@ -13,19 +11,13 @@ import {
    DialogDescription,
 } from "../components/ui/dialog";
 import { Button } from "../components/ui/button";
-import { InfoCarrinho } from "../components/Carrinho/InfoCarrinho";
 import TabelaItensCarrinho from "../components/Carrinho/TabelaItensCarrinho";
 import CupomDesconto from "../components/Carrinho/CupomDesconto";
 import ResumoCarrinho from "../components/Carrinho/ResumoCarrinho";
 import { CheckoutMP } from "../components/checkout/CheckoutMP";
-import {
-   AcoesCarrinhoContinue,
-   AcoesCarrinhoFinish,
-} from "../components/Carrinho/AcoesCarrinho";
+import { AcoesCarrinhoContinue } from "../components/Carrinho/AcoesCarrinho";
 import FreteResultado from "../components/Carrinho/FreteResultado";
 import { Separator } from "../components/ui/separator";
-
-// Importe o componente AddressForm aqui
 import { AddressForm } from "../components/AddressForm";
 
 export default function Carrinho() {
@@ -352,8 +344,6 @@ export default function Carrinho() {
                      >
                         Adicionar um Endereço
                      </Button>
-                     {/* ⭐ REMOVIDO: O botão para a opção de retirada foi removido daqui. */}
-                     {/* O usuário deve adicionar um endereço para prosseguir. */}
                   </div>
                ) : (
                   <>

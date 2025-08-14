@@ -10,11 +10,8 @@ import {
    FaTruck,
    FaMapMarkerAlt,
    FaLock,
-   FaCreditCard,
-   FaHeart,
 } from "react-icons/fa";
-import { MdSupportAgent } from "react-icons/md";
-import { MdOutlineMail } from "react-icons/md"; // Importado o ícone de e-mail para Contato
+import { MdSupportAgent, MdOutlineMail } from "react-icons/md";
 import React, { useState } from "react";
 import { FiUser, FiMenu } from "react-icons/fi";
 import { Link, useNavigate, useLocation } from "react-router-dom";
@@ -214,7 +211,6 @@ export function Nav() {
                                  <span>Sobre</span>
                               </Link>
                            </SheetClose>
-                           {/* ✨✨✨ CORRIGIDO AQUI: ADICIONADO CONTATO E SUPORTE SEPARADOS ✨✨✨ */}
                            <SheetClose asChild>
                               <Link
                                  to="/contato"

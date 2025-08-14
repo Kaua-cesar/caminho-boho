@@ -16,7 +16,6 @@ export const CartProvider = ({ children }) => {
    const [cartItems, setCartItems] = useState([]);
    const [cartLoading, setCartLoading] = useState(true);
 
-   // ✨ NOVA LINHA: Calcula o total de itens no carrinho
    const totalItems = cartItems.reduce((acc, item) => acc + item.quantidade, 0);
 
    useEffect(() => {
@@ -214,7 +213,7 @@ export const CartProvider = ({ children }) => {
          value={{
             cartItems,
             cartLoading,
-            totalItems, // ✨ ADICIONE ESTA LINHA AQUI para exportar o total
+            totalItems,
             addItemToCart,
             removeItemFromCart,
             updateItemQuantity,

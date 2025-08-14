@@ -1,9 +1,7 @@
-// src/components/Carrinho/AcoesCarrinhoFinish.jsx (se for um arquivo separado)
-// OU no mesmo arquivo, mas com exportações nomeadas
+// src/components/Carrinho/AcoesCarrinho.jsx
 
 import { Link } from "react-router-dom";
 
-// Exportação nomeada para AcoesCarrinhoFinish
 export function AcoesCarrinhoFinish() {
    return (
       <div className="flex flex-col items-center justify-center w-full ">
@@ -16,14 +14,10 @@ export function AcoesCarrinhoFinish() {
    );
 }
 
-// Exportação nomeada para AcoesCarrinhoContinue
 export function AcoesCarrinhoContinue() {
    return (
       <div className="flex flex-col items-center justify-center w-auto   rounded-md">
-         <Link
-            to="/"
-            className="w-full" // Garante que o link ocupe a largura total em telas pequenas
-         >
+         <Link to="/" className="w-full">
             <button className=" w-full p-3 rounded-sm hover:underline cursor-pointer ">
                Continuar comprando
             </button>

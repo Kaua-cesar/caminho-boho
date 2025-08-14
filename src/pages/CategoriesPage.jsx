@@ -25,7 +25,6 @@ export function CategoriesPage() {
                vestlenco: "Vestidos Lenço",
                boholongo: "Vestidos Boho Longo",
                bohochic: "Vestidos Boho Chic",
-               // Adicione mais mapeamentos conforme suas categorias
             };
 
             const finalCategories = uniqueCategories.map((cat) => ({

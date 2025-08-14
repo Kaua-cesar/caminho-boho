@@ -16,14 +16,12 @@ export default function Login() {
 
    const camposPreenchidos = email.trim() !== "" && senha.trim() !== "";
 
-   // Alerta se veio de rota privada
    useEffect(() => {
       if (location.state?.from) {
          toast.info("Você precisa fazer login para acessar esta página.");
       }
    }, [location.state]);
 
-   // Redireciona após login
    useEffect(() => {
       if (user && !loading) {
          const from = location.state?.from?.pathname || "/minha-conta";

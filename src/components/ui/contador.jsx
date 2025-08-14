@@ -1,4 +1,5 @@
 import React from "react";
+import { toast } from "sonner";
 
 export function ContadorCliques({ value, onChange }) {
    const handleIncrement = (e) => {
@@ -6,7 +7,7 @@ export function ContadorCliques({ value, onChange }) {
       if (value < 10) {
          onChange(value + 1);
       } else {
-         alert("Quantidade máxima atingida.");
+         toast.error("Quantidade máxima atingida.");
       }
    };
 

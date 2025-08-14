@@ -122,9 +122,7 @@ const MainContent = ({ user, selectedNav, setSelectedNav }) => {
    const selectedItem = navItems.find((item) => item.key === selectedNav);
 
    const renderContent = () => {
-      switch (
-         selectedNav // ⭐ CONTEÚDO DINÂMICO APLICADO AQUI ⭐
-      ) {
+      switch (selectedNav) {
          case "visao-geral":
             return (
                <p className="mt-4 text-[#6272a4]">

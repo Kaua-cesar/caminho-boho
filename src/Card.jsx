@@ -4,11 +4,9 @@ import { CardButton } from "./components/Cards/CardButton";
 import Rating from "@mui/material/Rating";
 import Stack from "@mui/material/Stack";
 import { toast } from "sonner";
-import { IoHeartOutline } from "react-icons/io5";
 
 import { useCart } from "./context/CartContext";
 
-// Objeto de mapeamento de cores
 const colorClassMap = {
    vermelho: "bg-red-500",
    preto: "bg-gray-900",
@@ -18,7 +16,6 @@ const colorClassMap = {
    verde: "bg-green-500",
    roxo: "bg-purple-500",
    amarelo: "bg-yellow-500",
-   // Adicione mais cores conforme necessário
 };
 
 export function Card({
@@ -162,12 +159,6 @@ export function Card({
    return (
       <div className="w-full">
          <div className="bg-white rounded-md shadow-md overflow-hidden flex flex-col h-[650px] sm:h-[650px] lg:h-[650px] transition-transform duration-300 ease-in-out hover:scale-105 mx-auto max-w-xs">
-            {desconto > 0 && (
-               <span className="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded z-10">
-                  -{desconto}%
-               </span>
-            )}
-
             <CardDialog
                id={id}
                nome={nome}
@@ -179,6 +170,13 @@ export function Card({
                avaliacao={avaliacao}
                qntavaliacoes={qntavaliacoes}
                atualizarTotalFavoritos={atualizarTotalFavoritos}
+               cores={cores.map((c) => ({ nome: c }))}
+               tamanhos={tamanhosDisponiveis.map((t) => ({ nome: t }))}
+               corSelecionada={corSelecionada}
+               setCorSelecionada={setCorSelecionada}
+               tamanhoSelecionado={tamanhoSelecionado}
+               setTamanhoSelecionado={setTamanhoSelecionado}
+               productHasAnyStock={productHasAnyStock}
             />
             <div className="p-3 flex flex-col flex-grow">
                <div className="flex items-center mb-1">

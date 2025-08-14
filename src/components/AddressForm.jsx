@@ -92,7 +92,6 @@ export function AddressForm({
    };
 
    const salvarEndereco = async () => {
-      // 'numero' e 'complemento' foram removidos da lista de campos obrigatórios
       const camposObrigatorios = [
          "nomeCompleto",
          "sobrenome",
@@ -140,9 +139,9 @@ export function AddressForm({
 
       const enderecoParaSalvar = {
          ...novoEndereco,
-         // Se o campo 'numero' estiver vazio, defina-o como 'S/N'
+
          numero: novoEndereco.numero || "S/N",
-         // Se o campo 'complemento' estiver vazio, envie uma string vazia
+
          complemento: novoEndereco.complemento || "",
       };
 

@@ -2,7 +2,6 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 
-// Função de validação de CPF real
 const validateCpf = (cpf) => {
    cpf = cpf.replace(/\D/g, "");
    if (cpf.length !== 11 || /^(\d)\1{10}$/.test(cpf)) return false;
@@ -36,7 +35,6 @@ export default function Register() {
 
    const navigate = useNavigate();
 
-   // Feedback visual instantâneo
    const [errors, setErrors] = useState({});
 
    const handleNameChange = (e) => {
@@ -63,7 +61,7 @@ export default function Register() {
 
    const handlePhoneChange = (e) => {
       const { value, selectionStart, selectionEnd } = e.target;
-      const rawValue = value.replace(/\D/g, ""); // Apenas números
+      const rawValue = value.replace(/\D/g, "");
       let masked = "";
 
       if (rawValue.length > 0) masked = `(${rawValue.substring(0, 2)}`;
@@ -72,7 +70,6 @@ export default function Register() {
 
       setTelefone(masked);
 
-      // Ajusta a posição do cursor
       let newPos = selectionStart + (masked.length - value.length);
       if (newPos < 0) newPos = 0;
       e.target.setSelectionRange(newPos, newPos);
@@ -80,7 +77,7 @@ export default function Register() {
 
    const handleCpfChange = (e) => {
       const { value, selectionStart, selectionEnd } = e.target;
-      const rawValue = value.replace(/\D/g, ""); // Apenas números
+      const rawValue = value.replace(/\D/g, "");
       let masked = "";
 
       if (rawValue.length > 0) masked = rawValue.substring(0, 3);
@@ -90,12 +87,10 @@ export default function Register() {
 
       setCpf(masked);
 
-      // Ajusta a posição do cursor
       let newPos = selectionStart + (masked.length - value.length);
       if (newPos < 0) newPos = 0;
       e.target.setSelectionRange(newPos, newPos);
 
-      // Validação instantânea
       if (rawValue.length === 11) {
          if (!validateCpf(rawValue)) {
             setErrors((prev) => ({ ...prev, cpf: "CPF inválido" }));
@@ -200,7 +195,6 @@ export default function Register() {
             "Registro realizado com sucesso! Verifique seu email ( caixa principal ou spam )."
          );
 
-         // Resetar campos
          setName("");
          setSobrenome("");
          setTelefone("");

@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { db } from "../lib/firebase"; // Certifique-se de que o caminho para o firebase é este
+import { db } from "../lib/firebase";
 import { doc, getDoc, setDoc } from "firebase/firestore";
-import { useAuth } from "./AuthContext"; // Importa o contexto de autenticação
+import { useAuth } from "./AuthContext";
 import { toast } from "sonner";
 
 const FavoritesContext = createContext();
@@ -15,7 +15,6 @@ export const FavoritesProvider = ({ children }) => {
    const [favorites, setFavorites] = useState([]);
    const [favoritesLoading, setFavoritesLoading] = useState(true);
 
-   // Efeito para carregar os favoritos do Firebase quando o usuário ou authLoading mudar
    useEffect(() => {
       const fetchFavorites = async () => {
          if (authLoading) return;
@@ -83,7 +82,6 @@ export const FavoritesProvider = ({ children }) => {
       const newFavorites = [...favorites, productId];
       const success = await updateFavoritesInFirebase(newFavorites);
       if (success) {
-         // ✨ Notificação de sucesso ao adicionar
          toast.success("Produto adicionado aos favoritos!");
       }
       return success;
@@ -105,15 +103,12 @@ export const FavoritesProvider = ({ children }) => {
 
       const success = await updateFavoritesInFirebase(filteredFavorites);
       if (success) {
-         // ✨ Notificação de sucesso ao remover
          toast.info("Produto removido dos favoritos.");
       }
       return success;
    };
 
    const isFavorite = (productId) => favorites.includes(productId);
-
-   // ✨ A função `clearFavorites` e toda a sua lógica foram removidas.
 
    const value = {
       favorites,
@@ -122,7 +117,6 @@ export const FavoritesProvider = ({ children }) => {
       removeFavorite,
       isFavorite,
       totalFavorites: favorites.length,
-      // ✨ `clearFavorites` não é mais exportado.
    };
 
    return (

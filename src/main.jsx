@@ -34,10 +34,9 @@ import AdminUpload from "./pages/AdminUpload";
 function Layout() {
    const location = useLocation();
 
-   // ⭐ NOVO: Variável para controlar se a Nav deve ser exibida.
-   const mostrarNav = location.pathname !== "/admin";
+   const mostrarNav =
+      location.pathname !== "/admin" && location.pathname !== "/add-products";
 
-   // Rotas onde o carrosel não deve aparecer
    const rotasSemCarrosel = [
       "/login",
       "/register",
@@ -50,6 +49,7 @@ function Layout() {
       "/sobre",
       "/contato",
       "/admin",
+      "/add-products",
    ];
 
    const isCategoryProductRoute = location.pathname.startsWith(
@@ -61,7 +61,6 @@ function Layout() {
 
    return (
       <>
-         {/* ⭐ MUDANÇA: Renderiza a Nav apenas se mostrarNav for verdadeiro */}
          {mostrarNav && (
             <div className="fixed top-0 left-0 w-full z-50 bg-white shadow-xs shadow-amber-600/50 h-17">
                <Nav />
@@ -122,7 +121,7 @@ function Layout() {
                <Route element={<AdminPrivateRoute />}>
                   <Route path="/admin" element={<AdminPage />} />
                </Route>
-               <Route path="/admin-upload" element={<AdminUpload />} />
+               <Route path="/add-products" element={<AdminUpload />} />
             </Routes>
          </div>
       </>

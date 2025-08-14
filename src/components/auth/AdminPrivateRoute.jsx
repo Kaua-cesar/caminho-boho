@@ -23,7 +23,6 @@ const AdminPrivateRoute = () => {
       return <Navigate to="/login" replace />;
    }
 
-   // Se o utilizador for um admin, renderiza o componente aninhado da rota.
    return <Outlet />;
 };
 

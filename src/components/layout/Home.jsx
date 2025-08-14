@@ -3,10 +3,10 @@ import { Card } from "../../Card";
 import { CardsHome } from "../CardsHome";
 import { Footer } from "./Footer";
 import { Filters } from "../Filters";
-import { getProdutos } from "../../lib/firebaseProducts"; // função que criamos
+import { getProdutos } from "../../lib/firebaseProducts";
 
 function calcularPrecoComDesconto(produto) {
-   return produto.precoOriginal * (1 + produto.desconto / 100);
+   return produto.precoOriginal * (1 - produto.desconto / 100);
 }
 
 export function Home() {
@@ -17,7 +17,6 @@ export function Home() {
    const [busca, setBusca] = useState("");
    const [quantidadeExibida, setQuantidadeExibida] = useState(8);
 
-   // ⭐ Busca os produtos do Firestore ao carregar a página
    useEffect(() => {
       async function fetchProdutos() {
          const data = await getProdutos();

@@ -1,6 +1,5 @@
 import Stack from "@mui/material/Stack";
 import Rating from "@mui/material/Rating";
-import { MdOutlineBookmarks } from "react-icons/md";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 export function CardClientes() {
    return (

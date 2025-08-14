@@ -7,7 +7,6 @@ import {
    updateProfile,
    sendEmailVerification,
 } from "firebase/auth";
-import { doc, setDoc } from "firebase/firestore";
 import { toast } from "sonner";
 
 const AuthContext = createContext();
@@ -17,11 +16,7 @@ export function AuthProvider({ children }) {
    const [loading, setLoading] = useState(true);
    const [isAdmin, setIsAdmin] = useState(false);
 
-   const ADMIN_EMAILS = [
-      "kauacz04coc@gmail.com",
-      "campanariolais@gmail.com",
-      "mais.um.email@exemplo.com",
-   ];
+   const ADMIN_EMAILS = ["kauacz04coc@gmail.com", "campanariolais@gmail.com"];
 
    useEffect(() => {
       const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {

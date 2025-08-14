@@ -2,7 +2,6 @@
 import React from "react";
 
 export function AboutPage() {
-   // Ou SobrePage
    return (
       <div className="flex items-center justify-center flex-col mx-36 pt-[4.25rem]">
          <h1 className="text-3xl font-bold my-8 text-center text-gray-800">

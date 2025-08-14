@@ -7,7 +7,6 @@ export default function FreteResultado({
    onSelectFreteOption,
    isLoading,
    error,
-   cep, // Mantemos o CEP para a mensagem final, se precisar
 }) {
    if (isLoading) {
       return (
@@ -25,7 +24,6 @@ export default function FreteResultado({
       );
    }
 
-   // Filtrar opções por categoria
    const freteOptions = availableFreteOptions.filter(
       (option) => option.category === "frete"
    );
@@ -33,13 +31,12 @@ export default function FreteResultado({
       (option) => option.category === "retirada"
    );
 
-   // Renderiza apenas se houver opções disponíveis ou se uma opção já foi selecionada
    if (
       freteOptions.length === 0 &&
       retiradaOptions.length === 0 &&
       !selectedFreteOptionInfo
    ) {
-      return null; // Não renderiza nada se não houver opções e nenhuma selecionada
+      return null;
    }
 
    return (
@@ -70,7 +67,7 @@ export default function FreteResultado({
                            <input
                               type="radio"
                               id={`frete-option-${option.id}`}
-                              name="frete-option" // Mesmo nome para que apenas um seja selecionável
+                              name="frete-option"
                               value={option.id}
                               checked={
                                  selectedFreteOptionInfo &&
@@ -108,7 +105,7 @@ export default function FreteResultado({
                   {retiradaOptions.map((option) => (
                      <label
                         key={option.id}
-                        htmlFor={`frete-option-${option.id}`} // Mesmo nome 'frete-option'
+                        htmlFor={`frete-option-${option.id}`}
                         className={`flex items-start justify-between p-4 cursor-pointer transition-colors duration-200 
                             ${
                                selectedFreteOptionInfo &&
@@ -121,7 +118,7 @@ export default function FreteResultado({
                            <input
                               type="radio"
                               id={`frete-option-${option.id}`}
-                              name="frete-option" // Mesmo nome para que apenas um seja selecionável
+                              name="frete-option"
                               value={option.id}
                               checked={
                                  selectedFreteOptionInfo &&
@@ -134,7 +131,7 @@ export default function FreteResultado({
                               <p className="font-medium text-gray-800">
                                  {option.name}
                               </p>
-                              {option.address && ( // Exibir endereço para retirada
+                              {option.address && (
                                  <p className="text-sm text-gray-500">
                                     {option.address}
                                  </p>
@@ -153,25 +150,6 @@ export default function FreteResultado({
                </div>
             </div>
          )}
-         {/* Mensagem de frete selecionado - opcional, se quiser um resumo à parte */}
-         {/* Se desejar uma confirmação abaixo, pode descomentar e ajustar o estilo */}
-         {/* {selectedFreteOptionInfo && (
-          <div className="mt-6 p-3 border border-green-400 bg-green-50 rounded-md w-full text-center md:text-left">
-            <p className="font-semibold text-green-700">Você escolheu:</p>
-            <p className="text-gray-800 text-lg mt-1">
-              <span className="font-bold">{selectedFreteOptionInfo.name}</span>
-              {selectedFreteOptionInfo.value !== undefined && (
-                <> - <span className="font-bold">R$ {selectedFreteOptionInfo.value.toFixed(2).replace(".", ",")}</span> </>
-              )}
-              {selectedFreteOptionInfo.prazo && (
-                <span className="text-gray-600 text-base"> ({selectedFreteOptionInfo.prazo})</span>
-              )}
-            </p>
-            {selectedFreteOptionInfo.carrier && (
-              <p className="text-sm text-gray-600">Transportadora: {selectedFreteOptionInfo.carrier}</p>
-            )}
-          </div>
-        )} */}
       </div>
    );
 }

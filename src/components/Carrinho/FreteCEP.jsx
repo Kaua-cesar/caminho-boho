@@ -10,13 +10,12 @@ const formatCEP = (value) => {
    return value;
 };
 
-// Remove as props freteOptions, selectedFreteOption, onSelectFreteOption
 export default function FreteCEP({
    cep,
    handleChange,
-   onCalculateFrete, // Função para disparar o cálculo
-   isCalculatingFrete, // Indica se o cálculo está em andamento
-   hasValidCep, // Indica se o CEP é válido para habilitar o botão de calcular
+   onCalculateFrete,
+   isCalculatingFrete,
+   hasValidCep,
 }) {
    const handleInternalCEPChange = (e) => {
       const rawValue = e.target.value;
@@ -33,7 +32,7 @@ export default function FreteCEP({
                onChange={handleInternalCEPChange}
                maxLength={9}
                placeholder="00000-000"
-               className="p-3 rounded-sm border w-34" // Estilos originais
+               className="p-3 rounded-sm border w-34"
                inputMode="numeric"
             />
             <div className="relative inline-block">
@@ -59,7 +58,6 @@ export default function FreteCEP({
                </span>
             </div>
          </div>
-         {/* As opções de frete NÃO SÃO MAIS RENDERIZADAS AQUI */}
       </div>
    );
 }

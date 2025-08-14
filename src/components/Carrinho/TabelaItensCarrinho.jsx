@@ -28,10 +28,8 @@ export default function TabelaItensCarrinho({
    };
 
    return (
-      // Removemos as classes de rolagem daqui
       <div className="overflow-x-auto">
          <Table>
-            {/* As classes sticky top-0 bg-white z-10 estão corretas aqui */}
             <TableHeader className="sticky top-0 bg-white z-10">
                <TableRow>
                   <TableHead className="text-start w-[300px]">

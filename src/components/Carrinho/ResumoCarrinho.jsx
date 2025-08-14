@@ -10,7 +10,6 @@ function ResumoCarrinho({
 }) {
    const valorDesconto = totalItens * descontoPercentual;
 
-   // Função para formatar o valor como moeda brasileira
    const formatarMoeda = (valor) => {
       return valor.toLocaleString("pt-BR", {
          style: "currency",

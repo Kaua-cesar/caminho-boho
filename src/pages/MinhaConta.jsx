@@ -29,9 +29,6 @@ import moment from "moment";
 import "moment/locale/pt-br";
 import { toast } from "sonner";
 
-// =======================================================
-// ⭐ COMPONENTES INDIVIDUAIS PARA CADA SEÇÃO DA CONTA ⭐
-// =======================================================
 export function Enderecos() {
    const { user } = useAuth();
    const [enderecos, setEnderecos] = useState([]);
@@ -237,7 +234,7 @@ export function Enderecos() {
 function Pedidos() {
    const { user } = useAuth();
    const [pedidos, setPedidos] = useState([]);
-   const [loading, setLoading] = useState(true); // ⭐ CORREÇÃO: Adicionada a verificação para garantir que pedidoId não seja nulo.
+   const [loading, setLoading] = useState(true);
 
    const handleRePagamento = async (pedidoId) => {
       if (!pedidoId) {
@@ -535,16 +532,12 @@ function Seguranca() {
    );
 }
 
-// =======================================================
-// ⭐ COMPONENTE PRINCIPAL (MinhaConta) com NAV LATERAL ⭐
-// =======================================================
-
 export default function MinhaConta() {
    const { user, logout } = useAuth();
    const navigate = useNavigate();
    const location = useLocation();
    const query = new URLSearchParams(location.search);
-   const tabSelecionada = query.get("tab") || "pedidos"; // Removido o estado 'isSidebarOpen' e seus modificadores // para evitar duplicação de menu hambúrguer
+   const tabSelecionada = query.get("tab") || "pedidos";
 
    const opcoes = [
       {
@@ -579,26 +572,21 @@ export default function MinhaConta() {
 
    return (
       <div className="flex flex-col md:flex-row h-[calc(100vh-4.3rem)] bg-white mt-[4.25rem]">
-                  
-         {/* Removido o botão de menu hambúrguer e o overlay para mobile */}   
-              {/* NAV LATERAL - Visível apenas no desktop */}         
+                   
          <nav className="hidden md:flex flex-col w-[20%] max-w-[300px] p-6 shadow-xl">
                        
             <div className="mb-6 md:mb-4">
-                              
+                          
                <h1 className="text-2xl font-bold mb-1">Minha Conta</h1>         
                     
                <p className="text-sm text-gray-600">
-                                    {user?.displayName}, <br /> {user?.email}   
-                             
+                   {user?.displayName}, <br /> {user?.email}             
                </p>
                           
             </div>
-                        <Separator />           
+            <Separator />           
             <div className="flex flex-col flex-grow overflow-y-auto mt-4">
-                              
                <div className="flex flex-col space-y-2">
-                                   
                   {opcoes.map((item) => (
                      <Link
                         key={item.path}
@@ -610,13 +598,11 @@ export default function MinhaConta() {
                               : "hover:bg-gray-50 text-gray-800 font-medium"
                         }`}
                      >
-                                               
+                                           
                         <span className="shadow bg-white rounded p-1 text-amber-600">
-                                                      {item.icon}               
-                                  
+                           {item.icon}                       
                         </span>
-                                                <span>{item.label}</span>       
-                                     
+                        <span>{item.label}</span>                     
                      </Link>
                   ))}
                                  
@@ -641,19 +627,17 @@ export default function MinhaConta() {
                      className="flex items-center gap-2 text-start rounded transition px-3 py-2 cursor-pointer hover:bg-gray-100 font-medium"
                      aria-label="Sair"
                   >
-                                          
+                                        
                      <FaSignOutAlt className="shadow bg-white rounded p-1 text-amber-600 text-2xl" />
-                                          <span>Sair</span>                 
+                     <span>Sair</span>                 
                   </button>
-                                 
+                     
                </div>
-                          
             </div>
-                     
          </nav>
                 
          <div className="flex-1 overflow-y-auto w-full p-4 md:p-6">
-                                  {renderConteudo()}         
+            {renderConteudo()}         
          </div>
       </div>
    );

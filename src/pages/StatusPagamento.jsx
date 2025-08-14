@@ -14,7 +14,6 @@ export default function StatusPagamento() {
       const status = searchParams.get("status");
       const pedidoId =
          searchParams.get("external_reference") || searchParams.get("pedidoId");
-      const paymentId = searchParams.get("payment_id");
 
       if (!status) {
          setStatusPagamento("erro");
@@ -24,12 +23,6 @@ export default function StatusPagamento() {
 
       async function verificarStatusEFinalizar() {
          try {
-            // A sua rota de webhook já atualiza o status do pedido no back-end.
-            // Agora, o front-end só precisa esperar a confirmação do back-end
-            // para exibir o status e limpar o carrinho.
-
-            // Vamos simular uma espera para dar tempo do webhook processar
-            // e o Firestore atualizar.
             await new Promise((resolve) => setTimeout(resolve, 2000));
 
             const response = await fetch(
@@ -46,7 +39,6 @@ export default function StatusPagamento() {
                if (statusDoServidor === "aprovado") {
                   setStatusPagamento("sucesso");
                   if (!pedidoFinalizado) {
-                     // Limpa o carrinho apenas uma vez
                      clearCart();
                      setPedidoFinalizado(true);
                   }
@@ -72,7 +64,6 @@ export default function StatusPagamento() {
          }
       }
 
-      // Evita chamadas múltiplas
       if (pedidoId && !pedidoFinalizado) {
          verificarStatusEFinalizar();
       } else if (status === "failure") {

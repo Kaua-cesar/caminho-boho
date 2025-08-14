@@ -38,7 +38,6 @@ export function ContactPage() {
          const response = await fetch(
             `${import.meta.env.VITE_API_URL}/send-contact`,
             {
-               // ✨ ENDPOINT DO SEU BACKEND
                method: "POST",
                headers: {
                   "Content-Type": "application/json",
@@ -76,25 +75,19 @@ export function ContactPage() {
    };
 
    return (
-      // Contêiner principal da página: padding responsivo, largura máxima e centralização
       <div className="pt-[4.25rem] px-4 md:px-6 lg:px-8 flex flex-col items-center justify-center min-h-[calc(100vh-100px)]">
-         {/* Título da página */}
          <h1 className="text-3xl sm:text-4xl font-bold my-8 text-center text-gray-800">
             Fale Conosco
          </h1>
 
-         {/* Contêiner do conteúdo principal: informações de contato e formulário */}
          <div className="bg-white p-6 sm:p-8 rounded-lg shadow-md mb-8 w-full max-w-4xl">
-            {/* Parágrafo de introdução, com ajuste de texto responsivo */}
             <p className="text-base sm:text-lg text-gray-700 leading-relaxed mb-6 text-center">
                Tem alguma dúvida, sugestão ou precisa de suporte? Entre em
                contato conosco através do formulário abaixo ou pelos nossos
                canais de atendimento.
             </p>
 
-            {/* Grid para Nossos Contatos e Envie uma Mensagem: responsividade md:grid-cols-2 */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 mb-8">
-               {/* Seção Nossos Contatos */}
                <div>
                   <h2 className="text-xl sm:text-2xl font-semibold mb-4 text-amber-600 text-center md:text-left">
                      Nossos Contatos
@@ -125,7 +118,6 @@ export function ContactPage() {
                   </p>
                </div>
 
-               {/* Seção Envie uma Mensagem - Formulário */}
                <div>
                   <h2 className="text-xl sm:text-2xl font-semibold mb-4 text-amber-600 text-center md:text-left">
                      Envie uma Mensagem

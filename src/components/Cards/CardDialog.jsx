@@ -19,6 +19,19 @@ import { toast } from "sonner";
 
 import { useCart } from "../../context/CartContext";
 
+// Objeto de mapeamento de cores
+const colorClassMap = {
+   vermelho: "bg-red-500",
+   preto: "bg-gray-900",
+   rosa: "bg-pink-500",
+   azul: "bg-blue-500",
+   branco: "bg-white border border-gray-300",
+   verde: "bg-green-500",
+   roxo: "bg-purple-500",
+   amarelo: "bg-yellow-500",
+   // Adicione mais cores conforme necessário
+};
+
 export function CardDialog({
    id,
    nome,
@@ -33,87 +46,23 @@ export function CardDialog({
    avaliacao,
    atualizarTotalFavoritos,
 }) {
-   const getInitialSelection = (options, stockData, parentSelection = null) => {
-      if (options.length === 0) return "";
-
-      for (const option of options) {
-         if (parentSelection === null) {
-            const hasStock = tamanhos.some(
-               (t) => stockData[option.nome]?.[t.nome] > 0
-            );
-            if (hasStock) {
-               return option.nome;
-            }
-         } else {
-            if (stockData[parentSelection]?.[option.nome] > 0) {
-               return option.nome;
-            }
-         }
-      }
-      return options[0]?.nome || "";
-   };
-
-   const [corSelecionada, setCorSelecionada] = useState(() =>
-      getInitialSelection(cores, estoque)
-   );
-   const [tamanhoSelecionado, setTamanhoSelecionado] = useState(() =>
-      getInitialSelection(tamanhos, estoque, corSelecionada)
-   );
-   const [quantidade, setQuantidade] = useState(1);
+   const { addItemToCart } = useCart();
    const [open, setOpen] = useState(false);
+   const [corSelecionada, setCorSelecionada] = useState("");
+   const [tamanhoSelecionado, setTamanhoSelecionado] = useState("");
+   const [quantidade, setQuantidade] = useState(1);
    const [currentStock, setCurrentStock] = useState(0);
 
-   const { addItemToCart } = useCart();
-
-   useEffect(() => {
-      if (estoque && corSelecionada && tamanhoSelecionado) {
-         const stockForCombination =
-            estoque[corSelecionada]?.[tamanhoSelecionado] || 0;
-         setCurrentStock(stockForCombination);
-      } else if (cores.length === 0 && tamanhos.length === 0) {
-         setCurrentStock(Number(estoque) || 0);
-      } else {
-         setCurrentStock(0);
-      }
-   }, [
-      estoque,
-      corSelecionada,
-      tamanhoSelecionado,
-      cores.length,
-      tamanhos.length,
-   ]);
-
-   useEffect(() => {
-      if (tamanhos.length > 0) {
-         let newTamanho = "";
-         if (corSelecionada) {
-            for (const tamanho of tamanhos) {
-               if (estoque[corSelecionada]?.[tamanho.nome] > 0) {
-                  newTamanho = tamanho.nome;
-                  break;
-               }
-            }
-            if (
-               tamanhoSelecionado &&
-               estoque[corSelecionada]?.[tamanhoSelecionado] > 0
-            ) {
-               setTamanhoSelecionado(tamanhoSelecionado);
-            } else {
-               setTamanhoSelecionado(newTamanho || tamanhos[0]?.nome || "");
-            }
-         } else {
-            setTamanhoSelecionado("");
-         }
-      }
-   }, [corSelecionada, tamanhos, estoque]);
-
+   // Função para verificar se o produto tem qualquer estoque
    const checkIfProductHasAnyStock = () => {
       if (!estoque) return false;
 
+      // Caso sem variações (estoque é um número)
       if (cores.length === 0 && tamanhos.length === 0) {
          return Number(estoque) > 0;
       }
 
+      // Caso com variações (estoque é um objeto)
       for (const cor of cores) {
          for (const tamanho of tamanhos) {
             if (estoque[cor.nome]?.[tamanho.nome] > 0) {
@@ -125,6 +74,105 @@ export function CardDialog({
    };
 
    const productHasAnyStock = checkIfProductHasAnyStock();
+
+   // Efeito para inicializar cor e tamanho quando o dialog abre
+   useEffect(() => {
+      if (!open || !productHasAnyStock) return;
+
+      // Se há cores, mas nenhuma está selecionada
+      if (cores.length > 0 && !corSelecionada) {
+         for (const cor of cores) {
+            // Encontra a primeira cor que tem algum estoque em qualquer tamanho
+            if (tamanhos.some((t) => estoque[cor.nome]?.[t.nome] > 0)) {
+               setCorSelecionada(cor.nome);
+               break;
+            }
+         }
+      }
+
+      // Se há tamanhos, mas nenhum está selecionado E uma cor já foi selecionada
+      if (tamanhos.length > 0 && corSelecionada && !tamanhoSelecionado) {
+         for (const tamanho of tamanhos) {
+            // Encontra o primeiro tamanho com estoque para a cor selecionada
+            if (estoque[corSelecionada]?.[tamanho.nome] > 0) {
+               setTamanhoSelecionado(tamanho.nome);
+               break;
+            }
+         }
+      }
+   }, [
+      open,
+      productHasAnyStock,
+      cores,
+      tamanhos,
+      estoque,
+      corSelecionada,
+      tamanhoSelecionado,
+   ]);
+
+   // Efeito para recalcular o estoque atual sempre que a cor ou o tamanho mudar
+   useEffect(() => {
+      if (!estoque) {
+         setCurrentStock(0);
+         return;
+      }
+
+      if (cores.length === 0 && tamanhos.length === 0) {
+         setCurrentStock(Number(estoque) || 0);
+         return;
+      }
+
+      if (corSelecionada && tamanhoSelecionado) {
+         const stockForCombination =
+            estoque[corSelecionada]?.[tamanhoSelecionado] || 0;
+         setCurrentStock(stockForCombination);
+      } else {
+         setCurrentStock(0);
+      }
+   }, [
+      estoque,
+      corSelecionada,
+      tamanhoSelecionado,
+      cores.length,
+      tamanhos.length,
+   ]);
+
+   // Efeito para resetar a quantidade se o estoque mudar
+   useEffect(() => {
+      if (quantidade > currentStock) {
+         setQuantidade(1);
+      }
+   }, [currentStock, quantidade]);
+
+   const handleCorChange = (corNome) => {
+      // Se a cor clicada for a mesma que a selecionada, deseleciona
+      if (corSelecionada === corNome) {
+         setCorSelecionada("");
+         setTamanhoSelecionado(""); // Reseta o tamanho ao deselecionar a cor
+      } else {
+         setCorSelecionada(corNome);
+         // Ao selecionar uma nova cor, tenta encontrar o primeiro tamanho com estoque
+         let newTamanho = "";
+         for (const tamanho of tamanhos) {
+            if (estoque[corNome]?.[tamanho.nome] > 0) {
+               newTamanho = tamanho.nome;
+               break;
+            }
+         }
+         setTamanhoSelecionado(newTamanho);
+      }
+      setQuantidade(1);
+   };
+
+   const handleTamanhoChange = (tamanhoNome) => {
+      // Se o tamanho clicado for o mesmo que o selecionado, deseleciona
+      if (tamanhoSelecionado === tamanhoNome) {
+         setTamanhoSelecionado("");
+      } else {
+         setTamanhoSelecionado(tamanhoNome);
+      }
+      setQuantidade(1);
+   };
 
    async function handleSubmit(e) {
       e.preventDefault();
@@ -156,7 +204,7 @@ export function CardDialog({
 
       if (currentStock < quantidade) {
          toast.error(
-            `Não há estoque suficiente para "${nome}" (${corSelecionada} / ${tamanhoSelecionado}). Disponível: ${currentStock}`
+            `Não há estoque suficiente para "${nome}". Disponível: ${currentStock}`
          );
          return;
       }
@@ -179,44 +227,24 @@ export function CardDialog({
    }
 
    const isVariationProduct = cores.length > 0 || tamanhos.length > 0;
-   const isSelectionComplete =
-      !isVariationProduct ||
-      (cores.length > 0 &&
-         corSelecionada &&
-         tamanhos.length > 0 &&
-         tamanhoSelecionado) ||
-      (cores.length > 0 && corSelecionada && tamanhos.length === 0) ||
-      (tamanhos.length > 0 && tamanhoSelecionado && cores.length === 0);
 
-   // Determina se o botão principal de adicionar ao carrinho deve estar desabilitado
-   const isAddToCartButtonDisabled =
-      currentStock <= 0 || !isSelectionComplete || quantidade <= 0;
+   // O botão só é habilitado se houver estoque para a combinação selecionada
+   const isAddToCartButtonDisabled = currentStock <= 0 || quantidade <= 0;
 
-   // --- Lógica aprimorada para a mensagem do botão ---
+   // Lógica aprimorada para a mensagem do botão
    let buttonMessage = "Adicionar ao carrinho";
 
-   if (isVariationProduct && !isSelectionComplete) {
-      // Prioriza a mensagem de seleção se for um produto com variação e a seleção não estiver completa
-      if (
-         cores.length > 0 &&
-         !corSelecionada &&
-         tamanhos.length > 0 &&
-         !tamanhoSelecionado
-      ) {
-         buttonMessage = "Selecione uma cor e tamanho";
-      } else if (cores.length > 0 && !corSelecionada) {
-         buttonMessage = "Selecione uma cor";
-      } else if (tamanhos.length > 0 && !tamanhoSelecionado) {
-         buttonMessage = "Selecione um tamanho";
-      }
-   } else if (!productHasAnyStock) {
-      // Se não tem estoque NENHUM, essa é a mensagem final
+   if (!productHasAnyStock) {
       buttonMessage = "Produto Indisponível";
-   } else if (currentStock <= 0) {
-      // Se a combinação selecionada está sem estoque
-      buttonMessage = `Indisponível (${corSelecionada} / ${tamanhoSelecionado})`;
+   } else if (isVariationProduct) {
+      if (!corSelecionada && cores.length > 0) {
+         buttonMessage = "Selecione uma cor";
+      } else if (!tamanhoSelecionado && tamanhos.length > 0) {
+         buttonMessage = "Selecione um tamanho";
+      } else if (currentStock <= 0) {
+         buttonMessage = `Indisponível`;
+      }
    }
-   // --- Fim da lógica aprimorada ---
 
    return (
       <>
@@ -257,7 +285,7 @@ export function CardDialog({
                   <img
                      src={imagem}
                      alt={nome}
-                     className="rounded-md md:w-100  h-158 object-cover transition-all duration-300 ease-in-out group-hover:scale-110 group-hover:brightness-80 "
+                     className="rounded-md md:w-100 h-158 object-cover transition-all duration-300 ease-in-out group-hover:scale-110 group-hover:brightness-80"
                   />
                </div>
 
@@ -319,21 +347,17 @@ export function CardDialog({
                                  const isColorDisabled =
                                     !hasAnyStockForThisColor;
 
+                                 // Usando o colorClassMap aqui
+                                 const colorClass =
+                                    colorClassMap[cor.nome.toLowerCase()] ||
+                                    "bg-gray-200";
+
                                  return (
                                     <button
                                        type="button"
                                        key={cor.nome}
-                                       onClick={() => {
-                                          setCorSelecionada(
-                                             corSelecionada === cor.nome
-                                                ? ""
-                                                : cor.nome
-                                          );
-                                          setQuantidade(1);
-                                       }}
-                                       className={`w-7 h-7 rounded-full border-2 transition cursor-pointer ${
-                                          cor.classe
-                                       } ${
+                                       onClick={() => handleCorChange(cor.nome)}
+                                       className={`w-7 h-7 rounded-full border-2 transition cursor-pointer ${colorClass} ${
                                           corSelecionada === cor.nome
                                              ? "border-black scale-110"
                                              : "border-gray-300"
@@ -343,6 +367,7 @@ export function CardDialog({
                                              : ""
                                        }`}
                                        title={cor.nome}
+                                       aria-label={`Selecionar cor ${cor.nome}`}
                                        disabled={isColorDisabled}
                                     ></button>
                                  );
@@ -371,14 +396,9 @@ export function CardDialog({
                                     <button
                                        type="button"
                                        key={tamanho.nome}
-                                       onClick={() => {
-                                          setTamanhoSelecionado(
-                                             tamanhoSelecionado === tamanho.nome
-                                                ? ""
-                                                : tamanho.nome
-                                          );
-                                          setQuantidade(1);
-                                       }}
+                                       onClick={() =>
+                                          handleTamanhoChange(tamanho.nome)
+                                       }
                                        className={`w-8 h-8 rounded-sm border-1 transition text-xs md:text-sm cursor-pointer ${
                                           tamanho.classe || ""
                                        } ${
@@ -391,6 +411,7 @@ export function CardDialog({
                                              : ""
                                        }`}
                                        title={tamanho.nome}
+                                       aria-label={`Selecionar tamanho ${tamanho.nome}`}
                                        disabled={
                                           isSizeDisabled || !corSelecionada
                                        }
@@ -401,6 +422,12 @@ export function CardDialog({
                               })}
                            </div>
                         </>
+                     )}
+
+                     {isVariationProduct && (
+                        <p className="text-sm text-gray-600">
+                           Estoque: {currentStock} unidades
+                        </p>
                      )}
 
                      <p className="mt-2 text-sm text-gray-600 font-medium text-start">
@@ -416,7 +443,11 @@ export function CardDialog({
                      <CardButton
                         type="submit"
                         onClick={handleSubmit}
-                        disabled={isAddToCartButtonDisabled}
+                        disabled={
+                           isAddToCartButtonDisabled ||
+                           !corSelecionada ||
+                           !tamanhoSelecionado
+                        }
                      >
                         {buttonMessage}
                      </CardButton>
@@ -434,7 +465,7 @@ export function CardDialog({
                         </span>
                      </div>
 
-                     <p className="md:line-clamp-3 md:max-w-[530px] overflow-hidden break-words text-xs  line-clamp-5 md:text-[16px]">
+                     <p className="md:line-clamp-3 md:max-w-[530px] overflow-hidden break-words text-xs line-clamp-5 md:text-[16px]">
                         Vestido Costa Nua Longo com diversos detalhes e etc
                         asdasd asdadasdasdasdasddasdasdsa...
                      </p>
