@@ -5,17 +5,24 @@ import { getFirestore, collection, getDocs } from "firebase/firestore";
 import { getApp } from "firebase/app";
 
 function calcularPrecoComDesconto(produto) {
-   const precoComDesconto =
-      produto.precoOriginal - (produto.precoOriginal * produto.desconto) / 100;
-   return precoComDesconto;
+   return (
+      produto.precoOriginal - (produto.precoOriginal * produto.desconto) / 100
+   );
 }
 
 export function FavoritesPage() {
-   const { favorites, totalFavorites, favoritesLoading } = useFavorites();
+   const { favorites, favoritesLoading, removeFavorite } = useFavorites();
    const [favoriteProductsData, setFavoriteProductsData] = useState([]);
+   const [loadingProducts, setLoadingProducts] = useState(true);
 
    useEffect(() => {
       async function fetchFavorites() {
+         if (favorites.length === 0) {
+            setFavoriteProductsData([]);
+            setLoadingProducts(false);
+            return;
+         }
+
          try {
             const app = getApp();
             const db = getFirestore(app);
@@ -29,16 +36,23 @@ export function FavoritesPage() {
                favorites.includes(product.id)
             );
             setFavoriteProductsData(fetchedData);
+
+            // Remove do contexto produtos inexistentes
+            const missingIds = favorites.filter(
+               (id) => !fetchedData.some((p) => p.id === id)
+            );
+            missingIds.forEach((id) => removeFavorite(id));
          } catch (err) {
             console.error("Erro ao buscar produtos favoritos:", err);
+         } finally {
+            setLoadingProducts(false);
          }
       }
 
-      if (favorites.length > 0) fetchFavorites();
-      else setFavoriteProductsData([]);
-   }, [favorites]);
+      fetchFavorites();
+   }, [favorites, removeFavorite]);
 
-   if (favoritesLoading) {
+   if (favoritesLoading || loadingProducts) {
       return (
          <div className="container mx-auto p-4 text-center mt-20 min-h-[calc(100vh-200px)] flex items-center justify-center">
             <p className="text-lg text-gray-600 animate-pulse">
@@ -51,10 +65,10 @@ export function FavoritesPage() {
    return (
       <div className="flex items-center justify-center flex-col pt-[4.25rem]">
          <h1 className="text-3xl font-bold my-8 text-center text-gray-800">
-            Meus Favoritos ({totalFavorites})
+            Meus Favoritos ({favoriteProductsData.length})
          </h1>
 
-         {totalFavorites === 0 ? (
+         {favoriteProductsData.length === 0 ? (
             <div className="text-center p-8 border border-dashed border-gray-300 rounded-lg shadow-sm bg-gray-50 max-w-lg mx-auto">
                <p className="text-xl text-gray-700 mb-4">
                   💖 Sua lista de favoritos está vazia!

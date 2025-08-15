@@ -1,20 +1,19 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { db } from "../lib/firebase";
-import { doc, getDoc, setDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc, collection, getDocs } from "firebase/firestore";
 import { useAuth } from "./AuthContext";
 import { toast } from "sonner";
 
 const FavoritesContext = createContext();
 
-export const useFavorites = () => {
-   return useContext(FavoritesContext);
-};
+export const useFavorites = () => useContext(FavoritesContext);
 
 export const FavoritesProvider = ({ children }) => {
    const { user, loading: authLoading } = useAuth();
    const [favorites, setFavorites] = useState([]);
    const [favoritesLoading, setFavoritesLoading] = useState(true);
 
+   // Sincroniza favoritos removendo IDs que não existem
    useEffect(() => {
       const fetchFavorites = async () => {
          if (authLoading) return;
@@ -26,7 +25,27 @@ export const FavoritesProvider = ({ children }) => {
                const docSnap = await getDoc(userFavoritesRef);
 
                if (docSnap.exists()) {
-                  setFavorites(docSnap.data().items || []);
+                  let userFavorites = docSnap.data().items || [];
+
+                  // Busca todos os produtos existentes
+                  const produtosSnapshot = await getDocs(
+                     collection(db, "produtos")
+                  );
+                  const produtosIds = produtosSnapshot.docs.map(
+                     (doc) => doc.id
+                  );
+
+                  // Filtra apenas IDs válidos
+                  const validFavorites = userFavorites.filter((id) =>
+                     produtosIds.includes(id)
+                  );
+
+                  // Atualiza Firebase se necessário
+                  if (validFavorites.length !== userFavorites.length) {
+                     await setDoc(userFavoritesRef, { items: validFavorites });
+                  }
+
+                  setFavorites(validFavorites);
                } else {
                   await setDoc(userFavoritesRef, { items: [] });
                   setFavorites([]);
@@ -47,7 +66,6 @@ export const FavoritesProvider = ({ children }) => {
       fetchFavorites();
    }, [user, authLoading]);
 
-   // Função auxiliar para atualizar os favoritos no Firebase
    const updateFavoritesInFirebase = async (updatedItems) => {
       if (!user) return false;
 
@@ -81,9 +99,7 @@ export const FavoritesProvider = ({ children }) => {
 
       const newFavorites = [...favorites, productId];
       const success = await updateFavoritesInFirebase(newFavorites);
-      if (success) {
-         toast.success("Produto adicionado aos favoritos!");
-      }
+      if (success) toast.success("Produto adicionado aos favoritos!");
       return success;
    };
 
@@ -97,14 +113,11 @@ export const FavoritesProvider = ({ children }) => {
 
       const filteredFavorites = favorites.filter((id) => id !== productId);
       if (filteredFavorites.length === favorites.length) {
-         toast.info("Este produto não foi encontrado nos seus favoritos.");
-         return false;
+         return false; // produto já removido ou inexistente
       }
 
       const success = await updateFavoritesInFirebase(filteredFavorites);
-      if (success) {
-         toast.info("Produto removido dos favoritos.");
-      }
+      if (success) toast.info("Produto removido dos favoritos.");
       return success;
    };
 

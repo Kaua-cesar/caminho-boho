@@ -146,7 +146,7 @@ export function Nav() {
                   <Link to="/favoritos" className="relative">
                      <IoHeartOutline className="cursor-pointer text-2xl" />
                      {totalFavorites > 0 && (
-                        <span className="absolute -top-1 -right-1 text-white bg-amber-500 text-[10px] p-[0.2em] rounded-full flex items-center justify-center min-w-[1em] h-[1em]">
+                        <span className="absolute -top-2 -right-2 text-white bg-amber-500 text-xs p-1 rounded-full flex items-center justify-center min-w-[1.25rem] h-[1.25rem]">
                            {totalFavorites}
                         </span>
                      )}
