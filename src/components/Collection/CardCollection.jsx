@@ -1,4 +1,9 @@
 import { categorias } from "./ColletionDados";
+import { Link } from "react-router-dom";
+
+const formatarUrl = (nome) => {
+   return nome.toLowerCase().replace(/\s+/g, "-");
+};
 
 export function CardCollection() {
    return (
@@ -19,9 +24,14 @@ export function CardCollection() {
                <p className="text-black text-md mx-2 h-6 text-start">
                   {cat.descricao}
                </p>
-               <button className="border-1 font-medium p-2 w-70 rounded-sm border-amber-500 text-black mt-8 cursor-pointer">
-                  Ver Colecao
-               </button>
+               <Link
+                  key={idx}
+                  to={`/produtos/categoria/${formatarUrl(cat.nome)}`}
+               >
+                  <button className="border-1 font-medium p-2 w-70 rounded-sm border-amber-500 text-black mt-8 cursor-pointer">
+                     Ver Colecao
+                  </button>
+               </Link>
             </div>
          ))}
       </div>

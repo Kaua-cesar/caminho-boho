@@ -3,7 +3,7 @@ import React from "react";
 
 export function AboutPage() {
    return (
-      <div className="flex items-center justify-center flex-col mx-36 pt-[4.25rem]">
+      <div className="flex items-center justify-center flex-col lg:mx-26 mx-8 pt-[4.25rem]">
          <h1 className="text-3xl font-bold my-8 text-center text-gray-800">
             Sobre a Caminho Boho
          </h1>
@@ -59,7 +59,7 @@ export function AboutPage() {
                   produtos duráveis e de excelente acabamento.
                </li>
                <li className="mb-2">
-                  <strong>Inspiração:</strong> Queremos inspirar nossos clientes
+                  <strong>Inspiração:</strong> Queremos inspirar nossas clientes
                   a se expressarem livremente através do estilo.
                </li>
             </ul>
